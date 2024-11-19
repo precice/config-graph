@@ -11,7 +11,7 @@
 - Coupling `Schemes
 - Exchanges
 
-##` Edges
+## Edges
 
 - Use-Data `<use-data />`: Mesh -> Data
 - Write-Data <-> Participant
