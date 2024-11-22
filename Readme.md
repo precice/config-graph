@@ -31,4 +31,5 @@
 - [x] Mapping <- Mesh (from)
 - [x] Mapping -> Mesh (to)
 - [x] Mapping <-> Participant (which the mapping is a child of)
-- Sockets: Participant (acceptor) -> Participant (connector)
+- [x] Sockets: Participant (acceptor) -> Participant (connector)
+- [ ] MPI M2N: TODO
