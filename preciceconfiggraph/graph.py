@@ -1,5 +1,7 @@
 from lxml import etree
 import networkx as nx
+import matplotlib.pyplot as plt
+
 
 # Taken from config-visualizer. Modified to also return postfix.
 def findAllWithPrefix(e: etree._Element, prefix: str):
@@ -157,3 +159,35 @@ def getGraph(root: etree._Element) -> nx.DiGraph:
 
 
     return G
+
+def print(graph: nx.DiGraph):
+    def color_for_node(value: str):
+        if value.startswith("Data \n "):
+            return [1, 0.3, 0]
+        if value.startswith("Mesh \n "):
+            return [0.9, 0.6, 0]
+        if value.startswith("Participant \n "):
+            return [0.3, 0.6, 1.0]
+        if value.startswith("Exchange \n "):
+            return [0.9, 0.9, 0.9]
+        if value.startswith("Coupling Scheme \n "):
+            return [0.7, 0.7, 0.7]
+        if value.startswith("Write-Data \n ") or value.startswith("Read-Data \n "):
+            return [0.7, 0, 1.0]
+        if value.startswith("Mapping \n "):
+            return [0.1, 0.7, 0.1]
+        else:
+            return [0, 0, 0]
+
+    def size_for_node(value: str):
+        if value.startswith("Participant \n "):
+            return 800
+        if value.startswith("Data \n ") or value.startswith("Mesh \n "):
+            return 600
+        else:
+            return 300
+
+    node_colors = [color_for_node(n) for n in graph.nodes()]
+    node_sizes = [size_for_node(n) for n in graph.nodes()]
+    nx.draw(graph, with_labels=True, arrows=True, pos=nx.spring_layout(graph), node_color=node_colors, node_size=node_sizes)
+    plt.show()
