@@ -3,18 +3,17 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-# Taken from config-visualizer. Modified to also return postfix.
-def findAllWithPrefix(e: etree._Element, prefix: str):
-    for child in e.iterchildren():
-        if child.tag.startswith(prefix):
-            postfix = child.tag[child.tag.find(":") + 1 :]
-            yield (child, postfix)
-
-
 def getGraph(root: etree._Element) -> nx.DiGraph:
     assert root.tag == "precice-configuration" # TODO: Make this an error?
 
     G = nx.DiGraph()
+    
+    # Taken from config-visualizer. Modified to also return postfix.
+    def findAllWithPrefix(e: etree._Element, prefix: str):
+        for child in e.iterchildren():
+            if child.tag.startswith(prefix):
+                postfix = child.tag[child.tag.find(":") + 1 :]
+                yield (child, postfix)
 
 
     # Data items – <data:… />
