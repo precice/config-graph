@@ -4,13 +4,13 @@ from enum import Enum
 
 
 class Direction(Enum):
-    READ = 1
-    WRITE = 2
+    READ = "read"
+    WRITE = "write"
 
 
 class DataType(Enum):
-    SCALAR = 1
-    VECTOR = 2
+    SCALAR = "scalar"
+    VECTOR = "vector"
 
 
 class ParticipantNode:
