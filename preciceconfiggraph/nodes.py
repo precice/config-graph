@@ -31,6 +31,13 @@ class MeshNode:
         self.write_data = write_data
 
 
+class ReceiveMeshNode:
+    def __init__(self, participant: ParticipantNode, mesh: MeshNode, from_participant: ParticipantNode):
+        self.participant = participant
+        self.mesh = mesh
+        self.from_participant = from_participant
+
+
 class CouplingNode:
     def __init__(self, name: str, first_participant: ParticipantNode, second_participant: ParticipantNode,
                  exchanges: list[ExchangeNode] = []):
