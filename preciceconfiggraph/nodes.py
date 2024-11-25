@@ -14,8 +14,8 @@ class DataType(Enum):
 
 
 class ParticipantNode:
-    def __init__(self, name: str, write_data: list[DataNode], read_data: list[DataNode], receive_meshes: list[MeshNode],
-                 provide_meshes: list[MeshNode], mappings: list[MappingNode]):
+    def __init__(self, name: str, write_data: list[DataNode] = [], read_data: list[DataNode] = [], receive_meshes: list[MeshNode] = [],
+                 provide_meshes: list[MeshNode] = [], mappings: list[MappingNode] = []):
         self.name = name
         self.write_data = write_data
         self.read_data = read_data
@@ -25,7 +25,7 @@ class ParticipantNode:
 
 
 class MeshNode:
-    def __init__(self, name: str, use_data: list[DataNode], write_data: list[DataNode]):
+    def __init__(self, name: str, use_data: list[DataNode] = [], write_data: list[DataNode] = []):
         self.name = name
         self.use_data = use_data
         self.write_data = write_data
@@ -33,7 +33,7 @@ class MeshNode:
 
 class CouplingNode:
     def __init__(self, name: str, first_participant: ParticipantNode, second_participant: ParticipantNode,
-                 exchanges: list[ExchangeNode]):
+                 exchanges: list[ExchangeNode] = []):
         self.name = name
         self.first_participant = first_participant
         self.second_participant = second_participant
