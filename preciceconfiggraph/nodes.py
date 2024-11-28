@@ -14,14 +14,14 @@ class DataType(Enum):
 
 
 class ParticipantNode:
-    def __init__(self, name: str, write_data: list[DataNode] = [], read_data: list[DataNode] = [], receive_meshes: list[MeshNode] = [],
+    def __init__(self, name: str, write_data: list[DataNode] = [], read_data: list[DataNode] = [], receive_meshes: list[ReceiveMeshNode] = [],
                  provide_meshes: list[MeshNode] = [], mappings: list[MappingNode] = []):
         self.name = name
         self.write_data = write_data
         self.read_data = read_data
         self.receive_meshes = receive_meshes
         self.provide_meshes = provide_meshes
-        self.mapping = mappings
+        self.mappings = mappings
 
 
 class MeshNode:
@@ -39,9 +39,8 @@ class ReceiveMeshNode:
 
 
 class CouplingNode:
-    def __init__(self, name: str, first_participant: ParticipantNode, second_participant: ParticipantNode,
+    def __init__(self, first_participant: ParticipantNode, second_participant: ParticipantNode,
                  exchanges: list[ExchangeNode] = []):
-        self.name = name
         self.first_participant = first_participant
         self.second_participant = second_participant
         self.exchanges = exchanges
@@ -54,9 +53,8 @@ class DataNode:
 
 
 class MappingNode:
-    def __init__(self, name: str, parent_participant: ParticipantNode, direction: Direction,
+    def __init__(self, parent_participant: ParticipantNode, direction: Direction,
                  from_participant: ParticipantNode, to_participant: ParticipantNode):
-        self.name = name
         self.parent_participant = parent_participant
         self.direction = direction
         self.from_participant = from_participant
