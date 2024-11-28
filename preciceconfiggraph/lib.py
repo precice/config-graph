@@ -1,15 +1,8 @@
-# use lxml instead of built-in, since it allows ignoring undefined namespaces.
-# PreCICE configs use tag names like `data:scalar`, which are like namespaces.
-from lxml import etree
 import graph as g
-
-def parseFile(path: str) -> etree._Element:
-    parser = etree.XMLParser(recover=True, remove_comments=True)
-    tree = etree.fromstring(open(path, "rb").read(), parser)
-    return tree
+from xml_processing import parse_file
 
 
 if __name__ == "__main__":
-    root = parseFile("test/example-configs/simple-good/precice-config.xml")
-    G = g.getGraph(root)
-    g.printGraph(G)
+    root = parse_file("test/example-configs/simple-good/precice-config.xml")
+    G = g.get_graph(root)
+    g.print_graph(G)

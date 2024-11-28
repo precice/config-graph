@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import nodes as n
 
 
-def getGraph(root: etree._Element) -> nx.DiGraph:
+def get_graph(root: etree._Element) -> nx.DiGraph:
     assert root.tag == "precice-configuration" # TODO: Make this an error?
     
     # Taken from config-visualizer. Modified to also return postfix.
-    def findAllWithPrefix(e: etree._Element, prefix: str):
+    def find_all_with_prefix(e: etree._Element, prefix: str):
         for child in e.iterchildren():
             if child.tag.startswith(prefix):
                 postfix = child.tag[child.tag.find(":") + 1 :]
@@ -32,7 +32,7 @@ def getGraph(root: etree._Element) -> nx.DiGraph:
     socket_edges: list[(n.ParticipantNode, n.ParticipantNode)] = []
 
     # Data items – <data:… />
-    for (data_el, kind) in findAllWithPrefix(root, "data"):
+    for (data_el, kind) in find_all_with_prefix(root, "data"):
         # TODO: Error on unknown kind
         name = data_el.attrib['name'] # TODO: Error on not found
         node = n.DataNode(name, n.DataType(kind))
@@ -90,7 +90,7 @@ def getGraph(root: etree._Element) -> nx.DiGraph:
             read_data_nodes.append(read_data)
         
         # Mapping
-        for (mapping_el, kind) in findAllWithPrefix(participant_el, "mapping"):
+        for (mapping_el, kind) in find_all_with_prefix(participant_el, "mapping"):
             direction = mapping_el.attrib['direction'] # TODO: Error on not found
             from_mesh_name = mapping_el.attrib['from'] # TODO: Error on not found
             from_mesh = mesh_nodes[from_mesh_name] # TODO: Raise custom error if mesh not found
@@ -125,7 +125,7 @@ def getGraph(root: etree._Element) -> nx.DiGraph:
 
 
     # Coupling Scheme – <coupling-scheme:… />
-    for (coupling_scheme_el, kind) in findAllWithPrefix(root, "coupling-scheme"):
+    for (coupling_scheme_el, kind) in find_all_with_prefix(root, "coupling-scheme"):
         # <participants />
         participants = coupling_scheme_el.find("participants") # TODO: Error on multiple participants tags
         first_participant_name = participants.attrib['first'] # TODO: Error on not found
@@ -152,7 +152,7 @@ def getGraph(root: etree._Element) -> nx.DiGraph:
 
 
     # M2N – <m2n:… />
-    for (m2n, kind) in findAllWithPrefix(root, "m2n"):
+    for (m2n, kind) in find_all_with_prefix(root, "m2n"):
         match kind:
             case "sockets":
                 acceptor_name = m2n.attrib['acceptor'] # TODO: Error on not found
@@ -232,7 +232,7 @@ def getGraph(root: etree._Element) -> nx.DiGraph:
 
     return G
 
-def printGraph(graph: nx.DiGraph):
+def print_graph(graph: nx.DiGraph):
     def color_for_node(node):
         match node:
             case n.DataNode():
