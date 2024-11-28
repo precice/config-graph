@@ -3,11 +3,6 @@
 from lxml import etree
 import graph as g
 
-
-# TODO class Graph:
-# TODO class Node:
-# TODO class Edge:
-
 def parseFile(path: str) -> etree._Element:
     parser = etree.XMLParser(recover=True, remove_comments=True)
     tree = etree.fromstring(open(path, "rb").read(), parser)
