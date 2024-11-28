@@ -27,7 +27,9 @@
 - [x] Exchange <-> Mesh
 - [x] Participant (from) -> Exchange -> Participant (to)
 - [x] Provide Mesh: Participant -> Mesh
-- [ ] Receive Mesh: Mesh -> Participant
+- [x] Receive Mesh: Mesh -> Receive-Mesh
+- [x] Receive Mesh: Participant (from) -> Receive-Mesh
+- [x] Receive Mesh: Receive-Mesh -> Participant (parent)
 - [x] Mapping <- Mesh (from)
 - [x] Mapping -> Mesh (to)
 - [x] Mapping <-> Participant (which the mapping is a child of)
