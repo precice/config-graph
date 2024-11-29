@@ -149,6 +149,8 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
             exchange = n.ExchangeNode(coupling_scheme, data, from_participant, to_participant)
             coupling_scheme.exchanges.append(exchange)
             exchange_nodes.append(exchange)
+        
+        coupling_nodes.append(coupling_scheme)
 
 
     # M2N – <m2n:… />
@@ -216,7 +218,7 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
         G.add_edge(coupling.first_participant, coupling)
         G.add_edge(coupling, coupling.first_participant)
         G.add_edge(coupling.second_participant, coupling)
-        G.add_edge(coupling, coupling.first_participant)
+        G.add_edge(coupling, coupling.second_participant)
     
     for exchange in exchange_nodes:
         G.add_node(exchange)
