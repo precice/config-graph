@@ -279,7 +279,7 @@ def print_graph(graph: nx.DiGraph):
             case n.ExchangeNode():
                 node_labels[node] = "Exchange"
             case n.MappingNode():
-                node_labels[node] = "Mapping"
+                node_labels[node] = f"Mapping ({node.direction})"
             case n.WriteDataNode():
                 node_labels[node] = f"Write {node.data.name}"
             case n.ReadDataNode():
