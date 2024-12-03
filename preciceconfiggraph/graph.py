@@ -73,7 +73,7 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
             mesh_name = write_data_el.attrib['mesh'] # TODO: Error on not found
             mesh = mesh_nodes[mesh_name] # TODO: Raise custom error if mesh not found
 
-            write_data = n.WriteDataNode(participant, data, mesh) # FIXME: participant is not yet initialized
+            write_data = n.WriteDataNode(participant, data, mesh)
             participant.write_data.append(write_data)
             write_data_nodes.append(write_data)
 
@@ -85,7 +85,7 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
             mesh_name = read_data_el.attrib['mesh'] # TODO: Error on not found
             mesh = mesh_nodes[mesh_name] # TODO: Raise custom error if mesh not found
 
-            read_data = n.ReadDataNode(participant, data, mesh) # FIXME: participant is not yet initialized
+            read_data = n.ReadDataNode(participant, data, mesh)
             participant.read_data.append(read_data)
             read_data_nodes.append(read_data)
         
