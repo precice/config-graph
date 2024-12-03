@@ -24,7 +24,7 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
     mesh_nodes: dict[str, n.MeshNode] = {}
     participant_nodes: dict[str, n.ParticipantNode] = {}
     write_data_nodes: list[n.WriteDataNode] = []
-    read_data_nodes: list[n.WriteDataNode] = []
+    read_data_nodes: list[n.ReadDataNode] = []
     receive_mesh_nodes: list[n.ReceiveMeshNode] = []
     coupling_nodes: list[n.CouplingNode] = []
     mapping_nodes: list[n.MappingNode] = []
@@ -207,8 +207,8 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
     
     for mapping in mapping_nodes:
         G.add_node(mapping)
-        G.add_edge(mapping, mapping.to_participant)
-        G.add_edge(mapping.from_participant, mapping)
+        G.add_edge(mapping, mapping.to_mesh)
+        G.add_edge(mapping.from_mesh, mapping)
         G.add_edge(mapping, mapping.parent_participant)
         G.add_edge(mapping.parent_participant, mapping)
     
