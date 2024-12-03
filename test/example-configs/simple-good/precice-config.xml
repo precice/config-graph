@@ -8,7 +8,6 @@
   </log>
 
   <data:scalar name="Color" />
-  <data:scalar name="Not-Color" />
 
   <mesh name="Generator-Mesh" dimensions="2">
     <use-data name="Color" />
