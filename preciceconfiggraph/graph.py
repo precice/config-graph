@@ -146,7 +146,7 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
             to_participant_name = exchange_el.attrib['to'] # TODO: Error on not found and different from first or second participant
             to_participant = participant_nodes[to_participant_name] # TODO: Raise custom error if participant not found
 
-            exchange = n.ExchangeNode(coupling_scheme, data, from_participant, to_participant)
+            exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
             coupling_scheme.exchanges.append(exchange)
             exchange_nodes.append(exchange)
         
