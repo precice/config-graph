@@ -3,6 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 import nodes as n
+from edges import Edge
 
 
 def get_graph(root: etree.Element) -> nx.DiGraph:
@@ -163,13 +164,14 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
                 connector = participant_nodes[connector_name] # TODO: Raise custom error if participant not found
                 socket_edges.append((acceptor, connector))
             case "mpi":
-                # TODO: Implement MPI
+                # TODO: Implement MPI. Maybe raise a warning instead of an error.
                 raise NotImplementedError("MPI M2N type is not implemented")
             case _:
                 raise ValueError("Unknown m2n type")
 
 
     # BUILD GRAPH
+    # from found nodes and inferred edges
 
     g = nx.DiGraph()
 
@@ -177,60 +179,62 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
 
     for mesh in mesh_nodes.values():
         g.add_node(mesh)
-        for data in mesh.use_data: g.add_edge(data, mesh)
-        for data in mesh.write_data: g.add_edge(mesh, data)
+        for data in mesh.use_data: g.add_edge(data, mesh, attr=Edge.USE_DATA)
+        # TODO: Is there even write_data for mesh? for data in mesh.write_data: g.add_edge(mesh, data, attr=Edge.WRITE_DATA)
     
     for participant in participant_nodes.values():
         g.add_node(participant)
-        for mesh in participant.provide_meshes: g.add_edge(participant, mesh)
+        for mesh in participant.provide_meshes: g.add_edge(participant, mesh, attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
         # Use data and write data, as well as receive mesh nodes are added later
     
     for read_data in read_data_nodes:
         g.add_node(read_data)
-        g.add_edge(read_data.data, read_data)
-        g.add_edge(read_data.mesh, read_data)
-        g.add_edge(read_data.participant, read_data)
-        g.add_edge(read_data, read_data.participant)
+        g.add_edge(read_data.data, read_data, attr=Edge.READ_DATA__DATA_READ_BY)
+        g.add_edge(read_data.mesh, read_data, attr=Edge.READ_DATA__MESH_READ_BY)
+        g.add_edge(read_data.participant, read_data, attr=Edge.READ_DATA__PARTICIPANT_PARENT_OF)
+        g.add_edge(read_data, read_data.participant, attr=Edge.READ_DATA__CHILD_OF)
 
     for write_data in read_data_nodes:
         g.add_node(write_data)
-        g.add_edge(write_data, write_data.data)
-        g.add_edge(write_data, write_data.mesh)
-        g.add_edge(write_data.participant, write_data)
-        g.add_edge(write_data, write_data.participant)
+        g.add_edge(write_data, write_data.data, attr=Edge.WRITE_DATA__WRITES_TO_DATA)
+        g.add_edge(write_data, write_data.mesh, attr=Edge.WRITE_DATA__WRITES_TO_MESH)
+        g.add_edge(write_data.participant, write_data, attr=Edge.WRITE_DATA__PARTICIPANT_PARENT_OF)
+        g.add_edge(write_data, write_data.participant, attr=Edge.WRITE_DATA__CHILD_OF)
     
     for receive_mesh in receive_mesh_nodes:
         g.add_node(receive_mesh)
-        g.add_edge(receive_mesh.from_participant, receive_mesh)
-        g.add_edge(receive_mesh.mesh, receive_mesh)
-        g.add_edge(receive_mesh, receive_mesh.participant)
+        g.add_edge(receive_mesh.mesh, receive_mesh, attr=Edge.RECEIVE_MESH__MESH_RECEIVED_BY)
+        g.add_edge(receive_mesh.from_participant, receive_mesh, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY)
+        g.add_edge(receive_mesh, receive_mesh.participant, attr=Edge.RECEIVE_MESH__CHILD_OF)
     
     for mapping in mapping_nodes:
         g.add_node(mapping)
-        g.add_edge(mapping, mapping.to_mesh)
-        g.add_edge(mapping.from_mesh, mapping)
-        g.add_edge(mapping, mapping.parent_participant)
-        g.add_edge(mapping.parent_participant, mapping)
+        g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
+        g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__MESH_MAPPED_BY)
+        g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__CHILD_OF)
+        g.add_edge(mapping.parent_participant, mapping, attr=Edge.MAPPING__PARTICIPANT_PARENT_OF)
     
     for coupling in coupling_nodes:
         g.add_node(coupling)
         # Edges to and from exchanges will be added by exchange nodes
-        g.add_edge(coupling.first_participant, coupling)
-        g.add_edge(coupling, coupling.first_participant)
-        g.add_edge(coupling.second_participant, coupling)
-        g.add_edge(coupling, coupling.second_participant)
+        g.add_edge(coupling.first_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
+        g.add_edge(coupling, coupling.first_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
+        g.add_edge(coupling.second_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
+        g.add_edge(coupling, coupling.second_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
     
     for exchange in exchange_nodes:
         g.add_node(exchange)
-        g.add_edge(exchange.from_participant, exchange)
-        g.add_edge(exchange, exchange.to_participant)
-        g.add_edge(data, exchange)
-        g.add_edge(exchange, data)
-        g.add_edge(exchange, exchange.coupling_scheme)
-        g.add_edge(exchange.coupling_scheme, exchange)
+        g.add_edge(exchange.from_participant, exchange, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
+        g.add_edge(exchange, exchange.to_participant, attr=Edge.EXCHANGE__EXCHANGES_TO)
+        g.add_edge(exchange.data, exchange, attr=Edge.EXCHANGE__DATA)
+        g.add_edge(exchange, exchange.data, attr=Edge.EXCHANGE__DATA)
+        g.add_edge(exchange, exchange.mesh, attr=Edge.EXCHANGE__MESH)
+        g.add_edge(exchange.mesh, exchange, attr=Edge.EXCHANGE__MESH)
+        g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__CHILD_OF)
+        g.add_edge(exchange.coupling_scheme, exchange, attr=Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF)
     
     for (acceptor, connector) in socket_edges:
-        g.add_edge(acceptor, connector)
+        g.add_edge(connector, acceptor, attr=Edge.SOCKET)
 
     return g
 
@@ -289,5 +293,17 @@ def print_graph(graph: nx.DiGraph):
             case _:
                 node_labels[node] = ""
 
-    nx.draw(graph, with_labels=True, arrows=True, pos=nx.spring_layout(graph), node_color=node_colors, node_size=node_sizes, labels=node_labels)
+    pos = nx.spring_layout(graph)
+    nx.draw(
+        graph, pos,
+        with_labels=True, arrows=True,
+        node_color=node_colors, node_size=node_sizes, labels=node_labels
+    )
+    nx.draw_networkx_edge_labels(
+        graph, pos,
+        edge_labels={
+
+        },
+        font_color='red'
+    )
     plt.show()
