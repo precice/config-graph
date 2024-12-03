@@ -1,13 +1,22 @@
 let
   pkgs = import <nixpkgs> {};
-in pkgs.mkShell {
-  buildInputs = with pkgs; [
-    python312
+  pythonEnv = pkgs.python312.withPackages(ps: with pkgs; [
     python312Packages.lxml
     python312Packages.elementpath
     python312Packages.networkx
-    python312Packages.pyprecice
     python312Packages.matplotlib
+  ]);
+in pkgs.mkShell {
+#  buildInputs = with pkgs; [
+#    python312
+#    python312Packages.lxml
+#    python312Packages.elementpath
+#    python312Packages.networkx
+#    python312Packages.pyprecice
+#    python312Packages.matplotlib
+#  ];
+  packages = [
+    pythonEnv
   ];
   shellHook = ''
     # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
