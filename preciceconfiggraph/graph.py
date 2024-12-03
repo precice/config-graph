@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import nodes as n
 
 
-def get_graph(root: etree._Element) -> nx.DiGraph:
+def get_graph(root: etree.Element) -> nx.DiGraph:
     assert root.tag == "precice-configuration" # TODO: Make this an error?
     
     # Taken from config-visualizer. Modified to also return postfix.
-    def find_all_with_prefix(e: etree._Element, prefix: str):
+    def find_all_with_prefix(e: etree.Element, prefix: str):
         for child in e.iterchildren():
             if child.tag.startswith(prefix):
                 postfix = child.tag[child.tag.find(":") + 1 :]
