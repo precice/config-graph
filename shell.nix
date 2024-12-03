@@ -7,14 +7,6 @@ let
     python312Packages.matplotlib
   ]);
 in pkgs.mkShell {
-#  buildInputs = with pkgs; [
-#    python312
-#    python312Packages.lxml
-#    python312Packages.elementpath
-#    python312Packages.networkx
-#    python312Packages.pyprecice
-#    python312Packages.matplotlib
-#  ];
   packages = [
     pythonEnv
   ];
