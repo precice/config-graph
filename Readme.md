@@ -5,6 +5,7 @@
 - [x] Participant `<participant />`
 - [x] Write-Data `<write-data />`
 - [x] Read-Data `<read-data />`
+- [x] Receive-Mesh-Node
 - [x] Data `<data:... />` (To find out if that data is actually ever used)
 - [x] Mesh `<mesh />`
 - [x] Mapping (with attribute `direction`)
