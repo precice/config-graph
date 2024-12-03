@@ -14,7 +14,7 @@ class DataType(Enum):
 
 
 class ParticipantNode:
-    def __init__(self, name: str, write_data: list[DataNode] = [], read_data: list[DataNode] = [], receive_meshes: list[ReceiveMeshNode] = [],
+    def __init__(self, name: str, write_data: list[WriteDataNode] = [], read_data: list[ReadDataNode] = [], receive_meshes: list[ReceiveMeshNode] = [],
                  provide_meshes: list[MeshNode] = [], mappings: list[MappingNode] = []):
         self.name = name
         self.write_data = write_data
@@ -54,11 +54,11 @@ class DataNode:
 
 class MappingNode:
     def __init__(self, parent_participant: ParticipantNode, direction: Direction,
-                 from_participant: ParticipantNode, to_participant: ParticipantNode):
+                 from_mesh: MeshNode, to_mesh: MeshNode):
         self.parent_participant = parent_participant
         self.direction = direction
-        self.from_participant = from_participant
-        self.to_participant = to_participant
+        self.from_mesh = from_mesh
+        self.to_mesh = to_mesh
 
 
 class WriteDataNode:
