@@ -267,8 +267,8 @@ def print_graph(graph: nx.DiGraph):
             case _:
                 return 300
 
-    node_colors = [color_for_node(n) for n in graph.nodes()]
-    node_sizes = [size_for_node(n) for n in graph.nodes()]
+    node_colors = [color_for_node(node) for node in graph.nodes()]
+    node_sizes = [size_for_node(node) for node in graph.nodes()]
     node_labels = dict()
     for node in graph.nodes():
         match node:
