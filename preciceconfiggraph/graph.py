@@ -271,6 +271,37 @@ def print_graph(graph: nx.DiGraph):
             case _:
                 return 300
 
+    def label_for_edge(edge):
+        match edge['attr']:
+            case Edge.RECEIVE_MESH__CHILD_OF | Edge.MAPPING__CHILD_OF | Edge.EXCHANGE__CHILD_OF | Edge.WRITE_DATA__CHILD_OF | Edge.READ_DATA__CHILD_OF:
+                return "child of"
+            case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF:
+                return "parent of"
+            case Edge.RECEIVE_MESH__MESH_RECEIVED_BY | Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY:
+                return "received by"
+            case Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES:
+                return "provides"
+            case Edge.MAPPING__TO_MESH | Edge.EXCHANGE__EXCHANGES_TO:
+                return "to"
+            case Edge.MAPPING__MESH_MAPPED_BY:
+                return "from"
+            case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
+                return "exchanged by"
+            case Edge.SOCKET:
+                return "socket"
+            case Edge.COUPLING_SCHEME__PARTICIPANT_FIRST:
+                return "first"
+            case Edge.COUPLING_SCHEME__PARTICIPANT_SECOND:
+                return "second"
+            case Edge.USE_DATA:
+                return "uses"
+            case Edge.WRITE_DATA__WRITES_TO_MESH | Edge.WRITE_DATA__WRITES_TO_DATA:
+                return "writes to"
+            case Edge.READ_DATA__DATA_READ_BY | Edge.READ_DATA__MESH_READ_BY:
+                return "read by"
+            case _:
+                return ""
+
     node_colors = [color_for_node(node) for node in graph.nodes()]
     node_sizes = [size_for_node(node) for node in graph.nodes()]
     node_labels = dict()
@@ -301,9 +332,6 @@ def print_graph(graph: nx.DiGraph):
     )
     nx.draw_networkx_edge_labels(
         graph, pos,
-        edge_labels={
-
-        },
-        font_color='red'
+        edge_labels={tuple(edge): label_for_edge(d) for *edge, d in graph.edges(data=True)},
     )
     plt.show()
