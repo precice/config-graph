@@ -171,68 +171,68 @@ def get_graph(root: etree._Element) -> nx.DiGraph:
 
     # BUILD GRAPH
 
-    G = nx.DiGraph()
+    g = nx.DiGraph()
 
-    for data in data_nodes.values(): G.add_node(data)
+    for data in data_nodes.values(): g.add_node(data)
 
     for mesh in mesh_nodes.values():
-        G.add_node(mesh)
-        for data in mesh.use_data: G.add_edge(data, mesh)
-        for data in mesh.write_data: G.add_edge(mesh, data)
+        g.add_node(mesh)
+        for data in mesh.use_data: g.add_edge(data, mesh)
+        for data in mesh.write_data: g.add_edge(mesh, data)
     
     for participant in participant_nodes.values():
-        G.add_node(participant)
-        for mesh in participant.provide_meshes: G.add_edge(participant, mesh)
+        g.add_node(participant)
+        for mesh in participant.provide_meshes: g.add_edge(participant, mesh)
         # Use data and write data, as well as receive mesh nodes are added later
     
     for read_data in read_data_nodes:
-        G.add_node(read_data)
-        G.add_edge(read_data.data, read_data)
-        G.add_edge(read_data.mesh, read_data)
-        G.add_edge(read_data.participant, read_data)
-        G.add_edge(read_data, read_data.participant)
+        g.add_node(read_data)
+        g.add_edge(read_data.data, read_data)
+        g.add_edge(read_data.mesh, read_data)
+        g.add_edge(read_data.participant, read_data)
+        g.add_edge(read_data, read_data.participant)
 
     for write_data in read_data_nodes:
-        G.add_node(write_data)
-        G.add_edge(write_data, write_data.data)
-        G.add_edge(write_data, write_data.mesh)
-        G.add_edge(write_data.participant, write_data)
-        G.add_edge(write_data, write_data.participant)
+        g.add_node(write_data)
+        g.add_edge(write_data, write_data.data)
+        g.add_edge(write_data, write_data.mesh)
+        g.add_edge(write_data.participant, write_data)
+        g.add_edge(write_data, write_data.participant)
     
     for receive_mesh in receive_mesh_nodes:
-        G.add_node(receive_mesh)
-        G.add_edge(receive_mesh.from_participant, receive_mesh)
-        G.add_edge(receive_mesh.mesh, receive_mesh)
-        G.add_edge(receive_mesh, receive_mesh.participant)
+        g.add_node(receive_mesh)
+        g.add_edge(receive_mesh.from_participant, receive_mesh)
+        g.add_edge(receive_mesh.mesh, receive_mesh)
+        g.add_edge(receive_mesh, receive_mesh.participant)
     
     for mapping in mapping_nodes:
-        G.add_node(mapping)
-        G.add_edge(mapping, mapping.to_mesh)
-        G.add_edge(mapping.from_mesh, mapping)
-        G.add_edge(mapping, mapping.parent_participant)
-        G.add_edge(mapping.parent_participant, mapping)
+        g.add_node(mapping)
+        g.add_edge(mapping, mapping.to_mesh)
+        g.add_edge(mapping.from_mesh, mapping)
+        g.add_edge(mapping, mapping.parent_participant)
+        g.add_edge(mapping.parent_participant, mapping)
     
     for coupling in coupling_nodes:
-        G.add_node(coupling)
+        g.add_node(coupling)
         # Edges to and from exchanges will be added by exchange nodes
-        G.add_edge(coupling.first_participant, coupling)
-        G.add_edge(coupling, coupling.first_participant)
-        G.add_edge(coupling.second_participant, coupling)
-        G.add_edge(coupling, coupling.second_participant)
+        g.add_edge(coupling.first_participant, coupling)
+        g.add_edge(coupling, coupling.first_participant)
+        g.add_edge(coupling.second_participant, coupling)
+        g.add_edge(coupling, coupling.second_participant)
     
     for exchange in exchange_nodes:
-        G.add_node(exchange)
-        G.add_edge(exchange.from_participant, exchange)
-        G.add_edge(exchange, exchange.to_participant)
-        G.add_edge(data, exchange)
-        G.add_edge(exchange, data)
-        G.add_edge(exchange, exchange.coupling_scheme)
-        G.add_edge(exchange.coupling_scheme, exchange)
+        g.add_node(exchange)
+        g.add_edge(exchange.from_participant, exchange)
+        g.add_edge(exchange, exchange.to_participant)
+        g.add_edge(data, exchange)
+        g.add_edge(exchange, data)
+        g.add_edge(exchange, exchange.coupling_scheme)
+        g.add_edge(exchange.coupling_scheme, exchange)
     
     for (acceptor, connector) in socket_edges:
-        G.add_edge(acceptor, connector)
+        g.add_edge(acceptor, connector)
 
-    return G
+    return g
 
 def print_graph(graph: nx.DiGraph):
     def color_for_node(node):
