@@ -2,33 +2,37 @@
  
 ## Nodes
 
-- Participant `<participant />`
-- Write-Data `<write-data />`
-- Read-Data `<read-data />`
-- Data `<data:... />` (To find out if that data is actually ever used)
-- Mesh `<mesh />`
-- Mapping (with attribute `direction`)
-- Coupling `Schemes
-- Exchanges
+- [x] Participant `<participant />`
+- [x] Write-Data `<write-data />`
+- [x] Read-Data `<read-data />`
+- [x] Receive-Mesh-Node
+- [x] Data `<data:... />` (To find out if that data is actually ever used)
+- [x] Mesh `<mesh />`
+- [x] Mapping (with attribute `direction`)
+- [x] Coupling Schemes
+- [x] Exchanges
 
 ## Edges
 
-- Use-Data `<use-data />`: Mesh -> Data
-- Write-Data <-> Participant
-- Write-Data -> Data
-- Write-Data -> Mesh
-- Read-Data <-> Participant
-- Read-Data <- Data
-- Read-Data <- Mesh
-- Coupling Scheme Participants:
+- [x] Use-Data `<use-data />`: Mesh -> Data
+- [x] Write-Data <-> Participant
+- [x] Write-Data -> Data
+- [x] Write-Data -> Mesh
+- [x] Read-Data <-> Participant
+- [x] Read-Data <- Data
+- [x] Read-Data <- Mesh
+- [x] Coupling Scheme Participants:
 `<coupling-scheme:...> <participants first="A" second="B" /> </coupling-scheme:..>` Participant-A <-> Coupling-Scheme, Participant-B <-> Coupling-Scheme
-- Coupling Scheme <-> Exchange
-- Exchange <-> Data
-- Exchange <-> Mesh
-- Participant (from) -> Exchange -> Participant (to)
-- Provide Mesh: Participant -> Mesh
-- Receive Mesh: Mesh -> Participant
-- Mapping <- Mesh (from)
-- Mapping -> Mesh (to)
-- Mapping <-> Participant (which the mapping is a child of)
-- Sockets: Participant (acceptor) -> Participant (connector)
+- [x] Coupling Scheme <-> Exchange
+- [x] Exchange <-> Data
+- [x] Exchange <-> Mesh
+- [x] Participant (from) -> Exchange -> Participant (to)
+- [x] Provide Mesh: Participant -> Mesh
+- [x] Receive Mesh: Mesh -> Receive-Mesh
+- [x] Receive Mesh: Participant (from) -> Receive-Mesh
+- [x] Receive Mesh: Receive-Mesh -> Participant (parent)
+- [x] Mapping <- Mesh (from)
+- [x] Mapping -> Mesh (to)
+- [x] Mapping <-> Participant (which the mapping is a child of)
+- [x] Sockets: Participant (acceptor) -> Participant (connector)
+- [ ] MPI M2N: TODO

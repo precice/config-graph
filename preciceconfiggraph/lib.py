@@ -1,9 +1,8 @@
-from lxml import etree
+import graph as g
+from xml_processing import parse_file
 
-# TODO class Graph:
-# TODO class Node:
-# TODO class Edge:
 
-def buildGraph(file: str):
-    # TODO: Parse file
-    etree
+if __name__ == "__main__":
+    root = parse_file("test/example-configs/simple-good/precice-config.xml")
+    G = g.get_graph(root)
+    g.print_graph(G)
