@@ -1,5 +1,5 @@
 [project]
-name = "precice-config-graph"
+name = "precice_config_graph"
 description = "A Library that builds a graph from a PreCICE configuration file for validation and visualization purposes"
 version = "0.0.1"
 
