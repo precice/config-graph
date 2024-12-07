@@ -1,5 +1,5 @@
-import graph as g
-from xml_processing import parse_file
+from . import graph as g
+from .xml_processing import parse_file
 
 
 if __name__ == "__main__":
