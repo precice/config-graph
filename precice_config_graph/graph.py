@@ -2,8 +2,8 @@ from lxml import etree
 import networkx as nx
 import matplotlib.pyplot as plt
 
-import nodes as n
-from edges import Edge
+from . import nodes as n
+from .edges import Edge
 
 
 def get_graph(root: etree.Element) -> nx.DiGraph:

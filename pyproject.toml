@@ -1,0 +1,19 @@
+[project]
+name = "precice_config_graph"
+description = "A Library that builds a graph from a PreCICE configuration file for validation and visualization purposes"
+version = "0.0.1"
+
+readme = "README.md"
+license = {text = "GPL-3.0 License"}
+
+requires-python = ">= 3.12"
+dependencies = [
+    "lxml",
+    "elementpath",
+    "matplotlib",
+    "networkx",
+]
+
+[project.urls]
+Repository = "https://github.com/precice-forschungsprojekt/config-graph.git"
+Issues = "https://github.com/precice-forschungsprojekt/config-graph/issues"
