@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from . import nodes as n
-from .edges import Edge
+from edges import Edge
 
 
 def get_graph(root: etree.Element) -> nx.DiGraph:
