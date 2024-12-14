@@ -36,6 +36,9 @@ config-graph
 ├── docs                       # Useful information for unterstanding how this library works
 │   └── …
 │
+├── debugging                  # Utility for debugging graph generation. See section in this README on the topic.
+│   └── cli.py                 # Call this script to visualize a provided config
+│
 ├── precice_config_graph       # Main library files
 │   ├── edges.py               # Definition of edge types
 │   ├── graph.py               # Main logic for building the graph from parsed XML
