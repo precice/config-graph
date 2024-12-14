@@ -11,6 +11,8 @@
 - [x] Mapping (with attribute `direction`)
 - [x] Coupling Schemes
 - [x] Exchanges
+- [ ] Actions
+- [ ] Exports
 
 ## Edges
 
