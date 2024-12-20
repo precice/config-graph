@@ -17,3 +17,6 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/precice-forschungsprojekt/config-graph.git"
 Issues = "https://github.com/precice-forschungsprojekt/config-graph/issues"
+
+[tool.setuptools]
+packages = ["precice_config_graph"]
