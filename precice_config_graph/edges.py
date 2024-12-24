@@ -12,7 +12,6 @@ class Edge(Enum):
     # participant --provides-> mesh
     PROVIDE_MESH__PARTICIPANT_PROVIDES = "provide-mesh_participant-provides"
 
-
     # mapping --to-> mesh
     MAPPING__TO_MESH = "mapping_to-mesh"
     # mesh --mapped-by-> mapping
@@ -41,7 +40,6 @@ class Edge(Enum):
     # participant (second) <--> coupling-scheme
     COUPLING_SCHEME__PARTICIPANT_SECOND = "coupling-scheme_participant-second"
 
-
     USE_DATA = "use-data"
 
     # write-data --writes-to-> data
@@ -59,3 +57,26 @@ class Edge(Enum):
     # The connection between read-data and participant it is part of
     READ_DATA__PARTICIPANT_PARENT_OF = "read-data_participant-parent-of"
     READ_DATA__CHILD_OF = "read-data_child-of"
+
+    # connection between data and its export node
+    DATA_EXPORT = "data-export"
+    # connection between participant and export node
+    PARTICIPANT_EXPORT = "participant-export"
+
+    # multi coupling: control participant
+    MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL = "multi_coupling_scheme-participant_control"
+    # multi coupling: regular participant
+    MULTI_COUPLING_SCHEME__PARTICIPANT_REGULAR = "multi_coupling_scheme-participant_regular"
+
+    # connection between actions and its members
+    ACTION_PARTICIPANT = "action-participant"
+    ACTION_MESH = "action-mesh"
+    ACTION_DATA = "action-data"
+
+    # connection between watchpoints/-integrals and their participants / meshes
+    WATCHPOINT_PARTICIPANT = "watchpoint-participant"
+    WATCHPOINT_MESH = "watchpoint-mesh"
+
+    WATCHINTEGRAL_PARTICIPANT = "watchintegral-participant"
+    WATCHINTEGRAL_MESH = "watchintegral-mesh"
+

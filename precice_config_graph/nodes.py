@@ -145,7 +145,7 @@ class ReadDataNode:
 
 
 class ExchangeNode:
-    def __init__(self, coupling_scheme: CouplingNode, data: DataNode, mesh: MeshNode, from_participant: ParticipantNode,
+    def __init__(self, coupling_scheme: CouplingNode|MultiCouplingNode, data: DataNode, mesh: MeshNode, from_participant: ParticipantNode,
                  to_participant: ParticipantNode):
         self.coupling_scheme = coupling_scheme
         self.data = data
