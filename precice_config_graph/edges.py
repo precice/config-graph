@@ -78,5 +78,5 @@ class Edge(Enum):
     WATCHPOINT_MESH = "watchpoint_mesh"
 
     WATCHINTEGRAL_PARTICIPANT = "watchintegral_participant"
-    WATCHINTEGRAL_MESH = "watchintegral-mesh"
+    WATCHINTEGRAL_MESH = "watchintegral_mesh"
 
