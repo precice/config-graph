@@ -182,10 +182,7 @@ class ActionNode:
                  timing: TimingType):
         self.name = name
         self.participant = participant
-        if mesh is None:
-            self.mesh = []
-        else:
-            self.mesh = mesh
+        self.mesh = mesh
         self.target_data = target_data
         self.timing = timing
 
