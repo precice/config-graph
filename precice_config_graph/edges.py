@@ -61,7 +61,7 @@ class Edge(Enum):
     # connection between data and its export node
     DATA_EXPORT = "data-export"
     # connection between participant and export node
-    PARTICIPANT_EXPORT = "participant-export"
+    EXPORT__CHILD_OF = "export_child-of"
 
     # multi coupling: control participant
     MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL = "multi-coupling-scheme_participant-control"
