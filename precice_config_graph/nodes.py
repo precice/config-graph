@@ -198,7 +198,4 @@ class WatchIntegralNode:
     def __init__(self, name: str, participant: ParticipantNode, mesh: MeshNode):
         self.name = name
         self.participant = participant
-        if mesh is None:
-            self.mesh = []
-        else:
-            self.mesh = mesh
+        self.mesh = mesh
