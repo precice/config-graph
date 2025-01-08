@@ -69,7 +69,7 @@ class Edge(Enum):
     MULTI_COUPLING_SCHEME__PARTICIPANT_REGULAR = "multi-coupling-scheme_participant-regular"
 
     # connection between actions and its members
-    ACTION_PARTICIPANT = "action-participant"
+    ACTION_PARTICIPANT = "action_participant"
     ACTION_MESH = "action-mesh"
     ACTION_DATA = "action-data"
 
