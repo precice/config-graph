@@ -28,7 +28,6 @@ class ParticipantNode:
             actions: list[ActionNode] = None,
             watchpoints: list[WatchpointNode] = None,
             watch_integrals: list[WatchIntegralNode] = None
-
     ):
         self.name = name
 
