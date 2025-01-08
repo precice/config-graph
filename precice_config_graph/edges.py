@@ -64,7 +64,7 @@ class Edge(Enum):
     PARTICIPANT_EXPORT = "participant-export"
 
     # multi coupling: control participant
-    MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL = "multi_coupling_scheme-participant_control"
+    MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL = "multi-coupling-scheme_participant-control"
     # multi coupling: regular participant
     MULTI_COUPLING_SCHEME__PARTICIPANT_REGULAR = "multi-coupling-scheme_participant-regular"
 
