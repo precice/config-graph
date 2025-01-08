@@ -7,7 +7,7 @@ from .edges import Edge
 
 
 def get_graph(root: etree.Element) -> nx.DiGraph:
-    assert root.tag == "precice-configuration" # TODO: Make this an error?
+    assert root.tag == "precice-configuration"
     
     # Taken from config-visualizer. Modified to also return postfix.
     def find_all_with_prefix(e: etree.Element, prefix: str):
@@ -48,7 +48,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         # Data usages – <use-data />: Will be mapped to edges
         for use_data in mesh_el.findall("use-data"):
             data_name = use_data.attrib['name'] # TODO: Error on not found
-            data_node = data_nodes[data_name] # TODO: Raise custom error if data not found
+            data_node = data_nodes[data_name]
             mesh.use_data.append(data_node)
         
         # Now that mesh_node is completely built, add it to our dictionary
@@ -64,15 +64,15 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         # <provide-mesh />
         for provide_mesh_el in participant_el.findall("provide-mesh"):
             mesh_name = provide_mesh_el.attrib['name'] # TODO: Error on not found
-            participant.provide_meshes.append(mesh_nodes[mesh_name]) # TODO: Raise custom error if mesh not found
+            participant.provide_meshes.append(mesh_nodes[mesh_name])
         
         # Read and write data
         # <write-data />
         for write_data_el in participant_el.findall("write-data"):
             data_name = write_data_el.attrib['name'] # TODO: Error on not found
-            data = data_nodes[data_name] # TODO: Raise custom error if data not found
+            data = data_nodes[data_name]
             mesh_name = write_data_el.attrib['mesh'] # TODO: Error on not found
-            mesh = mesh_nodes[mesh_name] # TODO: Raise custom error if mesh not found
+            mesh = mesh_nodes[mesh_name]
 
             write_data = n.WriteDataNode(participant, data, mesh)
             participant.write_data.append(write_data)
@@ -82,9 +82,9 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         # TODO: Refactor to reduce code duplication
         for read_data_el in participant_el.findall("read-data"):
             data_name = read_data_el.attrib['name'] # TODO: Error on not found
-            data = data_nodes[data_name] # TODO: Raise custom error if data not found
+            data = data_nodes[data_name]
             mesh_name = read_data_el.attrib['mesh'] # TODO: Error on not found
-            mesh = mesh_nodes[mesh_name] # TODO: Raise custom error if mesh not found
+            mesh = mesh_nodes[mesh_name]
 
             read_data = n.ReadDataNode(participant, data, mesh)
             participant.read_data.append(read_data)
@@ -94,9 +94,9 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         for (mapping_el, kind) in find_all_with_prefix(participant_el, "mapping"):
             direction = mapping_el.attrib['direction'] # TODO: Error on not found
             from_mesh_name = mapping_el.attrib['from'] # TODO: Error on not found
-            from_mesh = mesh_nodes[from_mesh_name] # TODO: Raise custom error if mesh not found
+            from_mesh = mesh_nodes[from_mesh_name]
             to_mesh_name = mapping_el.attrib['to'] # TODO: Error on not found
-            to_mesh = mesh_nodes[to_mesh_name] # TODO: Raise custom error if mesh not found
+            to_mesh = mesh_nodes[to_mesh_name]
 
             mapping = n.MappingNode(participant, n.Direction(direction), from_mesh, to_mesh)
             participant.mappings.append(mapping)
@@ -115,10 +115,10 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         # <receive-mesh />
         for receive_mesh_el in participant_el.findall("receive-mesh"):
             mesh_name = receive_mesh_el.attrib['name'] # TODO: Error on not found
-            mesh = mesh_nodes[mesh_name] # TODO: Raise custom error if mesh not found
+            mesh = mesh_nodes[mesh_name]
 
             from_participant_name = receive_mesh_el.attrib['from'] # TODO: Error on not found
-            from_participant = participant_nodes[from_participant_name] # TODO: Raise custom error if participant not found
+            from_participant = participant_nodes[from_participant_name]
 
             receive_mesh = n.ReceiveMeshNode(participant, mesh, from_participant)
             participant.receive_meshes.append(receive_mesh)
@@ -130,22 +130,22 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         # <participants />
         participants = coupling_scheme_el.find("participants") # TODO: Error on multiple participants tags
         first_participant_name = participants.attrib['first'] # TODO: Error on not found
-        first_participant = participant_nodes[first_participant_name] # TODO: Raise custom error if participant not found
+        first_participant = participant_nodes[first_participant_name]
         second_participant_name = participants.attrib['second'] # TODO: Error on not found
-        second_participant = participant_nodes[second_participant_name] # TODO: Raise custom error if participant not found
+        second_participant = participant_nodes[second_participant_name]
 
         coupling_scheme = n.CouplingNode(first_participant, second_participant)
 
         # Exchanges – <exchange />
         for exchange_el in coupling_scheme_el.findall("exchange"):
             data_name = exchange_el.attrib['data'] # TODO: Error on not found
-            data = data_nodes[data_name] # TODO: Raise custom error if data not found
+            data = data_nodes[data_name]
             mesh_name = exchange_el.attrib['mesh'] # TODO: Error on not found
-            mesh = mesh_nodes[mesh_name] # TODO: Raise custom error if mesh not found
+            mesh = mesh_nodes[mesh_name]
             from_participant_name = exchange_el.attrib['from'] # TODO: Error on not found and different from first or second participant
-            from_participant = participant_nodes[from_participant_name] # TODO: Raise custom error if participant not found
+            from_participant = participant_nodes[from_participant_name]
             to_participant_name = exchange_el.attrib['to'] # TODO: Error on not found and different from first or second participant
-            to_participant = participant_nodes[to_participant_name] # TODO: Raise custom error if participant not found
+            to_participant = participant_nodes[to_participant_name]
 
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
             coupling_scheme.exchanges.append(exchange)
@@ -159,9 +159,9 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         match kind:
             case "sockets":
                 acceptor_name = m2n.attrib['acceptor'] # TODO: Error on not found
-                acceptor = participant_nodes[acceptor_name] # TODO: Raise custom error if participant not found
+                acceptor = participant_nodes[acceptor_name]
                 connector_name = m2n.attrib['connector'] # TODO: Error on not found
-                connector = participant_nodes[connector_name] # TODO: Raise custom error if participant not found
+                connector = participant_nodes[connector_name]
                 socket_edges.append((acceptor, connector))
             case "mpi":
                 # TODO: Implement MPI. Maybe raise a warning instead of an error.

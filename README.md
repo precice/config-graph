@@ -4,6 +4,10 @@ A Library that builds a graph from a PreCICE configuration file for validation a
 
 **How does this differ from [the PreCICE Config-Visualizer](https://github.com/precice/config-visualizer)?** The graph built by this library is not (directly) meant to be displayed. The focus is on building a graph that represents the structure of a PreCICE configuration in a way that is useful in checking for logical errors.
 
+> [!NOTE]
+> This library assumes the config file to follow some basic rules. For example, references by name are assumed to exist.
+> If the config file passes the PreCICE-built-in checks (`precice-tools check`) without errors, then it is also read correctly by this library. If `precice-tools check` does not succeed, the behavior of this library is undefined (it will probably crash).
+
 ## Requirements
 
 - Python 3.12+
