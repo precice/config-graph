@@ -70,7 +70,7 @@ class Edge(Enum):
 
     # connection between actions and its members
     ACTION_PARTICIPANT = "action_participant"
-    ACTION_MESH = "action-mesh"
+    ACTION_MESH = "action_mesh"
     ACTION_DATA = "action-data"
 
     # connection between watchpoints/-integrals and their participants / meshes
