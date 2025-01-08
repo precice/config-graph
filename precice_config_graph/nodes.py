@@ -114,6 +114,18 @@ class CouplingNode:
             self.exchanges = exchanges
 
 
+class MultiCouplingNode:
+    def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode],
+                 exchanges: list[ExchangeNode] = None):
+        # TODO control participant as first entry of participants[] ?
+        self.control_participant = control_participant
+        self.participants = participants
+        if exchanges is None:
+            self.exchanges = []
+        else:
+            self.exchanges = exchanges
+
+
 class DataNode:
     def __init__(self, name: str, data_type: DataType):
         self.name = name
@@ -151,18 +163,6 @@ class ExchangeNode:
         self.mesh = mesh
         self.from_participant = from_participant
         self.to_participant = to_participant
-
-
-class MultiCouplingNode:
-    def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode],
-                 exchanges: list[ExchangeNode] = None):
-        # TODO control participant as first entry of participants[] ?
-        self.control_participant = control_participant
-        self.participants = participants
-        if exchanges is None:
-            self.exchanges = []
-        else:
-            self.exchanges = exchanges
 
 
 # TODO is a node for logging (https://precice.org/configuration-logging.html) needed? For me it does not make sense,
