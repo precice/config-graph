@@ -66,7 +66,7 @@ class Edge(Enum):
     # multi coupling: control participant
     MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL = "multi_coupling_scheme-participant_control"
     # multi coupling: regular participant
-    MULTI_COUPLING_SCHEME__PARTICIPANT_REGULAR = "multi_coupling_scheme-participant_regular"
+    MULTI_COUPLING_SCHEME__PARTICIPANT_REGULAR = "multi-coupling-scheme_participant-regular"
 
     # connection between actions and its members
     ACTION_PARTICIPANT = "action-participant"
