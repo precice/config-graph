@@ -58,8 +58,6 @@ class Edge(Enum):
     READ_DATA__PARTICIPANT_PARENT_OF = "read-data_participant-parent-of"
     READ_DATA__CHILD_OF = "read-data_child-of"
 
-    # connection between data and its export node
-    DATA_EXPORT = "data-export"
     # connection between participant and export node
     EXPORT__CHILD_OF = "export_child-of"
 
