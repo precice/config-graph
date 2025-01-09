@@ -167,7 +167,7 @@ class ExchangeNode:
 
 
 # TODO is a node for logging (https://precice.org/configuration-logging.html) needed? For me it does not make sense,
-#  as it is not used/connectd to anything else
+#  as it is not used/connected to anything else
 
 
 # TODO is export a “valid” node? Maybe good for info, but as stated in precice: "great feature for debugging", so not
