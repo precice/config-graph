@@ -30,6 +30,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     coupling_nodes: list[n.CouplingNode] = []
     multi_coupling_nodes: list[n.MultiCouplingNode] = []
     mapping_nodes: list[n.MappingNode] = []
+    export_nodes: list[n.ExportNode] = []
     exchange_nodes: list[n.ExchangeNode] = []
     socket_edges: list[(n.ParticipantNode, n.ParticipantNode)] = []
 
@@ -102,6 +103,11 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
             mapping = n.MappingNode(participant, n.Direction(direction), from_mesh, to_mesh)
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
+
+        # Exports
+        for (_, _) in find_all_with_prefix(participant_el, "export"):
+            export = n.ExportNode(participant)
+            export_nodes.append(export)
 
         # Now that participant_node is completely built, add it and children to the graph and our dictionary
         participant_nodes[name] = participant
@@ -239,6 +245,11 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__MESH_MAPPED_BY)
         g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__CHILD_OF)
         g.add_edge(mapping.parent_participant, mapping, attr=Edge.MAPPING__PARTICIPANT_PARENT_OF)
+
+    for export in export_nodes:
+        g.add_node(export)
+        g.add_edge(export, export.participant, attr=Edge.EXPORT__CHILD_OF)
+        g.add_edge(export.participant, export, attr=Edge.EXPORT__PARENT_PARTICIPANT_OF)
     
     for coupling in coupling_nodes:
         g.add_node(coupling)
@@ -293,6 +304,8 @@ def print_graph(graph: nx.DiGraph):
                 return [0.7, 0, 1.0]
             case n.MappingNode():
                 return [0.1, 0.7, 0.1]
+            case n.ExportNode():
+                return [0.5, 0.8, 1.0]
             case _:
                 return [0.5, 0.5, 0.5]
 
@@ -307,9 +320,9 @@ def print_graph(graph: nx.DiGraph):
 
     def label_for_edge(edge):
         match edge['attr']:
-            case Edge.RECEIVE_MESH__CHILD_OF | Edge.MAPPING__CHILD_OF | Edge.EXCHANGE__CHILD_OF | Edge.WRITE_DATA__CHILD_OF | Edge.READ_DATA__CHILD_OF:
+            case Edge.RECEIVE_MESH__CHILD_OF | Edge.MAPPING__CHILD_OF | Edge.EXCHANGE__CHILD_OF | Edge.WRITE_DATA__CHILD_OF | Edge.READ_DATA__CHILD_OF | Edge.EXPORT__CHILD_OF:
                 return "child of"
-            case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF:
+            case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF | Edge.EXPORT__PARENT_PARTICIPANT_OF:
                 return "parent of"
             case Edge.RECEIVE_MESH__MESH_RECEIVED_BY | Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY:
                 return "received by"
@@ -353,6 +366,8 @@ def print_graph(graph: nx.DiGraph):
                 node_labels[node] = "Exchange"
             case n.MappingNode():
                 node_labels[node] = f"Mapping ({node.direction})"
+            case n.ExportNode():
+                node_labels[node] = "Export"
             case n.WriteDataNode():
                 node_labels[node] = f"Write {node.data.name}"
             case n.ReadDataNode():
