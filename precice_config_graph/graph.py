@@ -28,6 +28,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     read_data_nodes: list[n.ReadDataNode] = []
     receive_mesh_nodes: list[n.ReceiveMeshNode] = []
     coupling_nodes: list[n.CouplingNode] = []
+    multi_coupling_nodes: list[n.MultiCouplingNode] = []
     mapping_nodes: list[n.MappingNode] = []
     exchange_nodes: list[n.ExchangeNode] = []
     socket_edges: list[(n.ParticipantNode, n.ParticipantNode)] = []
@@ -127,14 +128,36 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
 
     # Coupling Scheme – <coupling-scheme:… />
     for (coupling_scheme_el, kind) in find_all_with_prefix(root, "coupling-scheme"):
-        # <participants />
-        participants = coupling_scheme_el.find("participants") # TODO: Error on multiple participants tags
-        first_participant_name = participants.attrib['first'] # TODO: Error on not found
-        first_participant = participant_nodes[first_participant_name]
-        second_participant_name = participants.attrib['second'] # TODO: Error on not found
-        second_participant = participant_nodes[second_participant_name]
+        coupling_scheme = None
+        match kind:
+            case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
+                # <participants />
+                participants = coupling_scheme_el.find("participants") # TODO: Error on multiple participants tags
+                first_participant_name = participants.attrib['first'] # TODO: Error on not found
+                first_participant = participant_nodes[first_participant_name]
+                second_participant_name = participants.attrib['second'] # TODO: Error on not found
+                second_participant = participant_nodes[second_participant_name]
 
-        coupling_scheme = n.CouplingNode(first_participant, second_participant)
+                coupling_scheme = n.CouplingNode(first_participant, second_participant)
+            case "multi":
+                control_participant = None
+                participants = []
+                # <participant name="..." />
+                for participant_el in coupling_scheme_el.findall("participant"):
+                    name = participant_el.attrib['name']
+                    participant = participant_nodes[name]
+                    participants.append(participant)
+
+                    control = ('control' in participant_el.attrib) and (participant_el.attrib['control'] == 'yes')
+                    if control:
+                        assert control_participant is None # there must not be multiple control participants
+                        control_participant = participant
+
+                assert control_participant is not None
+
+                coupling_scheme = n.MultiCouplingNode(control_participant, participants)
+
+        assert coupling_scheme is not None # there must always be one participant that is in control
 
         # Exchanges – <exchange />
         for exchange_el in coupling_scheme_el.findall("exchange"):
@@ -150,8 +173,12 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
             coupling_scheme.exchanges.append(exchange)
             exchange_nodes.append(exchange)
-        
-        coupling_nodes.append(coupling_scheme)
+
+        match kind:
+            case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
+                coupling_nodes.append(coupling_scheme)
+            case "multi":
+                multi_coupling_nodes.append(coupling_scheme)
 
 
     # M2N – <m2n:… />
@@ -221,7 +248,15 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         g.add_edge(coupling, coupling.first_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
         g.add_edge(coupling.second_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
         g.add_edge(coupling, coupling.second_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
-    
+
+    for coupling in multi_coupling_nodes:
+        g.add_node(coupling)
+        g.add_edge(coupling.control_participant, coupling, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL)
+        g.add_edge(coupling, coupling.control_participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL)
+        for participant in coupling.participants:
+            g.add_edge(participant, coupling, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT)
+            g.add_edge(coupling, participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT)
+
     for exchange in exchange_nodes:
         g.add_node(exchange)
         g.add_edge(exchange.from_participant, exchange, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
@@ -253,7 +288,7 @@ def print_graph(graph: nx.DiGraph):
                 return [0.3, 0.6, 1.0]
             case n.ExchangeNode():
                 return [0.9, 0.9, 0.9]
-            case n.CouplingNode():
+            case n.CouplingNode() | n.MultiCouplingNode():
                 return [0.7, 0.7, 0.7]
             case n.WriteDataNode():
                 return [0.7, 0, 1.0]
@@ -293,6 +328,10 @@ def print_graph(graph: nx.DiGraph):
                 return "first"
             case Edge.COUPLING_SCHEME__PARTICIPANT_SECOND:
                 return "second"
+            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT:
+                return "participant"
+            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL:
+                return "control"
             case Edge.USE_DATA:
                 return "uses"
             case Edge.WRITE_DATA__WRITES_TO_MESH | Edge.WRITE_DATA__WRITES_TO_DATA:
@@ -309,7 +348,7 @@ def print_graph(graph: nx.DiGraph):
         match node:
             case n.ParticipantNode() | n.MeshNode() | n.DataNode():
                 node_labels[node] = node.name
-            case n.CouplingNode():
+            case n.CouplingNode() | n.MultiCouplingNode():
                 node_labels[node] = "Coupling"
             case n.ExchangeNode():
                 node_labels[node] = "Exchange"
