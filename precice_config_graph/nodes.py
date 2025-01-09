@@ -78,18 +78,13 @@ class ParticipantNode:
 
 
 class MeshNode:
-    def __init__(self, name: str, use_data: list[DataNode] = None, write_data: list[DataNode] = None):
+    def __init__(self, name: str, use_data: list[DataNode] = None):
         self.name = name
 
         if use_data is None:
             self.use_data = []
         else:
             self.use_data = use_data
-
-        if write_data is None:
-            self.write_data = []
-        else:
-            self.write_data = write_data
 
 
 class ReceiveMeshNode:

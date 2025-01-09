@@ -207,8 +207,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     for mesh in mesh_nodes.values():
         g.add_node(mesh)
         for data in mesh.use_data: g.add_edge(data, mesh, attr=Edge.USE_DATA)
-        # TODO: Is there even write_data for mesh? for data in mesh.write_data: g.add_edge(mesh, data, attr=Edge.WRITE_DATA)
-    
+
     for participant in participant_nodes.values():
         g.add_node(participant)
         for mesh in participant.provide_meshes: g.add_edge(participant, mesh, attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
