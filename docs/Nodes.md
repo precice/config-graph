@@ -1,6 +1,6 @@
 # Nodes
 
-Our config graph builds a graph based on a precice-config.xml file. The nodes in the graph correspond to the specified xml elements and tags.<br>
+This project builds a graph based on a precice-config.xml file. The nodes in the graph correspond to the specified xml elements and tags.<br>
 The documentation for preCICE's config tags can be read at [preCICE XML reference](https://precice.org/configuration-xml-reference.html)
 
 > [!NOTE]

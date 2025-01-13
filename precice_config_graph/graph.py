@@ -14,8 +14,6 @@ from . import nodes as n
 from .edges import Edge
 
 
-
-
 def get_graph(root: etree.Element) -> nx.DiGraph:
     assert root.tag == "precice-configuration"
 
@@ -217,7 +215,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     for mapping in mapping_nodes:
         g.add_node(mapping)
         g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
-        g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__MESH_MAPPED_BY)
+        g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__FROM_MESH)
         g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__CHILD_OF)
         g.add_edge(mapping.parent_participant, mapping, attr=Edge.MAPPING__PARTICIPANT_PARENT_OF)
 
@@ -281,7 +279,7 @@ def print_graph(graph: nx.DiGraph):
 
     def label_for_edge(edge):
         match edge['attr']:
-            case Edge.RECEIVE_MESH__CHILD_OF | Edge.MAPPING__CHILD_OF | Edge.EXCHANGE__CHILD_OF | Edge.WRITE_DATA__CHILD_OF | Edge.READ_DATA__CHILD_OF:
+            case Edge.RECEIVE_MESH__CHILD_OF | Edge.MAPPING__CHILD_OF | Edge.EXCHANGE__CHILD_OF | Edge.WRITE_DATA__CHILD_OF | Edge.READ_DATA__CHILD_OF | Edge.EXPORT__CHILD_OF:
                 return "child of"
             case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF:
                 return "parent of"
@@ -291,7 +289,7 @@ def print_graph(graph: nx.DiGraph):
                 return "provides"
             case Edge.MAPPING__TO_MESH | Edge.EXCHANGE__EXCHANGES_TO:
                 return "to"
-            case Edge.MAPPING__MESH_MAPPED_BY:
+            case Edge.MAPPING__FROM_MESH:
                 return "from"
             case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
                 return "exchanged by"
@@ -307,6 +305,10 @@ def print_graph(graph: nx.DiGraph):
                 return "writes to"
             case Edge.READ_DATA__DATA_READ_BY | Edge.READ_DATA__MESH_READ_BY:
                 return "read by"
+            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL:
+                return "control"
+            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_REGULAR:
+                return "regular"
             case _:
                 return ""
 
