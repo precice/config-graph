@@ -1,3 +1,11 @@
+"""
+This graph is intended for the preCICE logical-checker https://github.com/precice-forschungsprojekt/config-checker.
+
+You can find documentation under README.md, docs/Nodes.md and docs/Edges.md.
+
+This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackermann as part of https://github.com/precice-forschungsprojekt.
+"""
+
 from __future__ import annotations
 
 from enum import Enum
@@ -144,7 +152,8 @@ class ReadDataNode:
 
 
 class ExchangeNode:
-    def __init__(self, coupling_scheme: CouplingNode|MultiCouplingNode, data: DataNode, mesh: MeshNode, from_participant: ParticipantNode,
+    def __init__(self, coupling_scheme: CouplingNode | MultiCouplingNode, data: DataNode, mesh: MeshNode,
+                 from_participant: ParticipantNode,
                  to_participant: ParticipantNode):
         self.coupling_scheme = coupling_scheme
         self.data = data
