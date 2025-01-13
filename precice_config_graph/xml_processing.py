@@ -1,5 +1,5 @@
 # use lxml instead of built-in, since it allows ignoring undefined namespaces.
-# PreCICE configs use tag names like `data:scalar`, which are like namespaces.
+# preCICE configs use tag names like `data:scalar`, which are like namespaces.
 from lxml import etree
 
 def parse_file(path: str) -> etree._Element:
