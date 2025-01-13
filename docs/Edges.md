@@ -8,7 +8,7 @@ The edges mainly add redundancies to allow future checks to be less complex.
 
 > [!NOTE]
 > This graph is built for the [preCICE logic checker](https://github.com/precice-forschungsprojekt/config-checker). This
-> means that there may be a lot of redundancies or “inconsistencies” in the building of the graph itself.
+> means that there may redundancies or “inconsistencies” in the building of the graph itself.
 
 Edges are modeled as an enum. The “type” of the edge is important for the checker;
 for the graph the type defines a label for the edge.
@@ -282,7 +282,7 @@ its "control" participant.
 - `to`: Participant
 - `label`: regular
 
-##  Action → participant
+## Action → participant
 
 This edge connects an action node to the participant who specified it.
 
@@ -291,7 +291,7 @@ This edge connects an action node to the participant who specified it.
 - `to`: Participant
 - `label`:
 
-##  Action → mesh
+## Action → mesh
 
 This edge connects an action node to the mesh the action gets performed on.
 
@@ -300,17 +300,16 @@ This edge connects an action node to the mesh the action gets performed on.
 - `to`: Mesh
 - `label`:
 
-##  Action → data
+## Action → data
 
 This edge connects an action node with the data node that is involved in the operation.
 
 - `type`: ACTION_DATA
 - `from`: Action
 - `to`: Data
-- `label`: 
+- `label`:
 
-
-##  Watchpoint → participant
+## Watchpoint → participant
 
 This edge connects a watchpoint node to the participant specifying it.
 
@@ -319,7 +318,7 @@ This edge connects a watchpoint node to the participant specifying it.
 - `to`: Participant
 - `label`:
 
-##  Watchpoint → mesh
+## Watchpoint → mesh
 
 This edge connects a watchpoint node to the mesh it is watching 👁️👁️
 
@@ -328,8 +327,7 @@ This edge connects a watchpoint node to the mesh it is watching 👁️👁️
 - `to`: Mesh
 - `label`:
 
-
-##  Watch-integral → participant
+## Watch-integral → participant
 
 This edge connects a watch-integral node to the participant specifying it.
 
@@ -338,7 +336,7 @@ This edge connects a watch-integral node to the participant specifying it.
 - `to`: Participant
 - `label`:
 
-##  Watch-integral → mesh
+## Watch-integral → mesh
 
 This edge connects a watch-integral node to the mesh it is watching.
 
