@@ -74,7 +74,19 @@ dependencies = [
 # …
 ```
 
-Then, run `pip install .` in your project.
+Then, run `pip install .` in your project. To built a graph, use the following code snippet:
+
+```python
+from precice_config_graph import graph, xml_processing
+
+path = "./some/path/to/your/precice-config.xml"
+root = xml_processing.parse_file(path)
+G = graph.get_graph(root)
+# use, traverse inspect the graph
+
+# to view the graph
+graph.print_graph(G)
+```
 
 ## Debugging graph generation
 
