@@ -194,7 +194,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         g.add_edge(read_data.participant, read_data, attr=Edge.READ_DATA__PARTICIPANT_PARENT_OF)
         g.add_edge(read_data, read_data.participant, attr=Edge.READ_DATA__CHILD_OF)
 
-    for write_data in read_data_nodes:
+    for write_data in write_data_nodes:
         g.add_node(write_data)
         g.add_edge(write_data, write_data.data, attr=Edge.WRITE_DATA__WRITES_TO_DATA)
         g.add_edge(write_data, write_data.mesh, attr=Edge.WRITE_DATA__WRITES_TO_MESH)
