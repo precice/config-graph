@@ -1,5 +1,12 @@
-from enum import Enum
+"""
+This graph is intended for the preCICE logical-checker https://github.com/precice-forschungsprojekt/config-checker.
 
+You can find documentation under README.md, docs/Nodes.md and docs/Edges.md.
+
+This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackermann as part of https://github.com/precice-forschungsprojekt.
+"""
+
+from enum import Enum
 
 class Edge(Enum):
     # mesh --received-by-> receive-mesh
@@ -15,7 +22,7 @@ class Edge(Enum):
     # mapping --to-> mesh
     MAPPING__TO_MESH = "mapping_to-mesh"
     # mesh --mapped-by-> mapping
-    MAPPING__MESH_MAPPED_BY = "mapping_mesh-mapped-by"
+    MAPPING__FROM_MESH = "mapping_from-mesh"
     # The connection between mapping and participant it is part of
     MAPPING__PARTICIPANT_PARENT_OF = "mapping_participant-parent-of"
     MAPPING__CHILD_OF = "mapping_child-of"
@@ -28,7 +35,7 @@ class Edge(Enum):
     EXCHANGE__DATA = "exchange_data"
     # exchange <--> mesh
     EXCHANGE__MESH = "exchange_mesh"
-    # The connection between receive-mesh and participant it is part of
+    # The connection between exchange and coupling scheme it is part of
     EXCHANGE__CHILD_OF = "exchange_child-of"
     EXCHANGE__COUPLING_SCHEME_PARENT_OF = "exchange_coupling-scheme-parent-of"
 
@@ -40,6 +47,7 @@ class Edge(Enum):
     # participant (second) <--> coupling-scheme
     COUPLING_SCHEME__PARTICIPANT_SECOND = "coupling-scheme_participant-second"
 
+    # mesh --"uses"--> data
     USE_DATA = "use-data"
 
     # write-data --writes-to-> data
