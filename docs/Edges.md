@@ -18,7 +18,8 @@ Here you will find a list with brief explanations of each edge:
 - `type`: The type of the edge.
 - `from`: The type of the origin-node.
 - `to`: The type of the destination-node.
-- `label`: The label as shown in the debugging view of the graph.
+- `label`: The label as shown in the debugging view of the graph. If this is missing, then the edge does not have a
+  label.
 
 ## Participant → Receive-mesh
 
@@ -124,9 +125,9 @@ This edge connects data with exchanges using its data. This edge is undirected.
 
 This edge connects exchange nodes with the mesh that is being used in the exchange.
 
-- `type`: EXCHANGE__DATA
+- `type`: EXCHANGE__MESH
 - `from/to`: Exchange
-- `to/from`: Data
+- `to/from`: Mesh
 - `label`:
 
 ## Exchange → coupling-scheme
