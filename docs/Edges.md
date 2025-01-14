@@ -25,7 +25,7 @@ Here you will find a list with brief explanations of each edge:
 
 This edge connects a participant and a mesh that it receives.
 
-- `type`:RECEIVE_MESH__PARTICIPANT_RECEIVED_BY
+- `type`: RECEIVE_MESH__PARTICIPANT_RECEIVED_BY
 - `from`: Participant
 - `to`: ReceiveMesh
 - `label`: received by
@@ -34,7 +34,7 @@ This edge connects a participant and a mesh that it receives.
 
 This edge connects a receive-mesh node and the mesh that it actually refers to.
 
-- `type`:RECEIVE_MESH__MESH_RECEIVED_BY
+- `type`: RECEIVE_MESH__MESH_RECEIVED_BY
 - `from`: ReceiveMesh
 - `to`: Mesh
 - `label`: received by
@@ -52,7 +52,7 @@ This edge connects a receive-mesh node and a participant, who receives the mesh.
 
 This edge connects a participant and the meshes that it provides.
 
-- `type`:PROVIDE_MESH__PARTICIPANT_PROVIDES
+- `type`: PROVIDE_MESH__PARTICIPANT_PROVIDES
 - `from`: Participant
 - `to`: Mesh
 - `label`: provides
