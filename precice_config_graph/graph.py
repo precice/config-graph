@@ -177,7 +177,8 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     # BUILD GRAPH
     # from found nodes and inferred edges
 
-    g = nx.DiGraph()
+    # Use an undirected graph
+    g = nx.Graph()
 
     for data in data_nodes.values(): g.add_node(data)
 
