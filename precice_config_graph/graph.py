@@ -11,7 +11,7 @@ import networkx as nx
 from lxml import etree
 
 from . import nodes as n
-from edges import Edge
+from .edges import Edge
 
 
 def get_graph(root: etree.Element) -> nx.Graph:
@@ -325,7 +325,7 @@ def print_graph(graph: nx.Graph):
             case n.ExchangeNode():
                 node_labels[node] = "Exchange"
             case n.MappingNode():
-                node_labels[node] = f"Mapping ({node.direction})" # TODO: Get the string of the direction
+                node_labels[node] = f"Mapping ({node.direction.name})"
             case n.WriteDataNode():
                 node_labels[node] = f"Write {node.data.name}"
             case n.ReadDataNode():
