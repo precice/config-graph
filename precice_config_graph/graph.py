@@ -11,10 +11,10 @@ import networkx as nx
 from lxml import etree
 
 from . import nodes as n
-from .edges import Edge
+from edges import Edge
 
 
-def get_graph(root: etree.Element) -> nx.DiGraph:
+def get_graph(root: etree.Element) -> nx.Graph:
     assert root.tag == "precice-configuration"
 
     # Taken from config-visualizer. Modified to also return postfix.
@@ -245,7 +245,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     return g
 
 
-def print_graph(graph: nx.DiGraph):
+def print_graph(graph: nx.Graph):
     def color_for_node(node):
         match node:
             case n.DataNode():
@@ -325,7 +325,7 @@ def print_graph(graph: nx.DiGraph):
             case n.ExchangeNode():
                 node_labels[node] = "Exchange"
             case n.MappingNode():
-                node_labels[node] = f"Mapping ({node.direction})"
+                node_labels[node] = f"Mapping ({node.direction})" # TODO: Get the string of the direction
             case n.WriteDataNode():
                 node_labels[node] = f"Write {node.data.name}"
             case n.ReadDataNode():
