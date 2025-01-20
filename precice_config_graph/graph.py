@@ -375,6 +375,8 @@ def print_graph(graph: nx.DiGraph):
                 return [0.5, 0.8, 1.0]
             case n.ActionNode():
                 return [0.3, 0.5, 0.8]
+            case n.WatchPointNode() | n.WatchIntegralNode():
+                return [0.5, 0.0, 1.0]
             case _:
                 return [0.5, 0.5, 0.5]
 
@@ -407,6 +409,10 @@ def print_graph(graph: nx.DiGraph):
                 return "source data"
             case Edge.ACTION_TARGET_DATA:
                 return "target data"
+            case Edge.WATCH_POINT_MESH | Edge.WATCH_INTEGRAL_MESH:
+                return "mesh"
+            case Edge.WATCH_POINT_PARTICIPANT | Edge.WATCH_INTEGRAL_PARTICIPANT:
+                return "participant"
             case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
                 return "exchanged by"
             case Edge.SOCKET:
@@ -433,7 +439,7 @@ def print_graph(graph: nx.DiGraph):
     node_labels = dict()
     for node in graph.nodes():
         match node:
-            case n.ParticipantNode() | n.MeshNode() | n.DataNode():
+            case n.ParticipantNode() | n.MeshNode() | n.DataNode() | n.WatchPointNode() | n.WatchIntegralNode():
                 node_labels[node] = node.name
             case n.CouplingNode() | n.MultiCouplingNode():
                 node_labels[node] = "Coupling"
