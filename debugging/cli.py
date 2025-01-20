@@ -8,8 +8,6 @@ This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackerma
 
 import argparse
 
-#from precice_config_graph import graph as g
-#from precice_config_graph.xml_processing import parse_file
 from ..precice_config_graph import graph as g
 from ..precice_config_graph.xml_processing import parse_file
 
