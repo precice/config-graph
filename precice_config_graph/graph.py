@@ -130,7 +130,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
 
             source_data: list[n.DataNode] = []
             if kind in ["summation", "python"]:
-                source_data_els = action_el.find_all("source-data")
+                source_data_els = action_el.findall("source-data")
                 for source_data_el in source_data_els:
                     source_data.append(data_nodes[source_data_el.attrib['name']])
 
