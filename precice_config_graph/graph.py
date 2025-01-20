@@ -33,6 +33,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     export_nodes: list[n.ExportNode] = []
     exchange_nodes: list[n.ExchangeNode] = []
     socket_edges: list[(n.ParticipantNode, n.ParticipantNode)] = []
+    action_nodes: list[n.ActionNode] = []
 
     # Data items – <data:… />
     for (data_el, kind) in find_all_with_prefix(root, "data"):
@@ -108,6 +109,26 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         for (_, _) in find_all_with_prefix(participant_el, "export"):
             export = n.ExportNode(participant)
             export_nodes.append(export)
+
+        # Actions
+        for (action_el, kind) in find_all_with_prefix(participant_el, "action"):
+            mesh = mesh_nodes[action_el.attrib['mesh']]
+            timing = n.TimingType(action_el.attrib['timing'])
+
+            target_data = None
+            if kind in ["multiply-by-area", "divide-by-area", "summation", "python"]:
+                target_data_el = action_el.find("target-data")
+                if target_data_el is not None:
+                    target_data = data_nodes[target_data_el.attrib['name']]
+
+            source_data: list[n.DataNode] = []
+            if kind in ["summation", "python"]:
+                source_data_els = action_el.find_all("source-data")
+                for source_data_el in source_data_els:
+                    source_data.append(data_nodes[source_data_el.attrib['name']])
+
+            action = n.ActionNode(participant, mesh, timing, target_data, source_data)
+            action_nodes.append(action)
 
         # Now that participant_node is completely built, add it and children to the graph and our dictionary
         participant_nodes[name] = participant
@@ -250,6 +271,15 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         g.add_node(export)
         g.add_edge(export, export.participant, attr=Edge.EXPORT__CHILD_OF)
         g.add_edge(export.participant, export, attr=Edge.EXPORT__PARENT_PARTICIPANT_OF)
+
+    for action in action_nodes:
+        g.add_node(action)
+        g.add_edge(action.participant, action, attr=Edge.ACTION_PARTICIPANT)
+        g.add_edge(action.mesh, action, attr=Edge.ACTION_MESH)
+        if action.target_data is not None:
+            g.add_edge(action.target_data, action, attr=Edge.ACTION_TARGET_DATA)
+        for source_data in action.source_data:
+            g.add_edge(source_data, action, attr=Edge.ACTION_SOURCE_DATA)
     
     for coupling in coupling_nodes:
         g.add_node(coupling)
@@ -306,6 +336,8 @@ def print_graph(graph: nx.DiGraph):
                 return [0.1, 0.7, 0.1]
             case n.ExportNode():
                 return [0.5, 0.8, 1.0]
+            case n.ActionNode():
+                return [0.3, 0.5, 0.8]
             case _:
                 return [0.5, 0.5, 0.5]
 
@@ -322,7 +354,7 @@ def print_graph(graph: nx.DiGraph):
         match edge['attr']:
             case Edge.RECEIVE_MESH__CHILD_OF | Edge.MAPPING__CHILD_OF | Edge.EXCHANGE__CHILD_OF | Edge.WRITE_DATA__CHILD_OF | Edge.READ_DATA__CHILD_OF | Edge.EXPORT__CHILD_OF:
                 return "child of"
-            case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF | Edge.EXPORT__PARENT_PARTICIPANT_OF:
+            case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF | Edge.EXPORT__PARENT_PARTICIPANT_OF | Edge.ACTION_PARTICIPANT:
                 return "parent of"
             case Edge.RECEIVE_MESH__MESH_RECEIVED_BY | Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY:
                 return "received by"
@@ -332,6 +364,12 @@ def print_graph(graph: nx.DiGraph):
                 return "to"
             case Edge.MAPPING__MESH_MAPPED_BY:
                 return "from"
+            case Edge.ACTION_MESH:
+                return "mesh"
+            case Edge.ACTION_SOURCE_DATA:
+                return "source data"
+            case Edge.ACTION_TARGET_DATA:
+                return "target data"
             case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
                 return "exchanged by"
             case Edge.SOCKET:
@@ -368,6 +406,8 @@ def print_graph(graph: nx.DiGraph):
                 node_labels[node] = f"Mapping ({node.direction})"
             case n.ExportNode():
                 node_labels[node] = "Export"
+            case n.ActionNode():
+                node_labels[node] = "Action"
             case n.WriteDataNode():
                 node_labels[node] = f"Write {node.data.name}"
             case n.ReadDataNode():

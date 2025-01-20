@@ -178,13 +178,16 @@ class ExportNode:
 
 
 class ActionNode:
-    def __init__(self, name: str, participant: ParticipantNode, mesh: MeshNode, target_data: DataNode,
-                 timing: TimingType):
-        self.name = name
+    def __init__(self, participant: ParticipantNode, mesh: MeshNode, timing: TimingType,
+                 target_data: DataNode = None, source_data: list[DataNode] = None):
         self.participant = participant
         self.mesh = mesh
-        self.target_data = target_data
         self.timing = timing
+        self.target_data = target_data
+        if source_data is None:
+            self.source_data = []
+        else:
+            self.source_data = source_data
 
 
 class WatchpointNode:
