@@ -1,6 +1,14 @@
-from lxml import etree
-import networkx as nx
+"""
+This graph is intended for the preCICE logical-checker https://github.com/precice-forschungsprojekt/config-checker.
+
+You can find documentation under README.md, docs/Nodes.md and docs/Edges.md.
+
+This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackermann as part of https://github.com/precice-forschungsprojekt.
+"""
+
 import matplotlib.pyplot as plt
+import networkx as nx
+from lxml import etree
 
 from . import nodes as n
 from .edges import Edge
@@ -8,14 +16,13 @@ from .edges import Edge
 
 def get_graph(root: etree.Element) -> nx.DiGraph:
     assert root.tag == "precice-configuration"
-    
+
     # Taken from config-visualizer. Modified to also return postfix.
     def find_all_with_prefix(e: etree.Element, prefix: str):
         for child in e.iterchildren():
             if child.tag.startswith(prefix):
-                postfix = child.tag[child.tag.find(":") + 1 :]
+                postfix = child.tag[child.tag.find(":") + 1:]
                 yield child, postfix
-
 
     # FIND NODES
 
@@ -38,43 +45,41 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     # Data items – <data:… />
     for (data_el, kind) in find_all_with_prefix(root, "data"):
         # TODO: Error on unknown kind
-        name = data_el.attrib['name'] # TODO: Error on not found
+        name = data_el.attrib['name']  # TODO: Error on not found
         node = n.DataNode(name, n.DataType(kind))
         data_nodes[name] = node
 
-
     # Meshes – <mesh />
     for mesh_el in root.findall("mesh"):
-        name = mesh_el.attrib['name'] # TODO: Error on not found
+        name = mesh_el.attrib['name']  # TODO: Error on not found
         mesh = n.MeshNode(name)
 
         # Data usages – <use-data />: Will be mapped to edges
         for use_data in mesh_el.findall("use-data"):
-            data_name = use_data.attrib['name'] # TODO: Error on not found
+            data_name = use_data.attrib['name']  # TODO: Error on not found
             data_node = data_nodes[data_name]
             mesh.use_data.append(data_node)
-        
+
         # Now that mesh_node is completely built, add it to our dictionary
         mesh_nodes[name] = mesh
 
-
     # Participants – <participant />
     for participant_el in root.findall("participant"):
-        name = participant_el.attrib['name'] # TODO: Error on not found
+        name = participant_el.attrib['name']  # TODO: Error on not found
         participant = n.ParticipantNode(name)
 
         # Provide- and Receive-Mesh
         # <provide-mesh />
         for provide_mesh_el in participant_el.findall("provide-mesh"):
-            mesh_name = provide_mesh_el.attrib['name'] # TODO: Error on not found
+            mesh_name = provide_mesh_el.attrib['name']  # TODO: Error on not found
             participant.provide_meshes.append(mesh_nodes[mesh_name])
-        
+
         # Read and write data
         # <write-data />
         for write_data_el in participant_el.findall("write-data"):
-            data_name = write_data_el.attrib['name'] # TODO: Error on not found
+            data_name = write_data_el.attrib['name']  # TODO: Error on not found
             data = data_nodes[data_name]
-            mesh_name = write_data_el.attrib['mesh'] # TODO: Error on not found
+            mesh_name = write_data_el.attrib['mesh']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
 
             write_data = n.WriteDataNode(participant, data, mesh)
@@ -84,21 +89,21 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         # <read-data />
         # TODO: Refactor to reduce code duplication
         for read_data_el in participant_el.findall("read-data"):
-            data_name = read_data_el.attrib['name'] # TODO: Error on not found
+            data_name = read_data_el.attrib['name']  # TODO: Error on not found
             data = data_nodes[data_name]
-            mesh_name = read_data_el.attrib['mesh'] # TODO: Error on not found
+            mesh_name = read_data_el.attrib['mesh']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
 
             read_data = n.ReadDataNode(participant, data, mesh)
             participant.read_data.append(read_data)
             read_data_nodes.append(read_data)
-        
+
         # Mapping
         for (mapping_el, kind) in find_all_with_prefix(participant_el, "mapping"):
-            direction = mapping_el.attrib['direction'] # TODO: Error on not found
-            from_mesh_name = mapping_el.attrib['from'] # TODO: Error on not found
+            direction = mapping_el.attrib['direction']  # TODO: Error on not found
+            from_mesh_name = mapping_el.attrib['from']  # TODO: Error on not found
             from_mesh = mesh_nodes[from_mesh_name]
-            to_mesh_name = mapping_el.attrib['to'] # TODO: Error on not found
+            to_mesh_name = mapping_el.attrib['to']  # TODO: Error on not found
             to_mesh = mesh_nodes[to_mesh_name]
 
             mapping = n.MappingNode(participant, n.Direction(direction), from_mesh, to_mesh)
@@ -132,26 +137,25 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
 
         # Now that participant_node is completely built, add it and children to the graph and our dictionary
         participant_nodes[name] = participant
-    
+
     # Receive Mesh Participants
     # This can't be done in the participants loop, since it references participants which might not yet be created
     # <participant />
     for participant_el in root.findall("participant"):
-        name = participant_el.attrib['name'] # TODO: Error on not found
-        participant = participant_nodes[name] # This should not fail, because we created participants before
+        name = participant_el.attrib['name']  # TODO: Error on not found
+        participant = participant_nodes[name]  # This should not fail, because we created participants before
 
         # <receive-mesh />
         for receive_mesh_el in participant_el.findall("receive-mesh"):
-            mesh_name = receive_mesh_el.attrib['name'] # TODO: Error on not found
+            mesh_name = receive_mesh_el.attrib['name']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
 
-            from_participant_name = receive_mesh_el.attrib['from'] # TODO: Error on not found
+            from_participant_name = receive_mesh_el.attrib['from']  # TODO: Error on not found
             from_participant = participant_nodes[from_participant_name]
 
             receive_mesh = n.ReceiveMeshNode(participant, mesh, from_participant)
             participant.receive_meshes.append(receive_mesh)
             receive_mesh_nodes.append(receive_mesh)
-
 
     # Coupling Scheme – <coupling-scheme:… />
     for (coupling_scheme_el, kind) in find_all_with_prefix(root, "coupling-scheme"):
@@ -159,10 +163,10 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         match kind:
             case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
                 # <participants />
-                participants = coupling_scheme_el.find("participants") # TODO: Error on multiple participants tags
-                first_participant_name = participants.attrib['first'] # TODO: Error on not found
+                participants = coupling_scheme_el.find("participants")  # TODO: Error on multiple participants tags
+                first_participant_name = participants.attrib['first']  # TODO: Error on not found
                 first_participant = participant_nodes[first_participant_name]
-                second_participant_name = participants.attrib['second'] # TODO: Error on not found
+                second_participant_name = participants.attrib['second']  # TODO: Error on not found
                 second_participant = participant_nodes[second_participant_name]
 
                 coupling_scheme = n.CouplingNode(first_participant, second_participant)
@@ -177,7 +181,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
 
                     control = ('control' in participant_el.attrib) and (participant_el.attrib['control'] == 'yes')
                     if control:
-                        assert control_participant is None # there must not be multiple control participants
+                        assert control_participant is None  # there must not be multiple control participants
                         control_participant = participant
 
                 assert control_participant is not None
@@ -188,13 +192,13 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
 
         # Exchanges – <exchange />
         for exchange_el in coupling_scheme_el.findall("exchange"):
-            data_name = exchange_el.attrib['data'] # TODO: Error on not found
+            data_name = exchange_el.attrib['data']  # TODO: Error on not found
             data = data_nodes[data_name]
-            mesh_name = exchange_el.attrib['mesh'] # TODO: Error on not found
+            mesh_name = exchange_el.attrib['mesh']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
-            from_participant_name = exchange_el.attrib['from'] # TODO: Error on not found and different from first or second participant
+            from_participant_name = exchange_el.attrib['from']  # TODO: Error on not found and different from first or second participant
             from_participant = participant_nodes[from_participant_name]
-            to_participant_name = exchange_el.attrib['to'] # TODO: Error on not found and different from first or second participant
+            to_participant_name = exchange_el.attrib['to']  # TODO: Error on not found and different from first or second participant
             to_participant = participant_nodes[to_participant_name]
 
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
@@ -207,14 +211,13 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
             case "multi":
                 multi_coupling_nodes.append(coupling_scheme)
 
-
     # M2N – <m2n:… />
     for (m2n, kind) in find_all_with_prefix(root, "m2n"):
         match kind:
             case "sockets":
-                acceptor_name = m2n.attrib['acceptor'] # TODO: Error on not found
+                acceptor_name = m2n.attrib['acceptor']  # TODO: Error on not found
                 acceptor = participant_nodes[acceptor_name]
-                connector_name = m2n.attrib['connector'] # TODO: Error on not found
+                connector_name = m2n.attrib['connector']  # TODO: Error on not found
                 connector = participant_nodes[connector_name]
                 socket_edges.append((acceptor, connector))
             case "mpi":
@@ -222,7 +225,6 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
                 raise NotImplementedError("MPI M2N type is not implemented")
             case _:
                 raise ValueError("Unknown m2n type")
-
 
     # BUILD GRAPH
     # from found nodes and inferred edges
@@ -234,10 +236,12 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     for mesh in mesh_nodes.values():
         g.add_node(mesh)
         for data in mesh.use_data: g.add_edge(data, mesh, attr=Edge.USE_DATA)
+        # TODO: Is there even write_data for mesh? for data in mesh.write_data: g.add_edge(mesh, data, attr=Edge.WRITE_DATA)
 
     for participant in participant_nodes.values():
         g.add_node(participant)
-        for mesh in participant.provide_meshes: g.add_edge(participant, mesh, attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
+        for mesh in participant.provide_meshes:
+            g.add_edge(participant, mesh, attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
         # Use data and write data, as well as receive mesh nodes are added later
     
     for read_data in read_data_nodes:
@@ -253,17 +257,17 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         g.add_edge(write_data, write_data.mesh, attr=Edge.WRITE_DATA__WRITES_TO_MESH)
         g.add_edge(write_data.participant, write_data, attr=Edge.WRITE_DATA__PARTICIPANT_PARENT_OF)
         g.add_edge(write_data, write_data.participant, attr=Edge.WRITE_DATA__CHILD_OF)
-    
+
     for receive_mesh in receive_mesh_nodes:
         g.add_node(receive_mesh)
         g.add_edge(receive_mesh.mesh, receive_mesh, attr=Edge.RECEIVE_MESH__MESH_RECEIVED_BY)
         g.add_edge(receive_mesh.from_participant, receive_mesh, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY)
         g.add_edge(receive_mesh, receive_mesh.participant, attr=Edge.RECEIVE_MESH__CHILD_OF)
-    
+
     for mapping in mapping_nodes:
         g.add_node(mapping)
         g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
-        g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__MESH_MAPPED_BY)
+        g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__FROM_MESH)
         g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__CHILD_OF)
         g.add_edge(mapping.parent_participant, mapping, attr=Edge.MAPPING__PARTICIPANT_PARENT_OF)
 
@@ -280,7 +284,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
             g.add_edge(action.target_data, action, attr=Edge.ACTION_TARGET_DATA)
         for source_data in action.source_data:
             g.add_edge(source_data, action, attr=Edge.ACTION_SOURCE_DATA)
-    
+
     for coupling in coupling_nodes:
         g.add_node(coupling)
         # Edges to and from exchanges will be added by exchange nodes
@@ -307,11 +311,12 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         g.add_edge(exchange.mesh, exchange, attr=Edge.EXCHANGE__MESH)
         g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__CHILD_OF)
         g.add_edge(exchange.coupling_scheme, exchange, attr=Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF)
-    
+
     for (acceptor, connector) in socket_edges:
         g.add_edge(connector, acceptor, attr=Edge.SOCKET)
 
     return g
+
 
 def print_graph(graph: nx.DiGraph):
     def color_for_node(node):
@@ -362,7 +367,7 @@ def print_graph(graph: nx.DiGraph):
                 return "provides"
             case Edge.MAPPING__TO_MESH | Edge.EXCHANGE__EXCHANGES_TO:
                 return "to"
-            case Edge.MAPPING__MESH_MAPPED_BY:
+            case Edge.MAPPING__FROM_MESH:
                 return "from"
             case Edge.ACTION_MESH:
                 return "mesh"
