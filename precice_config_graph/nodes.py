@@ -34,7 +34,7 @@ class ParticipantNode:
             mappings: list[MappingNode] = None,
             exports: list[ExportNode] = None,
             actions: list[ActionNode] = None,
-            watchpoints: list[WatchpointNode] = None,
+            watchpoints: list[WatchPointNode] = None,
             watch_integrals: list[WatchIntegralNode] = None
     ):
         self.name = name
@@ -198,11 +198,10 @@ class ActionNode:
             self.source_data = source_data
 
 
-class WatchpointNode:
+class WatchPointNode:
     def __init__(self, name: str, participant: ParticipantNode, mesh: MeshNode):
         self.name = name
         self.participant = participant
-
         self.mesh = mesh
 
 
