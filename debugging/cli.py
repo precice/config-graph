@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     if args.src.name.endswith('.xml'):
         file_path = args.src.name
-        print(f"Create graph from '{color_cyan}{file_path}{color_reset}'")
+        print(f"Creating graph from '{color_cyan}{file_path}{color_reset}'")
     else:
         sys.exit(f"[{color_red}ERROR{color_reset}]: '{color_cyan}{args.src.name}{color_reset}' is not an xml file")
 
