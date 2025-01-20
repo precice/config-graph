@@ -7,6 +7,7 @@ This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackerma
 """
 
 import argparse
+import sys
 
 from precice_config_graph import graph as g
 from precice_config_graph.xml_processing import parse_file
@@ -25,7 +26,7 @@ if __name__ == "__main__":
         file_path = args.src.name
         print(f"Checking file at '{color_cyan}{file_path}{color_reset}'")
     else:
-        print(f"[{color_red}ERROR{color_reset}]: '{color_cyan}{args.src.name}{color_reset}' is not an xml file")
+        sys.exit(f"[{color_red}ERROR{color_reset}]: '{color_cyan}{args.src.name}{color_reset}' is not an xml file")
 
     root = parse_file(file_path)
     G = g.get_graph(root)
