@@ -82,9 +82,9 @@ class Edge(Enum):
     ACTION_SOURCE_DATA = "action_source-data"
 
     # connection between watchpoints/-integrals and their participants / meshes
-    WATCHPOINT_PARTICIPANT = "watchpoint_participant"
-    WATCHPOINT_MESH = "watchpoint_mesh"
+    WATCH_POINT_PARTICIPANT = "watch-point_participant"
+    WATCH_POINT_MESH = "watch-point_mesh"
 
-    WATCHINTEGRAL_PARTICIPANT = "watchintegral_participant"
-    WATCHINTEGRAL_MESH = "watchintegral_mesh"
+    WATCH_INTEGRAL_PARTICIPANT = "watch-integral_participant"
+    WATCH_INTEGRAL_MESH = "watch-integral_mesh"
 
