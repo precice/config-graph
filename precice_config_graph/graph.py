@@ -111,11 +111,13 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
             mapping_nodes.append(mapping)
 
         # Exports
+        # <export:… />
         for (_, _) in find_all_with_prefix(participant_el, "export"):
             export = n.ExportNode(participant)
             export_nodes.append(export)
 
         # Actions
+        # <action:… />
         for (action_el, kind) in find_all_with_prefix(participant_el, "action"):
             mesh = mesh_nodes[action_el.attrib['mesh']]
             timing = n.TimingType(action_el.attrib['timing'])
