@@ -41,6 +41,8 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     exchange_nodes: list[n.ExchangeNode] = []
     socket_edges: list[(n.ParticipantNode, n.ParticipantNode)] = []
     action_nodes: list[n.ActionNode] = []
+    watch_point_nodes: list[n.WatchPointNode] = []
+    watch_integral_nodes: list[n.WatchIntegralNode] = []
 
     # Data items – <data:… />
     for (data_el, kind) in find_all_with_prefix(root, "data"):
@@ -136,6 +138,24 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
 
             action = n.ActionNode(participant, mesh, timing, target_data, source_data)
             action_nodes.append(action)
+
+        # Watch-Points
+        # <watch-point />
+        for watch_point_el in participant_el.findall("watch-point"):
+            point_name = watch_point_el.attrib['name']
+            mesh = mesh_nodes[watch_point_el.attrib['mesh']]
+
+            watch_point = n.WatchPointNode(point_name, participant, mesh)
+            watch_point_nodes.append(watch_point)
+
+        # Watch-Integral
+        # <watch-integral />
+        for watch_integral_el in participant_el.findall("watch-integral"):
+            integral_name = watch_integral_el.attrib['name']
+            mesh = mesh_nodes[watch_integral_el.attrib['mesh']]
+
+            watch_integral = n.WatchIntegralNode(integral_name, participant, mesh)
+            watch_integral_nodes.append(watch_integral)
 
         # Now that participant_node is completely built, add it and children to the graph and our dictionary
         participant_nodes[name] = participant
@@ -286,6 +306,16 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
             g.add_edge(action.target_data, action, attr=Edge.ACTION_TARGET_DATA)
         for source_data in action.source_data:
             g.add_edge(source_data, action, attr=Edge.ACTION_SOURCE_DATA)
+
+    for watch_point in watch_point_nodes:
+        g.add_node(watch_point)
+        g.add_edge(watch_point, watch_point.participant, attr=Edge.WATCH_POINT_PARTICIPANT)
+        g.add_edge(watch_point, watch_point.mesh, attr=Edge.WATCH_POINT_MESH)
+
+    for watch_integral in watch_integral_nodes:
+        g.add_node(watch_integral)
+        g.add_edge(watch_integral, watch_integral.participant, attr=Edge.WATCH_INTEGRAL_PARTICIPANT)
+        g.add_edge(watch_integral, watch_integral.mesh, attr=Edge.WATCH_INTEGRAL_MESH)
 
     for coupling in coupling_nodes:
         g.add_node(coupling)
