@@ -26,10 +26,10 @@ As the graph is undirected, the `to` and `from` entries correspond only to the r
 
 This edge connects a participant and a mesh that it receives.
 
-- `type`: RECEIVE_MESH__PARTICIPANT_RECEIVED_BY
+- `type`: RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM
 - `from`: Participant
 - `to`: ReceiveMesh
-- `label`: received by
+- `label`: received from
 
 ## Receive-mesh - mesh
 
@@ -44,10 +44,10 @@ This edge connects a receive-mesh node and the mesh that it actually refers to.
 
 This edge connects a receive-mesh node and a participant who receives the mesh.
 
-- `type`: RECEIVE_MESH__BELONGS_TO
+- `type`: RECEIVE_MESH__PARTICIPANT__BELONGS_TO
 - `from`: ReceiveMesh
 - `to`: Participant
-- `label`: child of
+- `label`: belongs to
 
 ## Participant - mesh
 
@@ -80,7 +80,7 @@ This edge connects a mapping and the to-mesh of it.
 
 This edge connects a mapping and the participant it is part of.
 
-- `type`: MAPPING__BELONGS_TO
+- `type`: MAPPING__PARTICIPANT__BELONGS_TO
 - `from`: Mapping
 - `to`: Participant
 - `label`: belongs to
@@ -190,7 +190,7 @@ This edge connects a write-data node with the mesh it is written to.
 
 This edge connects a write-data node with the participant who specified it.
 
-- `type`: WRITE_DATA__BELONGS_TO
+- `type`: WRITE_DATA__PARTICIPANT__BELONGS_TO
 - `from`: WriteData
 - `to`: Participant
 - `label`: belongs to
@@ -218,7 +218,7 @@ This edge connects a mesh to its read-data node.
 
 This edge connects a read-data node to the participant specifying it.
 
-- `type`: READ_DATA__BELONGS_TO
+- `type`: READ_DATA__PARTICIPANT__BELONGS_TO
 - `from`: ReadData
 - `to`: Participant
 - `label`: belongs to

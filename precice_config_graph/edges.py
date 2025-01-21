@@ -10,11 +10,11 @@ from enum import Enum
 
 class Edge(Enum):
     # mesh --received-by-> receive-mesh
-    RECEIVE_MESH__MESH_RECEIVED_BY = "receive-mesh_mesh-received-by"
+    RECEIVE_MESH__MESH_RECEIVED_FROM = "receive-mesh_mesh-received-from"
     # participant (from) --received-by-> receive-mesh
     RECEIVE_MESH__PARTICIPANT_RECEIVED_BY = "receive-mesh_participant-received-by"
     # The connection between receive-mesh and participant it is part of
-    RECEIVE_MESH__BELONGS_TO = "receive-mesh_belongs-to"
+    RECEIVE_MESH__PARTICIPANT__BELONGS_TO = "receive-mesh_belongs-to"
 
     # participant --provides-> mesh
     PROVIDE_MESH__PARTICIPANT_PROVIDES = "provide-mesh_participant-provides"

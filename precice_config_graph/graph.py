@@ -209,9 +209,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for receive_mesh in receive_mesh_nodes:
         g.add_node(receive_mesh)
-        g.add_edge(receive_mesh.mesh, receive_mesh, attr=Edge.RECEIVE_MESH__MESH_RECEIVED_BY)
+        g.add_edge(receive_mesh.mesh, receive_mesh, attr=Edge.RECEIVE_MESH__MESH_RECEIVED_FROM)
         g.add_edge(receive_mesh.from_participant, receive_mesh, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY)
-        g.add_edge(receive_mesh, receive_mesh.participant, attr=Edge.RECEIVE_MESH__BELONGS_TO)
+        g.add_edge(receive_mesh, receive_mesh.participant, attr=Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO)
 
     for mapping in mapping_nodes:
         g.add_node(mapping)
@@ -275,11 +275,13 @@ def print_graph(graph: nx.Graph):
     def label_for_edge(edge):
         match edge['attr']:
             # case "child of" and "belongs to" can be summarized to "belongs to"
-            case (Edge.RECEIVE_MESH__BELONGS_TO | Edge.MAPPING__PARTICIPANT__BELONGS_TO |
+            case (Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO | Edge.MAPPING__PARTICIPANT__BELONGS_TO |
                   Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
                   Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO):
                 return "belongs to"
-            case Edge.RECEIVE_MESH__MESH_RECEIVED_BY | Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY:
+            case Edge.RECEIVE_MESH__MESH_RECEIVED_FROM:
+                return "received from"
+            case Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY:
                 return "received by"
             case Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES:
                 return "provides"
