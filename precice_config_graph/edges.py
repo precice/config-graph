@@ -67,20 +67,20 @@ class Edge(Enum):
     EXPORT__PARTICIPANT__BELONGS_TO = "export_belongs-to"
 
     # multi coupling: control participant
-    MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL = "multi-coupling-scheme_participant-control"
+    MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL = "multi-coupling-scheme_control"
     # multi coupling: all participants (this includes regular ones, as well as control participants (they have two edges))
     MULTI_COUPLING_SCHEME__PARTICIPANT = "multi-coupling-scheme_participant"
 
     # connection between actions and its members
-    ACTION_PARTICIPANT = "action_participant"
-    ACTION_MESH = "action_mesh"
-    ACTION_TARGET_DATA = "action_target-data"
-    ACTION_SOURCE_DATA = "action_source-data"
+    ACTION__PARTICIPANT__BELONGS_TO = "action_belongs-to"
+    ACTION__MESH = "action_mesh"
+    ACTION__TARGET_DATA = "action_target-data"
+    ACTION__SOURCE_DATA = "action_source-data"
 
     # connection between watchpoints/-integrals and their participants / meshes
-    WATCH_POINT_PARTICIPANT = "watch-point_participant"
-    WATCH_POINT_MESH = "watch-point_mesh"
+    WATCH_POINT__PARTICIPANT__BELONGS_TO = "watch-point_belongs-to"
+    WATCH_POINT__MESH = "watch-point_mesh"
 
-    WATCH_INTEGRAL_PARTICIPANT = "watch-integral_participant"
-    WATCH_INTEGRAL_MESH = "watch-integral_mesh"
+    WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO = "watch-integral_belongs-to"
+    WATCH_INTEGRAL__MESH = "watch-integral_mesh"
 

@@ -294,27 +294,26 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for export in export_nodes:
         g.add_node(export)
-        g.add_edge(export, export.participant, attr=Edge.EXPORT__CHILD_OF)
-        g.add_edge(export.participant, export, attr=Edge.EXPORT__PARENT_PARTICIPANT_OF)
+        g.add_edge(export, export.participant, attr=Edge.EXPORT__PARTICIPANT__BELONGS_TO)
 
     for action in action_nodes:
         g.add_node(action)
-        g.add_edge(action.participant, action, attr=Edge.ACTION_PARTICIPANT)
-        g.add_edge(action.mesh, action, attr=Edge.ACTION_MESH)
+        g.add_edge(action, action.participant, attr=Edge.ACTION__PARTICIPANT__BELONGS_TO)
+        g.add_edge(action, action.mesh, attr=Edge.ACTION__MESH)
         if action.target_data is not None:
-            g.add_edge(action.target_data, action, attr=Edge.ACTION_TARGET_DATA)
+            g.add_edge(action, action.target_data, attr=Edge.ACTION__TARGET_DATA)
         for source_data in action.source_data:
-            g.add_edge(source_data, action, attr=Edge.ACTION_SOURCE_DATA)
+            g.add_edge(action, source_data, attr=Edge.ACTION__SOURCE_DATA)
 
     for watch_point in watch_point_nodes:
         g.add_node(watch_point)
-        g.add_edge(watch_point, watch_point.participant, attr=Edge.WATCH_POINT_PARTICIPANT)
-        g.add_edge(watch_point, watch_point.mesh, attr=Edge.WATCH_POINT_MESH)
+        g.add_edge(watch_point, watch_point.participant, attr=Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO)
+        g.add_edge(watch_point, watch_point.mesh, attr=Edge.WATCH_POINT__MESH)
 
     for watch_integral in watch_integral_nodes:
         g.add_node(watch_integral)
-        g.add_edge(watch_integral, watch_integral.participant, attr=Edge.WATCH_INTEGRAL_PARTICIPANT)
-        g.add_edge(watch_integral, watch_integral.mesh, attr=Edge.WATCH_INTEGRAL_MESH)
+        g.add_edge(watch_integral, watch_integral.participant, attr=Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO)
+        g.add_edge(watch_integral, watch_integral.mesh, attr=Edge.WATCH_INTEGRAL__MESH)
 
     for coupling in coupling_nodes:
         g.add_node(coupling)
@@ -324,8 +323,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for coupling in multi_coupling_nodes:
         g.add_node(coupling)
-        g.add_edge(coupling.control_participant, coupling, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL)
-        g.add_edge(coupling, coupling.control_participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL)
+        g.add_edge(coupling.control_participant, coupling, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL)
+        g.add_edge(coupling, coupling.control_participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL)
         for participant in coupling.participants:
             g.add_edge(participant, coupling, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT)
             g.add_edge(coupling, participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT)
@@ -387,7 +386,9 @@ def print_graph(graph: nx.Graph):
         match edge['attr']:
             case (Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO | Edge.MAPPING__PARTICIPANT__BELONGS_TO |
                   Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
-                  Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO | Edge.ACTION_PARTICIPANT):
+                  Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO |
+                  Edge.ACTION__PARTICIPANT__BELONGS_TO | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO |
+                Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO):
                 return "belongs to"
             case Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM:
                 return "received from"
@@ -397,16 +398,14 @@ def print_graph(graph: nx.Graph):
                 return "to"
             case Edge.MAPPING__FROM_MESH:
                 return "from"
-            case Edge.ACTION_MESH:
+            case Edge.ACTION__MESH:
                 return "mesh"
-            case Edge.ACTION_SOURCE_DATA:
+            case Edge.ACTION__SOURCE_DATA:
                 return "source data"
-            case Edge.ACTION_TARGET_DATA:
+            case Edge.ACTION__TARGET_DATA:
                 return "target data"
-            case Edge.WATCH_POINT_MESH | Edge.WATCH_INTEGRAL_MESH:
+            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH:
                 return "mesh"
-            case Edge.WATCH_POINT_PARTICIPANT | Edge.WATCH_INTEGRAL_PARTICIPANT:
-                return "participant"
             case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
                 return "exchanged by"
             case Edge.SOCKET:
@@ -417,7 +416,7 @@ def print_graph(graph: nx.Graph):
                 return "second"
             case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT:
                 return "participant"
-            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL:
+            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL:
                 return "control"
             case Edge.USE_DATA:
                 return "uses"
