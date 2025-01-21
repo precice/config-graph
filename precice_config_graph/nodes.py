@@ -107,12 +107,9 @@ class ReceiveMeshNode:
         self.from_participant = from_participant
 
 
-class CouplingNode:
-    def __init__(
-            self,
-            first_participant: ParticipantNode, second_participant: ParticipantNode,
-            exchanges: list[ExchangeNode] = None
-    ):
+class CouplingSchemeNode:
+    def __init__(self, first_participant: ParticipantNode, second_participant: ParticipantNode,
+                 exchanges: list[ExchangeNode] = None):
         self.first_participant = first_participant
         self.second_participant = second_participant
 
@@ -152,7 +149,7 @@ class ReadDataNode:
 
 
 class ExchangeNode:
-    def __init__(self, coupling_scheme: CouplingNode | MultiCouplingNode, data: DataNode, mesh: MeshNode,
+    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode, data: DataNode, mesh: MeshNode,
                  from_participant: ParticipantNode,
                  to_participant: ParticipantNode):
         self.coupling_scheme = coupling_scheme
@@ -162,10 +159,9 @@ class ExchangeNode:
         self.to_participant = to_participant
 
 
-class MultiCouplingNode:
+class MultiCouplingSchemeNode:
     def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode],
                  exchanges: list[ExchangeNode] = None):
-        # TODO control participant as first entry of participants[] ?
         self.control_participant = control_participant
         self.participants = participants
         if exchanges is None:
