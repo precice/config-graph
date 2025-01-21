@@ -199,14 +199,12 @@ def get_graph(root: etree.Element) -> nx.Graph:
         g.add_node(read_data)
         g.add_edge(read_data.data, read_data, attr=Edge.READ_DATA__DATA_READ_BY)
         g.add_edge(read_data.mesh, read_data, attr=Edge.READ_DATA__MESH_READ_BY)
-        # TODO g.add_edge(read_data.participant, read_data, attr=Edge.READ_DATA__PARTICIPANT_PARENT_OF)
         g.add_edge(read_data, read_data.participant, attr=Edge.READ_DATA__PARTICIPANT__BELONGS_TO)
 
     for write_data in write_data_nodes:
         g.add_node(write_data)
         g.add_edge(write_data, write_data.data, attr=Edge.WRITE_DATA__WRITES_TO_DATA)
         g.add_edge(write_data, write_data.mesh, attr=Edge.WRITE_DATA__WRITES_TO_MESH)
-        # TODO g.add_edge(write_data.participant, write_data, attr=Edge.WRITE_DATA__PARTICIPANT_PARENT_OF)
         g.add_edge(write_data, write_data.participant, attr=Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO)
 
     for receive_mesh in receive_mesh_nodes:
@@ -220,26 +218,20 @@ def get_graph(root: etree.Element) -> nx.Graph:
         g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
         g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__FROM_MESH)
         g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__PARTICIPANT__BELONGS_TO)
-        # TODO g.add_edge(mapping.parent_participant, mapping, attr=Edge.MAPPING__PARTICIPANT_PARENT_OF)
 
     for coupling in coupling_nodes:
         g.add_node(coupling)
         # Edges to and from exchanges will be added by exchange nodes
         g.add_edge(coupling.first_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
-        # TODO g.add_edge(coupling, coupling.first_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
         g.add_edge(coupling.second_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
-        # TODO g.add_edge(coupling, coupling.second_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
 
     for exchange in exchange_nodes:
         g.add_node(exchange)
         g.add_edge(exchange.from_participant, exchange, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
         g.add_edge(exchange, exchange.to_participant, attr=Edge.EXCHANGE__EXCHANGES_TO)
         g.add_edge(exchange.data, exchange, attr=Edge.EXCHANGE__DATA)
-        # TODO g.add_edge(exchange, exchange.data, attr=Edge.EXCHANGE__DATA)
         g.add_edge(exchange, exchange.mesh, attr=Edge.EXCHANGE__MESH)
-        # TODO g.add_edge(exchange.mesh, exchange, attr=Edge.EXCHANGE__MESH)
         g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)
-        # TODO g.add_edge(exchange.coupling_scheme, exchange, attr=Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF)
 
     for (acceptor, connector) in socket_edges:
         g.add_edge(connector, acceptor, attr=Edge.SOCKET)
@@ -282,17 +274,11 @@ def print_graph(graph: nx.Graph):
 
     def label_for_edge(edge):
         match edge['attr']:
-            # TODO remove old cases
             # case "child of" and "belongs to" can be summarized to "belongs to"
-            case (Edge.RECEIVE_MESH__BELONGS_TO | Edge.MAPPING__PARTICIPANT__BELONGS_TO | Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO |
-                  Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO | Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO |
-                  Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF |
-                  Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF):
+            case (Edge.RECEIVE_MESH__BELONGS_TO | Edge.MAPPING__PARTICIPANT__BELONGS_TO |
+                  Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
+                  Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO):
                 return "belongs to"
-            case Edge.RECEIVE_MESH__BELONGS_TO | Edge.MAPPING__PARTICIPANT__BELONGS_TO | Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO | Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO:
-                return "child of"
-            case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF:
-                return "parent of"
             case Edge.RECEIVE_MESH__MESH_RECEIVED_BY | Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY:
                 return "received by"
             case Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES:

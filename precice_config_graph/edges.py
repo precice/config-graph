@@ -24,7 +24,6 @@ class Edge(Enum):
     # mesh --mapped-by-> mapping
     MAPPING__FROM_MESH = "mapping_from-mesh"
     # The connection between mapping and participant it is part of
-    # TODO MAPPING__PARTICIPANT_PARENT_OF = "mapping_participant-parent-of"
     MAPPING__PARTICIPANT__BELONGS_TO = "mapping_belongs-to"
 
     # participant (from) --exchanged_by--> exchange
@@ -37,7 +36,6 @@ class Edge(Enum):
     EXCHANGE__MESH = "exchange_mesh"
     # The connection between exchange and coupling scheme it is part of
     EXCHANGE__COUPLING_SCHEME__BELONGS_TO = "exchange_child-of"
-    # TODO EXCHANGE__COUPLING_SCHEME_PARENT_OF = "exchange_coupling-scheme-parent-of"
 
     # participant (connector) -> participant (acceptor)
     SOCKET = "socket"
@@ -55,7 +53,6 @@ class Edge(Enum):
     # write-data --writes-to-> mesh
     WRITE_DATA__WRITES_TO_MESH = "write-data_writes-to-mesh"
     # The connection between write-data and participant it is part of
-    # TODO WRITE_DATA__PARTICIPANT_PARENT_OF = "write-data_participant-parent-of"
     WRITE_DATA__PARTICIPANT__BELONGS_TO = "write-data_belongs-to"
 
     # data --read-by-> read-data
@@ -63,7 +60,6 @@ class Edge(Enum):
     # mesh --read-by-> read-data
     READ_DATA__MESH_READ_BY = "read-data_mesh-read-by"
     # The connection between read-data and participant it is part of
-    # TODO READ_DATA__PARTICIPANT_PARENT_OF = "read-data_participant-parent-of"
     READ_DATA__PARTICIPANT__BELONGS_TO = "read-data_belongs-to"
 
     # connection between participant and export node
