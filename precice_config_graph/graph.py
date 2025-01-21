@@ -187,7 +187,6 @@ def get_graph(root: etree.Element) -> nx.Graph:
         g.add_node(mesh)
         for data in mesh.use_data:
             g.add_edge(data, mesh, attr=Edge.USE_DATA)
-        # TODO: Is there even write_data for mesh? for data in mesh.write_data: g.add_edge(mesh, data, attr=Edge.WRITE_DATA)
 
     for participant in participant_nodes.values():
         g.add_node(participant)
@@ -197,8 +196,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for read_data in read_data_nodes:
         g.add_node(read_data)
-        g.add_edge(read_data.data, read_data, attr=Edge.READ_DATA__DATA_READ_BY)
-        g.add_edge(read_data.mesh, read_data, attr=Edge.READ_DATA__MESH_READ_BY)
+        g.add_edge(read_data, read_data.data, attr=Edge.READ_DATA__DATA_READ_BY)
+        g.add_edge(read_data, read_data.mesh, attr=Edge.READ_DATA__MESH_READ_BY)
         g.add_edge(read_data, read_data.participant, attr=Edge.READ_DATA__PARTICIPANT__BELONGS_TO)
 
     for write_data in write_data_nodes:
@@ -209,27 +208,27 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for receive_mesh in receive_mesh_nodes:
         g.add_node(receive_mesh)
-        g.add_edge(receive_mesh.mesh, receive_mesh, attr=Edge.RECEIVE_MESH__MESH)
-        g.add_edge(receive_mesh.from_participant, receive_mesh, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM)
+        g.add_edge(receive_mesh, receive_mesh.mesh, attr=Edge.RECEIVE_MESH__MESH)
+        g.add_edge(receive_mesh, receive_mesh.from_participant, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM)
         g.add_edge(receive_mesh, receive_mesh.participant, attr=Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO)
 
     for mapping in mapping_nodes:
         g.add_node(mapping)
         g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
-        g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__FROM_MESH)
+        g.add_edge(mapping, mapping.from_mesh, attr=Edge.MAPPING__FROM_MESH)
         g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__PARTICIPANT__BELONGS_TO)
 
     for coupling in coupling_nodes:
         g.add_node(coupling)
         # Edges to and from exchanges will be added by exchange nodes
-        g.add_edge(coupling.first_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
-        g.add_edge(coupling.second_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
+        g.add_edge(coupling, coupling.first_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
+        g.add_edge(coupling, coupling.second_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
 
     for exchange in exchange_nodes:
         g.add_node(exchange)
-        g.add_edge(exchange.from_participant, exchange, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
+        g.add_edge(exchange, exchange.from_participant, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
         g.add_edge(exchange, exchange.to_participant, attr=Edge.EXCHANGE__EXCHANGES_TO)
-        g.add_edge(exchange.data, exchange, attr=Edge.EXCHANGE__DATA)
+        g.add_edge(exchange, exchange.data, attr=Edge.EXCHANGE__DATA)
         g.add_edge(exchange, exchange.mesh, attr=Edge.EXCHANGE__MESH)
         g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)
 
