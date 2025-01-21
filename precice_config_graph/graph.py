@@ -34,7 +34,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     write_data_nodes: list[n.WriteDataNode] = []
     read_data_nodes: list[n.ReadDataNode] = []
     receive_mesh_nodes: list[n.ReceiveMeshNode] = []
-    coupling_nodes: list[n.CouplingNode] = []
+    coupling_nodes: list[n.CouplingSchemeNode] = []
     mapping_nodes: list[n.MappingNode] = []
     exchange_nodes: list[n.ExchangeNode] = []
     socket_edges: list[(n.ParticipantNode, n.ParticipantNode)] = []
@@ -138,7 +138,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
         second_participant_name = participants.attrib['second']  # TODO: Error on not found
         second_participant = participant_nodes[second_participant_name]
 
-        coupling_scheme = n.CouplingNode(first_participant, second_participant)
+        coupling_scheme = n.CouplingSchemeNode(first_participant, second_participant)
 
         # Exchanges – <exchange />
         for exchange_el in coupling_scheme_el.findall("exchange"):
@@ -259,7 +259,7 @@ def print_graph(graph: nx.DiGraph):
                 return [0.3, 0.6, 1.0]
             case n.ExchangeNode():
                 return [0.9, 0.9, 0.9]
-            case n.CouplingNode():
+            case n.CouplingSchemeNode():
                 return [0.7, 0.7, 0.7]
             case n.WriteDataNode():
                 return [0.7, 0, 1.0]
@@ -319,8 +319,8 @@ def print_graph(graph: nx.DiGraph):
         match node:
             case n.ParticipantNode() | n.MeshNode() | n.DataNode():
                 node_labels[node] = node.name
-            case n.CouplingNode():
-                node_labels[node] = "Coupling"
+            case n.CouplingSchemeNode():
+                node_labels[node] = "Coupling scheme"
             case n.ExchangeNode():
                 node_labels[node] = "Exchange"
             case n.MappingNode():
