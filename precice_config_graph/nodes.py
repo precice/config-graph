@@ -102,12 +102,9 @@ class ReceiveMeshNode:
         self.from_participant = from_participant
 
 
-class CouplingNode:
-    def __init__(
-            self,
-            first_participant: ParticipantNode, second_participant: ParticipantNode,
-            exchanges: list[ExchangeNode] = None
-    ):
+class CouplingSchemeNode:
+    def __init__(self, first_participant: ParticipantNode, second_participant: ParticipantNode,
+                 exchanges: list[ExchangeNode] = None):
         self.first_participant = first_participant
         self.second_participant = second_participant
 
@@ -117,7 +114,7 @@ class CouplingNode:
             self.exchanges = exchanges
 
 
-class MultiCouplingNode:
+class MultiCouplingSchemeNode:
     def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode] = None,
                  exchanges: list[ExchangeNode] = None):
         # TODO control participant as first entry of participants[] ?
@@ -164,7 +161,7 @@ class ReadDataNode:
 
 
 class ExchangeNode:
-    def __init__(self, coupling_scheme: CouplingNode | MultiCouplingNode, data: DataNode, mesh: MeshNode,
+    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode, data: DataNode, mesh: MeshNode,
                  from_participant: ParticipantNode,
                  to_participant: ParticipantNode):
         self.coupling_scheme = coupling_scheme
@@ -174,12 +171,6 @@ class ExchangeNode:
         self.to_participant = to_participant
 
 
-# TODO is a node for logging (https://precice.org/configuration-logging.html) needed? For me it does not make sense,
-#  as it is not used/connected to anything else
-
-
-# TODO is export a “valid” node? Maybe good for info, but as stated in precice: "great feature for debugging", so not
-#  really a good way to use coupling data
 class ExportNode:
     def __init__(self, participant: ParticipantNode):
         self.participant = participant

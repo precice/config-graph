@@ -9,12 +9,13 @@ This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackerma
 from enum import Enum
 
 class Edge(Enum):
-    # mesh --received-by-> receive-mesh
-    RECEIVE_MESH__MESH_RECEIVED_BY = "receive-mesh_mesh-received-by"
-    # participant (from) --received-by-> receive-mesh
-    RECEIVE_MESH__PARTICIPANT_RECEIVED_BY = "receive-mesh_participant-received-by"
+    # receive mesh --> mesh
+    RECEIVE_MESH__MESH = "receive-mesh_mesh"
+    # receive-mesh --received-from-> participant (from)
+    RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM = "receive-mesh_participant-received-from"
     # The connection between receive-mesh and participant it is part of
-    RECEIVE_MESH__CHILD_OF = "receive-mesh_child-of"
+    # receive-mesh --belongs to-> participant
+    RECEIVE_MESH__PARTICIPANT__BELONGS_TO = "receive-mesh_belongs-to"
 
     # participant --provides-> mesh
     PROVIDE_MESH__PARTICIPANT_PROVIDES = "provide-mesh_participant-provides"
@@ -24,8 +25,7 @@ class Edge(Enum):
     # mesh --mapped-by-> mapping
     MAPPING__FROM_MESH = "mapping_from-mesh"
     # The connection between mapping and participant it is part of
-    MAPPING__PARTICIPANT_PARENT_OF = "mapping_participant-parent-of"
-    MAPPING__CHILD_OF = "mapping_child-of"
+    MAPPING__PARTICIPANT__BELONGS_TO = "mapping_belongs-to"
 
     # participant (from) --exchanged_by--> exchange
     EXCHANGE__PARTICIPANT_EXCHANGED_BY = "exchange_participant-exchanged-by"
@@ -36,8 +36,7 @@ class Edge(Enum):
     # exchange <--> mesh
     EXCHANGE__MESH = "exchange_mesh"
     # The connection between exchange and coupling scheme it is part of
-    EXCHANGE__CHILD_OF = "exchange_child-of"
-    EXCHANGE__COUPLING_SCHEME_PARENT_OF = "exchange_coupling-scheme-parent-of"
+    EXCHANGE__COUPLING_SCHEME__BELONGS_TO = "exchange_belongs-to"
 
     # participant (connector) -> participant (acceptor)
     SOCKET = "socket"
@@ -55,20 +54,17 @@ class Edge(Enum):
     # write-data --writes-to-> mesh
     WRITE_DATA__WRITES_TO_MESH = "write-data_writes-to-mesh"
     # The connection between write-data and participant it is part of
-    WRITE_DATA__PARTICIPANT_PARENT_OF = "write-data_participant-parent-of"
-    WRITE_DATA__CHILD_OF = "write-data_child-of"
+    WRITE_DATA__PARTICIPANT__BELONGS_TO = "write-data_belongs-to"
 
     # data --read-by-> read-data
     READ_DATA__DATA_READ_BY = "read-data_data-read-by"
     # mesh --read-by-> read-data
     READ_DATA__MESH_READ_BY = "read-data_mesh-read-by"
     # The connection between read-data and participant it is part of
-    READ_DATA__PARTICIPANT_PARENT_OF = "read-data_participant-parent-of"
-    READ_DATA__CHILD_OF = "read-data_child-of"
+    READ_DATA__PARTICIPANT__BELONGS_TO = "read-data_belongs-to"
 
     # connection between participant and export node
-    EXPORT__CHILD_OF = "export_child-of"
-    EXPORT__PARENT_PARTICIPANT_OF = "export_participant-parent-of"
+    EXPORT__PARTICIPANT__BELONGS_TO = "export_belongs-to"
 
     # multi coupling: control participant
     MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL = "multi-coupling-scheme_participant-control"

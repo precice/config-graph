@@ -51,17 +51,17 @@ They are also meshes, with the additional information of who they get received b
 - `mesh`: The mesh that gets received.
 - `from_participant`: The participant that provides the mesh.
 
-## Coupling
+## CouplingScheme
 
-A coupling node represents a coupling scheme element of the XML file.
+A coupling-scheme node represents a coupling-scheme element of the XML file.
 
-- `first_participant`: The participant of the coupling scheme that gets referred to as `first=“”`.
-- `second_participant`: The participant of the coupling scheme that gets referred to as `second=“”`
+- `first_participant`: The participant of the coupling-scheme that gets referred to as `first=“”`.
+- `second_participant`: The participant of the coupling-scheme that gets referred to as `second=“”`
 - `exchanges`: A list of exchanges between the participants. This links to `Exchange` nodes for further references.
 
-## MultiCoupling
+## MultiCouplingScheme
 
-A multi-coupling node corresponds to a multi-coupling-scheme XML element. It is an extension of a regular
+A multi-coupling-scheme node corresponds to a multi-coupling-scheme XML element. It is an extension of a regular
 coupling-scheme to allow for more than two participants.
 
 - `control_participant`: The key participant of the multi-coupling-scheme, which links to a regular `Participant` node.
@@ -136,7 +136,7 @@ participants.
 - `participant`: The participant who the watchpoint belongs to.
 - `mesh`: The mesh which gets observed 👁️👁️
 
-## Watchpoint
+## WatchIntegral
 
 Watch-integrals are a way to keep track of data development in an entire mesh. They correspond to a subelement of
 participants.

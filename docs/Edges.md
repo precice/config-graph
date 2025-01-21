@@ -13,7 +13,8 @@ The edges mainly add redundancies to allow future checks to be less complex.
 Edges are modeled as an enum. The “type” of the edge is important for the checker;
 for the graph the type defines a label for the edge.
 
-Here you will find a list with brief explanations of each edge:
+Here you will find a list with brief explanations of each edge.
+As the graph is undirected, the `to` and `from` entries correspond only to the reading direction of the edge's `label`.
 
 - `type`: The type of the edge.
 - `from`: The type of the origin-node.
@@ -21,34 +22,36 @@ Here you will find a list with brief explanations of each edge:
 - `label`: The label as shown in the debugging view of the graph. If this is missing, then the edge does not have a
   label.
 
-## Participant → Receive-mesh
+## Participant - Receive-mesh
 
-This edge connects a participant and a mesh that it receives.
+This edge connects a participant and a receive-mesh node. The participant is the one who the mesh is received from (the
+participant who provides the mesh. In the context of a receive-mesh node, the receive-mesh gets received from this
+participant).
 
-- `type`: RECEIVE_MESH__PARTICIPANT_RECEIVED_BY
+- `type`: RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM
 - `from`: Participant
 - `to`: ReceiveMesh
-- `label`: received by
+- `label`: received from
 
-## Receive-mesh → mesh
+## Receive-mesh - mesh
 
 This edge connects a receive-mesh node and the mesh that it actually refers to.
 
-- `type`: RECEIVE_MESH__MESH_RECEIVED_BY
+- `type`: RECEIVE_MESH__MESH
 - `from`: ReceiveMesh
 - `to`: Mesh
-- `label`: received by
+- `label`:
 
-## Receive-mesh → participant
+## Receive-mesh - participant
 
-This edge connects a receive-mesh node and a participant, who receives the mesh.
+This edge connects a receive-mesh node and a participant who receives the mesh and defined the <receive-mesh .../> tag.
 
-- `type`: RECEIVE_MESH__CHILD_OF
+- `type`: RECEIVE_MESH__PARTICIPANT__BELONGS_TO
 - `from`: ReceiveMesh
 - `to`: Participant
-- `label`: child of
+- `label`: belongs to
 
-## Participant → mesh
+## Participant - mesh
 
 This edge connects a participant and the meshes that it provides.
 
@@ -57,7 +60,7 @@ This edge connects a participant and the meshes that it provides.
 - `to`: Mesh
 - `label`: provides
 
-## Mapping → mesh
+## Mapping - mesh
 
 This edge connects a mapping and the to-mesh of it.
 
@@ -66,7 +69,7 @@ This edge connects a mapping and the to-mesh of it.
 - `to`: Mesh
 - `label`: to
 
-## Mapping → mesh
+## Mapping - mesh
 
 This edge connects a mapping and the to-mesh of it.
 
@@ -75,25 +78,16 @@ This edge connects a mapping and the to-mesh of it.
 - `to`: Mesh
 - `label`: from
 
-## Participant → mapping
-
-This edge connects a participant with its mappings.
-
-- `type`: MAPPING__PARTICIPANT_PARENT_OF
-- `from`: Participant
-- `to`: Mapping
-- `label`: parent of
-
-## Mapping → participant
+## Mapping - participant
 
 This edge connects a mapping and the participant it is part of.
 
-- `type`: MAPPING__CHILD_OF
+- `type`: MAPPING__PARTICIPANT__BELONGS_TO
 - `from`: Mapping
 - `to`: Participant
-- `label`: child of
+- `label`: belongs to
 
-## Participant → exchange
+## Participant - exchange
 
 This edge connects a participant with an exchange. This edge is to identify the "from" participant.
 
@@ -102,7 +96,7 @@ This edge connects a participant with an exchange. This edge is to identify the 
 - `to`: Exchange
 - `label`: exchanged by
 
-## Exchange → participant
+## Exchange - participant
 
 This edge connects an exchange with a participant. This edge specifically connects to the "to" participant of the
 exchange.
@@ -112,7 +106,7 @@ exchange.
 - `to`: Participant
 - `label`: exchanges to
 
-## Exchange ←→ data
+## Exchange - data
 
 This edge connects data with exchanges using its data. This edge is undirected.
 
@@ -121,7 +115,7 @@ This edge connects data with exchanges using its data. This edge is undirected.
 - `to/from`: Data
 - `label`:
 
-## Exchange ←→ mesh
+## Exchange - mesh
 
 This edge connects exchange nodes with the mesh that is being used in the exchange.
 
@@ -130,25 +124,16 @@ This edge connects exchange nodes with the mesh that is being used in the exchan
 - `to/from`: Mesh
 - `label`:
 
-## Exchange → coupling-scheme
-
-This edge connects an exchange with the coupling scheme it is part of.
-
-- `type`: EXCHANGE__CHILD_OF
-- `from/to`: Exchange
-- `to/from`: CouplingScheme or MultiCouplingScheme
-- `label`: child of
-
-## Coupling-scheme → exchange
+## Coupling-scheme - exchange
 
 This edge connects a coupling scheme with its exchanges.
 
-- `type`: EXCHANGE__COUPLING_SCHEME_PARENT_OF
-- `from`: Coupling-scheme
-- `to`: Exchange
-- `label`: parent of
+- `type`: EXCHANGE__COUPLING_SCHEME__BELONGS_TO
+- `from`: Exchange
+- `to`: Coupling-scheme
+- `label`: belongs to
 
-## Participant → participant
+## Participant - participant
 
 This edge connects two participants as specified by the socket connection.<br>
 The "connector"-participant is the source node, the "acceptor" participant is the destination.
@@ -158,7 +143,7 @@ The "connector"-participant is the source node, the "acceptor" participant is th
 - `to`: Participant
 - `label`: socket
 
-## Coupling-scheme ←→ participant
+## Coupling-scheme - participant
 
 This edge connects a coupling-scheme with its "first" participant.
 
@@ -167,7 +152,7 @@ This edge connects a coupling-scheme with its "first" participant.
 - `to/from`: Participant
 - `label`: first
 
-## Coupling-scheme ←→ participant
+## Coupling-scheme - participant
 
 This edge connects a coupling-scheme with its "second" participant.
 
@@ -176,7 +161,7 @@ This edge connects a coupling-scheme with its "second" participant.
 - `to/from`: Participant
 - `label`: second
 
-## Mesh → data
+## Mesh - data
 
 This edge connects a mesh to the data it uses.
 
@@ -185,7 +170,7 @@ This edge connects a mesh to the data it uses.
 - `to`: Data
 - `label`: uses
 
-## Write-data → data
+## Write-data - data
 
 This edge connects a write-data node to the data it writes.
 
@@ -194,7 +179,7 @@ This edge connects a write-data node to the data it writes.
 - `to`: Data
 - `label`: writes to
 
-## Write-data → mesh
+## Write-data - mesh
 
 This edge connects a write-data node with the mesh it is written to.
 
@@ -203,23 +188,16 @@ This edge connects a write-data node with the mesh it is written to.
 - `to`: Mesh
 - `label`: writes to
 
-## Write-data → participant
+## Write-data - participant
 
 This edge connects a write-data node with the participant who specified it.
 
-- `type`: WRITE_DATA__CHILD_OF
+- `type`: WRITE_DATA__PARTICIPANT__BELONGS_TO
 - `from`: WriteData
 - `to`: Participant
-- `label`: child of
+- `label`: belongs to
 
-## Participant → write-data
-
-- `type`: WRITE_DATA__PARTICIPANT_PARENT_OF
-- `from`: Participant
-- `to`: WriteData
-- `label`: parent of
-
-## Data → read-data
+## Data - read-data
 
 This edge connects a data node to read-data nodes who read it.
 
@@ -228,7 +206,7 @@ This edge connects a data node to read-data nodes who read it.
 - `to`: ReadData
 - `label`: read by
 
-## Mesh → read-data
+## Mesh - read-data
 
 This edge connects a mesh to its read-data node.
 
@@ -237,34 +215,25 @@ This edge connects a mesh to its read-data node.
 - `to`: ReadData
 - `label`: read by
 
-## Read-data → participant
+## Read-data - participant
 
 This edge connects a read-data node to the participant specifying it.
 
-- `type`: READ_DATA__CHILD_OF
+- `type`: READ_DATA__PARTICIPANT__BELONGS_TO
 - `from`: ReadData
 - `to`: Participant
-- `label`: child of
+- `label`: belongs to
 
-## Participant → read-data
-
-This edge connects a participant with the read-data it specifies.
-
-- `type`: READ_DATA__PARTICIPANT_PARENT_OF
-- `from`: Participant
-- `to`: ReadData
-- `label`: parent of
-
-## Export → participant
+## Export - participant
 
 This edge connects an export node to the participant who specified it.
 
-- `type`: EXPORT__CHILD OF
+- `type`: EXPORT__PARTICIPANT__BELONGS_TO
 - `from`: Export
 - `to`: Participant
-- `label`: child of
+- `label`: belongs to
 
-## Multi-coupling-scheme ←→ participant
+## Multi-coupling-scheme - participant
 
 This edge connects a multi-coupling-scheme with its "control" participant.
 
@@ -273,7 +242,7 @@ This edge connects a multi-coupling-scheme with its "control" participant.
 - `to`: Participant
 - `label`: control
 
-## Multi-coupling-scheme ←→ participant
+## Multi-coupling-scheme - participant
 
 This edge connects a multi-coupling-scheme with its "regular" participants. Note that this does <em>not</em> include
 its "control" participant.
@@ -283,7 +252,7 @@ its "control" participant.
 - `to`: Participant
 - `label`: regular
 
-## Action → participant
+## Action - participant
 
 This edge connects an action node to the participant who specified it.
 
@@ -292,7 +261,7 @@ This edge connects an action node to the participant who specified it.
 - `to`: Participant
 - `label`:
 
-## Action → mesh
+## Action - mesh
 
 This edge connects an action node to the mesh the action gets performed on.
 
@@ -301,7 +270,7 @@ This edge connects an action node to the mesh the action gets performed on.
 - `to`: Mesh
 - `label`:
 
-## Action → data
+## Action - data
 
 This edge connects an action node with the data node that is involved in the operation.
 
@@ -310,7 +279,7 @@ This edge connects an action node with the data node that is involved in the ope
 - `to`: Data
 - `label`:
 
-## Watchpoint → participant
+## Watchpoint - participant
 
 This edge connects a watchpoint node to the participant specifying it.
 
@@ -319,7 +288,7 @@ This edge connects a watchpoint node to the participant specifying it.
 - `to`: Participant
 - `label`:
 
-## Watchpoint → mesh
+## Watchpoint - mesh
 
 This edge connects a watchpoint node to the mesh it is watching 👁️👁️
 
@@ -328,7 +297,7 @@ This edge connects a watchpoint node to the mesh it is watching 👁️👁️
 - `to`: Mesh
 - `label`:
 
-## Watch-integral → participant
+## Watch-integral - participant
 
 This edge connects a watch-integral node to the participant specifying it.
 
@@ -337,7 +306,7 @@ This edge connects a watch-integral node to the participant specifying it.
 - `to`: Participant
 - `label`:
 
-## Watch-integral → mesh
+## Watch-integral - mesh
 
 This edge connects a watch-integral node to the mesh it is watching.
 
