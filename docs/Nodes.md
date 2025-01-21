@@ -136,7 +136,7 @@ participants.
 - `participant`: The participant who the watchpoint belongs to.
 - `mesh`: The mesh which gets observed 👁️👁️
 
-## Watchpoint
+## WatchIntegral
 
 Watch-integrals are a way to keep track of data development in an entire mesh. They correspond to a subelement of
 participants.

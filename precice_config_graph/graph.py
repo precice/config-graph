@@ -14,7 +14,7 @@ from . import nodes as n
 from .edges import Edge
 
 
-def get_graph(root: etree.Element) -> nx.DiGraph:
+def get_graph(root: etree.Element) -> nx.Graph:
     assert root.tag == "precice-configuration"
 
     # Taken from config-visualizer. Modified to also return postfix.
@@ -177,66 +177,60 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     # BUILD GRAPH
     # from found nodes and inferred edges
 
-    g = nx.DiGraph()
+    # Use an undirected graph
+    g = nx.Graph()
 
-    for data in data_nodes.values(): g.add_node(data)
+    for data in data_nodes.values():
+        g.add_node(data)
 
     for mesh in mesh_nodes.values():
         g.add_node(mesh)
-        for data in mesh.use_data: g.add_edge(data, mesh, attr=Edge.USE_DATA)
-        # TODO: Is there even write_data for mesh? for data in mesh.write_data: g.add_edge(mesh, data, attr=Edge.WRITE_DATA)
+        for data in mesh.use_data:
+            g.add_edge(data, mesh, attr=Edge.USE_DATA)
 
     for participant in participant_nodes.values():
         g.add_node(participant)
-        for mesh in participant.provide_meshes: g.add_edge(participant, mesh,
-                                                           attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
+        for mesh in participant.provide_meshes:
+            g.add_edge(participant, mesh, attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
         # Use data and write data, as well as receive mesh nodes are added later
 
     for read_data in read_data_nodes:
         g.add_node(read_data)
-        g.add_edge(read_data.data, read_data, attr=Edge.READ_DATA__DATA_READ_BY)
-        g.add_edge(read_data.mesh, read_data, attr=Edge.READ_DATA__MESH_READ_BY)
-        g.add_edge(read_data.participant, read_data, attr=Edge.READ_DATA__PARTICIPANT_PARENT_OF)
-        g.add_edge(read_data, read_data.participant, attr=Edge.READ_DATA__CHILD_OF)
+        g.add_edge(read_data, read_data.data, attr=Edge.READ_DATA__DATA_READ_BY)
+        g.add_edge(read_data, read_data.mesh, attr=Edge.READ_DATA__MESH_READ_BY)
+        g.add_edge(read_data, read_data.participant, attr=Edge.READ_DATA__PARTICIPANT__BELONGS_TO)
 
     for write_data in write_data_nodes:
         g.add_node(write_data)
         g.add_edge(write_data, write_data.data, attr=Edge.WRITE_DATA__WRITES_TO_DATA)
         g.add_edge(write_data, write_data.mesh, attr=Edge.WRITE_DATA__WRITES_TO_MESH)
-        g.add_edge(write_data.participant, write_data, attr=Edge.WRITE_DATA__PARTICIPANT_PARENT_OF)
-        g.add_edge(write_data, write_data.participant, attr=Edge.WRITE_DATA__CHILD_OF)
+        g.add_edge(write_data, write_data.participant, attr=Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO)
 
     for receive_mesh in receive_mesh_nodes:
         g.add_node(receive_mesh)
-        g.add_edge(receive_mesh.mesh, receive_mesh, attr=Edge.RECEIVE_MESH__MESH_RECEIVED_BY)
-        g.add_edge(receive_mesh.from_participant, receive_mesh, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY)
-        g.add_edge(receive_mesh, receive_mesh.participant, attr=Edge.RECEIVE_MESH__CHILD_OF)
+        g.add_edge(receive_mesh, receive_mesh.mesh, attr=Edge.RECEIVE_MESH__MESH)
+        g.add_edge(receive_mesh, receive_mesh.from_participant, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM)
+        g.add_edge(receive_mesh, receive_mesh.participant, attr=Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO)
 
     for mapping in mapping_nodes:
         g.add_node(mapping)
         g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
-        g.add_edge(mapping.from_mesh, mapping, attr=Edge.MAPPING__FROM_MESH)
-        g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__CHILD_OF)
-        g.add_edge(mapping.parent_participant, mapping, attr=Edge.MAPPING__PARTICIPANT_PARENT_OF)
+        g.add_edge(mapping, mapping.from_mesh, attr=Edge.MAPPING__FROM_MESH)
+        g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__PARTICIPANT__BELONGS_TO)
 
     for coupling in coupling_nodes:
         g.add_node(coupling)
         # Edges to and from exchanges will be added by exchange nodes
-        g.add_edge(coupling.first_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
         g.add_edge(coupling, coupling.first_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
-        g.add_edge(coupling.second_participant, coupling, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
         g.add_edge(coupling, coupling.second_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
 
     for exchange in exchange_nodes:
         g.add_node(exchange)
-        g.add_edge(exchange.from_participant, exchange, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
+        g.add_edge(exchange, exchange.from_participant, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
         g.add_edge(exchange, exchange.to_participant, attr=Edge.EXCHANGE__EXCHANGES_TO)
-        g.add_edge(exchange.data, exchange, attr=Edge.EXCHANGE__DATA)
         g.add_edge(exchange, exchange.data, attr=Edge.EXCHANGE__DATA)
         g.add_edge(exchange, exchange.mesh, attr=Edge.EXCHANGE__MESH)
-        g.add_edge(exchange.mesh, exchange, attr=Edge.EXCHANGE__MESH)
-        g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__CHILD_OF)
-        g.add_edge(exchange.coupling_scheme, exchange, attr=Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF)
+        g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)
 
     for (acceptor, connector) in socket_edges:
         g.add_edge(connector, acceptor, attr=Edge.SOCKET)
@@ -244,7 +238,7 @@ def get_graph(root: etree.Element) -> nx.DiGraph:
     return g
 
 
-def print_graph(graph: nx.DiGraph):
+def print_graph(graph: nx.Graph):
     def color_for_node(node):
         match node:
             case n.DataNode():
@@ -279,12 +273,12 @@ def print_graph(graph: nx.DiGraph):
 
     def label_for_edge(edge):
         match edge['attr']:
-            case Edge.RECEIVE_MESH__CHILD_OF | Edge.MAPPING__CHILD_OF | Edge.EXCHANGE__CHILD_OF | Edge.WRITE_DATA__CHILD_OF | Edge.READ_DATA__CHILD_OF | Edge.EXPORT__CHILD_OF:
-                return "child of"
-            case Edge.MAPPING__PARTICIPANT_PARENT_OF | Edge.EXCHANGE__COUPLING_SCHEME_PARENT_OF | Edge.WRITE_DATA__PARTICIPANT_PARENT_OF | Edge.READ_DATA__PARTICIPANT_PARENT_OF:
-                return "parent of"
-            case Edge.RECEIVE_MESH__MESH_RECEIVED_BY | Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_BY:
-                return "received by"
+            case (Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO | Edge.MAPPING__PARTICIPANT__BELONGS_TO |
+                  Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
+                  Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO):
+                return "belongs to"
+            case Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM:
+                return "received from"
             case Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES:
                 return "provides"
             case Edge.MAPPING__TO_MESH | Edge.EXCHANGE__EXCHANGES_TO:
