@@ -9,11 +9,12 @@ This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackerma
 from enum import Enum
 
 class Edge(Enum):
-    # mesh --received-by-> receive-mesh
-    RECEIVE_MESH__MESH_RECEIVED_FROM = "receive-mesh_mesh-received-from"
-    # participant (from) --received-by-> receive-mesh
-    RECEIVE_MESH__PARTICIPANT_RECEIVED_BY = "receive-mesh_participant-received-by"
+    # receive mesh --> mesh
+    RECEIVE_MESH__MESH = "receive-mesh_mesh"
+    # receive-mesh --received-from-> participant (from)
+    RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM = "receive-mesh_participant-received-from"
     # The connection between receive-mesh and participant it is part of
+    # receive-mesh --belongs to-> participant
     RECEIVE_MESH__PARTICIPANT__BELONGS_TO = "receive-mesh_belongs-to"
 
     # participant --provides-> mesh
@@ -35,7 +36,7 @@ class Edge(Enum):
     # exchange <--> mesh
     EXCHANGE__MESH = "exchange_mesh"
     # The connection between exchange and coupling scheme it is part of
-    EXCHANGE__COUPLING_SCHEME__BELONGS_TO = "exchange_child-of"
+    EXCHANGE__COUPLING_SCHEME__BELONGS_TO = "exchange_belongs-to"
 
     # participant (connector) -> participant (acceptor)
     SOCKET = "socket"

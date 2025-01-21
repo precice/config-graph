@@ -24,7 +24,9 @@ As the graph is undirected, the `to` and `from` entries correspond only to the r
 
 ## Participant - Receive-mesh
 
-This edge connects a participant and a mesh that it receives.
+This edge connects a participant and a receive-mesh node. The participant is the one who the mesh is received from (the
+participant who provides the mesh. In the context of a receive-mesh node, the receive-mesh gets received from this
+participant).
 
 - `type`: RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM
 - `from`: Participant
@@ -35,14 +37,14 @@ This edge connects a participant and a mesh that it receives.
 
 This edge connects a receive-mesh node and the mesh that it actually refers to.
 
-- `type`: RECEIVE_MESH__MESH_RECEIVED_BY
+- `type`: RECEIVE_MESH__MESH
 - `from`: ReceiveMesh
 - `to`: Mesh
-- `label`: received by
+- `label`:
 
 ## Receive-mesh - participant
 
-This edge connects a receive-mesh node and a participant who receives the mesh.
+This edge connects a receive-mesh node and a participant who receives the mesh and defined the <receive-mesh .../> tag.
 
 - `type`: RECEIVE_MESH__PARTICIPANT__BELONGS_TO
 - `from`: ReceiveMesh
@@ -194,7 +196,6 @@ This edge connects a write-data node with the participant who specified it.
 - `from`: WriteData
 - `to`: Participant
 - `label`: belongs to
-
 
 ## Data - read-data
 
