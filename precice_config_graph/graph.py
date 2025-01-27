@@ -323,10 +323,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for coupling in multi_coupling_nodes:
         g.add_node(coupling)
-        g.add_edge(coupling.control_participant, coupling, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL)
         g.add_edge(coupling, coupling.control_participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL)
         for participant in coupling.participants:
-            g.add_edge(participant, coupling, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT)
             g.add_edge(coupling, participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT)
 
     for exchange in exchange_nodes:
