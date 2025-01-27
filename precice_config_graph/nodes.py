@@ -117,7 +117,6 @@ class CouplingSchemeNode:
 class MultiCouplingSchemeNode:
     def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode] = None,
                  exchanges: list[ExchangeNode] = None):
-        # TODO control participant as first entry of participants[] ?
         self.control_participant = control_participant
 
         if participants is None:
