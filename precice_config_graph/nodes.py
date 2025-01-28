@@ -26,6 +26,13 @@ class TimingType(Enum):
     READ_MAPPING_POST = "read-mapping-post"
 
 
+class ExportFormat(Enum):
+    VTK = "vtk"
+    VTU = "vtu"
+    VTP = "vtp"
+    CSV = "csv"
+
+
 class ParticipantNode:
     def __init__(
             self, name: str,
@@ -171,8 +178,9 @@ class ExchangeNode:
 
 
 class ExportNode:
-    def __init__(self, participant: ParticipantNode):
+    def __init__(self, participant: ParticipantNode, format: ExportFormat):
         self.participant = participant
+        self.format = format
 
 
 class ActionNode:
