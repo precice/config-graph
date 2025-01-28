@@ -26,6 +26,14 @@ class TimingType(Enum):
     READ_MAPPING_POST = "read-mapping-post"
 
 
+class CouplingSchemeType(Enum):
+    SERIAL_EXPLICIT = "serial-explicit"
+    PARALLEL_EXPLICIT = "parallel-explicit"
+    SERIAL_IMPLICIT = "serial-implicit"
+    PARALLEL_IMPLICIT = "parallel-implicit"
+    # This enum does not include coupling-scheme:multi, since it is modeled with a different node type
+
+
 class ExportFormat(Enum):
     VTK = "vtk"
     VTU = "vtu"
@@ -110,8 +118,9 @@ class ReceiveMeshNode:
 
 
 class CouplingSchemeNode:
-    def __init__(self, first_participant: ParticipantNode, second_participant: ParticipantNode,
-                 exchanges: list[ExchangeNode] = None):
+    def __init__(self, type: CouplingSchemeType, first_participant: ParticipantNode,
+                 second_participant: ParticipantNode, exchanges: list[ExchangeNode] = None):
+        self.type = type
         self.first_participant = first_participant
         self.second_participant = second_participant
 

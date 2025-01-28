@@ -12,6 +12,7 @@ from lxml import etree
 
 from . import nodes as n
 from .edges import Edge
+from .nodes import CouplingSchemeType
 
 
 def get_graph(root: etree.Element) -> nx.Graph:
@@ -191,7 +192,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 second_participant_name = participants.attrib['second']  # TODO: Error on not found
                 second_participant = participant_nodes[second_participant_name]
 
-                coupling_scheme = n.CouplingSchemeNode(first_participant, second_participant)
+                type = CouplingSchemeType(kind)
+
+                coupling_scheme = n.CouplingSchemeNode(type, first_participant, second_participant)
             case "multi":
                 control_participant = None
                 participants = []
@@ -433,7 +436,7 @@ def print_graph(graph: nx.Graph):
             case n.ParticipantNode() | n.MeshNode() | n.DataNode() | n.WatchPointNode() | n.WatchIntegralNode():
                 node_labels[node] = node.name
             case n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
-                node_labels[node] = "Coupling scheme"
+                node_labels[node] = f"Coupling scheme ({node.type.value})"
             case n.ExchangeNode():
                 node_labels[node] = "Exchange"
             case n.MappingNode():
