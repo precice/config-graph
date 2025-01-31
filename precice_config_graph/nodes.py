@@ -26,6 +26,21 @@ class TimingType(Enum):
     READ_MAPPING_POST = "read-mapping-post"
 
 
+class CouplingSchemeType(Enum):
+    SERIAL_EXPLICIT = "serial-explicit"
+    PARALLEL_EXPLICIT = "parallel-explicit"
+    SERIAL_IMPLICIT = "serial-implicit"
+    PARALLEL_IMPLICIT = "parallel-implicit"
+    # This enum does not include coupling-scheme:multi, since it is modeled with a different node type
+
+
+class ExportFormat(Enum):
+    VTK = "vtk"
+    VTU = "vtu"
+    VTP = "vtp"
+    CSV = "csv"
+
+
 class ParticipantNode:
     def __init__(
             self, name: str,
@@ -34,7 +49,7 @@ class ParticipantNode:
             mappings: list[MappingNode] = None,
             exports: list[ExportNode] = None,
             actions: list[ActionNode] = None,
-            watchpoints: list[WatchpointNode] = None,
+            watchpoints: list[WatchPointNode] = None,
             watch_integrals: list[WatchIntegralNode] = None
     ):
         self.name = name
@@ -86,18 +101,13 @@ class ParticipantNode:
 
 
 class MeshNode:
-    def __init__(self, name: str, use_data: list[DataNode] = None, write_data: list[DataNode] = None):
+    def __init__(self, name: str, use_data: list[DataNode] = None):
         self.name = name
 
         if use_data is None:
             self.use_data = []
         else:
             self.use_data = use_data
-
-        if write_data is None:
-            self.write_data = []
-        else:
-            self.write_data = write_data
 
 
 class ReceiveMeshNode:
@@ -108,10 +118,27 @@ class ReceiveMeshNode:
 
 
 class CouplingSchemeNode:
-    def __init__(self, first_participant: ParticipantNode, second_participant: ParticipantNode,
-                 exchanges: list[ExchangeNode] = None):
+    def __init__(self, type: CouplingSchemeType, first_participant: ParticipantNode,
+                 second_participant: ParticipantNode, exchanges: list[ExchangeNode] = None):
+        self.type = type
         self.first_participant = first_participant
         self.second_participant = second_participant
+
+        if exchanges is None:
+            self.exchanges = []
+        else:
+            self.exchanges = exchanges
+
+
+class MultiCouplingSchemeNode:
+    def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode] = None,
+                 exchanges: list[ExchangeNode] = None):
+        self.control_participant = control_participant
+
+        if participants is None:
+            self.participants = []
+        else:
+            self.participants = participants
 
         if exchanges is None:
             self.exchanges = []
@@ -159,37 +186,29 @@ class ExchangeNode:
         self.to_participant = to_participant
 
 
-class MultiCouplingSchemeNode:
-    def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode],
-                 exchanges: list[ExchangeNode] = None):
-        self.control_participant = control_participant
-        self.participants = participants
-        if exchanges is None:
-            self.exchanges = []
-        else:
-            self.exchanges = exchanges
-
-
 class ExportNode:
-    def __init__(self, participant: ParticipantNode):
+    def __init__(self, participant: ParticipantNode, format: ExportFormat):
         self.participant = participant
+        self.format = format
 
 
 class ActionNode:
-    def __init__(self, name: str, participant: ParticipantNode, mesh: MeshNode, target_data: DataNode,
-                 timing: TimingType):
-        self.name = name
+    def __init__(self, participant: ParticipantNode, mesh: MeshNode, timing: TimingType,
+                 target_data: DataNode = None, source_data: list[DataNode] = None):
         self.participant = participant
         self.mesh = mesh
-        self.target_data = target_data
         self.timing = timing
+        self.target_data = target_data
+        if source_data is None:
+            self.source_data = []
+        else:
+            self.source_data = source_data
 
 
-class WatchpointNode:
+class WatchPointNode:
     def __init__(self, name: str, participant: ParticipantNode, mesh: MeshNode):
         self.name = name
         self.participant = participant
-
         self.mesh = mesh
 
 
