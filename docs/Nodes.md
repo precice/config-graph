@@ -65,8 +65,8 @@ A multi-coupling-scheme node corresponds to a multi-coupling-scheme XML element.
 coupling-scheme to allow for more than two participants.
 
 - `control_participant`: The key participant of the multi-coupling-scheme, which links to a regular `Participant` node.
-- `participants`: A list of all <em>other</em> participants taking part in the multi-coupling-scheme. Also includes the
-control participant.
+- `participants`: A list of all participants taking part in the multi-coupling-scheme. Also includes the control
+participant.
 - `exchanges`: A ist of all exchanges being used to exchange data in this multi-coupling-scheme.
 
 ## Data
