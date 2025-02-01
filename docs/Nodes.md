@@ -16,7 +16,8 @@ Here you will find a list with brief explanations of each node and its parameter
 The participant is the center of the graph. It saves references to all connected meshes, written and read data,
 mappings, and more.
 
-- `name`: The name of the participant as specified by its tag `name=""`, used in the graph debugging view to identify the
+- `name`: The name of the participant as specified by its tag `name=""`, used in the graph debugging view to identify
+  the
   participant.
 - `write_data`: A list of all data the participant writes. This links to `WriteData` nodes to allow further references.
 - `read_data`: A list of all data the participant reads. This links to `ReadData` nodes to allow further references.
@@ -40,7 +41,6 @@ Mesh nodes represent the XML elements mesh.
 
 - `name`: The name of the mesh as specified by its tag `name=""`, used in the graph debugging view to identify the mesh.
 - `use_data`: A list of all data used by the mesh. This links to `Data` nodes.
-- `write_data`: A list of all data written by the mesh. This links to `Data` nodes.
 
 ## ReceiveMesh
 
@@ -55,6 +55,8 @@ They are also meshes, with the additional information of who they get received b
 
 A coupling-scheme node represents a coupling-scheme element of the XML file.
 
+- `type`: The type of the coupling being used. Possible values are `serial-explicit`,`parallel-explicit`,
+  `serial-implicit` and `parallel-implicit`.
 - `first_participant`: The participant of the coupling-scheme that gets referred to as `first=“”`.
 - `second_participant`: The participant of the coupling-scheme that gets referred to as `second=“”`
 - `exchanges`: A list of exchanges between the participants. This links to `Exchange` nodes for further references.
@@ -66,7 +68,7 @@ coupling-scheme to allow for more than two participants.
 
 - `control_participant`: The key participant of the multi-coupling-scheme, which links to a regular `Participant` node.
 - `participants`: A list of all participants taking part in the multi-coupling-scheme. Also includes the control
-participant.
+  participant.
 - `exchanges`: A ist of all exchanges being used to exchange data in this multi-coupling-scheme.
 
 ## Data
@@ -119,14 +121,17 @@ participants.
 Export nodes are another way a user can receive data from a coupled simulation using preCICE.
 
 - `participant`: The participant whose data gets exported.
+- `format`: The format of the file export. Possible values are `vtk`,`vtu`,`vtp` and `csv`.
 
 ## Action
 
-- `name`: The name of the action, as specified by `<action:…` …/>
 - `participant`: The participant specifying this action.
+- `type`: The type of the action, as specified by `<action:…` …/>. Possible values are `multiply-by-area`, 
+  `divide-by-area`, `summation` and `python`.
 - `mesh`: The mesh this action will operate on.
-- `target_data`: The data that is being targeted by this action.
 - `timing`: When this action will be executed. One value is `write-mapping-post`, the other `read-mapping-post`.
+- `target_data`: The data that will be the output of this action.
+- `source_data`: The data that is the input of this action.
 
 ## Watchpoint
 
