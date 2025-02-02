@@ -34,6 +34,13 @@ class CouplingSchemeType(Enum):
     # This enum does not include coupling-scheme:multi, since it is modeled with a different node type
 
 
+class ActionType(Enum):
+    MULTIPLY_BY_AREA = "multiply-by-area"
+    DIVIDE_BY_AREA = "divide-by-area"
+    SUMMATION = "summation"
+    PYTHON = "python"
+
+
 class ExportFormat(Enum):
     VTK = "vtk"
     VTU = "vtu"
@@ -44,8 +51,10 @@ class ExportFormat(Enum):
 class ParticipantNode:
     def __init__(
             self, name: str,
-            write_data: list[WriteDataNode] = None, read_data: list[ReadDataNode] = None,
-            receive_meshes: list[ReceiveMeshNode] = None, provide_meshes: list[MeshNode] = None,
+            write_data: list[WriteDataNode] = None,
+            read_data: list[ReadDataNode] = None,
+            receive_meshes: list[ReceiveMeshNode] = None,
+            provide_meshes: list[MeshNode] = None,
             mappings: list[MappingNode] = None,
             exports: list[ExportNode] = None,
             actions: list[ActionNode] = None,
@@ -176,7 +185,9 @@ class ReadDataNode:
 
 
 class ExchangeNode:
-    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode, data: DataNode, mesh: MeshNode,
+    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
+                 data: DataNode,
+                 mesh: MeshNode,
                  from_participant: ParticipantNode,
                  to_participant: ParticipantNode):
         self.coupling_scheme = coupling_scheme
@@ -193,9 +204,14 @@ class ExportNode:
 
 
 class ActionNode:
-    def __init__(self, participant: ParticipantNode, mesh: MeshNode, timing: TimingType,
-                 target_data: DataNode = None, source_data: list[DataNode] = None):
+    def __init__(self, participant: ParticipantNode,
+                 type: ActionType,
+                 mesh: MeshNode,
+                 timing: TimingType,
+                 target_data: DataNode = None,
+                 source_data: list[DataNode] = None):
         self.participant = participant
+        self.type = type
         self.mesh = mesh
         self.timing = timing
         self.target_data = target_data

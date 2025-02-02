@@ -12,7 +12,7 @@ from lxml import etree
 
 from . import nodes as n
 from .edges import Edge
-from .nodes import CouplingSchemeType
+from .nodes import CouplingSchemeType, ActionType
 
 
 def get_graph(root: etree.Element) -> nx.Graph:
@@ -137,7 +137,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 for source_data_el in source_data_els:
                     source_data.append(data_nodes[source_data_el.attrib['name']])
 
-            action = n.ActionNode(participant, mesh, timing, target_data, source_data)
+            kind = ActionType(kind)
+
+            action = n.ActionNode(participant, kind, mesh, timing, target_data, source_data)
             action_nodes.append(action)
 
         # Watch-Points
@@ -442,9 +444,9 @@ def print_graph(graph: nx.Graph):
             case n.MappingNode():
                 node_labels[node] = f"Mapping ({node.direction.name})"
             case n.ExportNode():
-                node_labels[node] = f"Export {node.format.value}"
+                node_labels[node] = f"Export ({node.format.value})"
             case n.ActionNode():
-                node_labels[node] = "Action"
+                node_labels[node] = f"Action ({node.type.value})"
             case n.WriteDataNode():
                 node_labels[node] = f"Write {node.data.name}"
             case n.ReadDataNode():
