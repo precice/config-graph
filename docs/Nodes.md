@@ -17,8 +17,7 @@ The participant is the center of the graph. It saves references to all connected
 mappings, and more.
 
 - `name`: The name of the participant as specified by its tag `name=""`, used in the graph debugging view to identify
-  the
-  participant.
+  the participant.
 - `write_data`: A list of all data the participant writes. This links to `WriteData` nodes to allow further references.
 - `read_data`: A list of all data the participant reads. This links to `ReadData` nodes to allow further references.
 - `receive_meshes`: A list of all meshes the participant receives. This links to `ReceiveMesh` nodes to allow further
