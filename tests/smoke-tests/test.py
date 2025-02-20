@@ -1,0 +1,29 @@
+# This smoke test does not test generated graphs for correctness. Instead, it just tests if graph generation does not
+# fail on the inputs.
+# Provide files to test in the ./configs/-folder
+
+import glob
+import os
+
+from precice_config_graph import graph
+from precice_config_graph import xml_processing
+
+search_pattern = os.getcwd() + "/tests/smoke-tests/configs/**/*.xml"
+
+print("Testing all files in " + search_pattern)
+
+errors = []
+for file in glob.glob(search_pattern, recursive=True):
+    try:
+        xml = xml_processing.parse_file(file)
+        G = graph.get_graph(xml)
+    except Exception as e:
+        errors.append((file, e))
+
+if errors:
+    for (file, error) in errors:
+        print(f"Error in {file}:\n     {error}")
+else:
+    print("Graph generation did not fail on any files provided")
+
+assert not errors
