@@ -9,8 +9,9 @@ from precice_config_graph import graph
 from precice_config_graph import xml_processing
 
 search_pattern = os.getcwd() + "/tests/smoke-tests/configs/**/*.xml"
+files = glob.glob(search_pattern, recursive=True)
 
-print("Testing all files in " + search_pattern)
+print(f"Testing all {len(files)} files matching {search_pattern}")
 
 errors = []
 for file in glob.glob(search_pattern, recursive=True):
@@ -26,4 +27,4 @@ if errors:
 else:
     print("Graph generation did not fail on any files provided")
 
-assert not errors
+assert not errors, f"{len(errors)} files produced errors"
