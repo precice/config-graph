@@ -3,7 +3,7 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import DataType, Direction, TimingType, CouplingSchemeType
+from precice_config_graph.nodes import DataType, Direction, TimingType, CouplingSchemeType, ActionType
 
 xml = xml_processing.parse_file("tests/example-configs/actions/precice-config.xml")
 G_actual = graph.get_graph(xml)
@@ -51,8 +51,8 @@ n_read_data = n.ReadDataNode(n_propagator_participant, data=n_color, mesh=n_prop
 n_propagator_participant.read_data.append(n_read_data)
 
 n_action = n.ActionNode(
-    n_propagator_participant, mesh=n_propagator_mesh, timing=TimingType.WRITE_MAPPING_POST, target_data=n_color,
-    source_data=[],
+    n_propagator_participant, type=ActionType.MULTIPLY_BY_AREA, mesh=n_propagator_mesh,
+    timing=TimingType.WRITE_MAPPING_POST, target_data=n_color, source_data=[],
 )
 n_propagator_participant.actions.append(n_action)
 
