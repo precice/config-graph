@@ -1,6 +1,7 @@
 # This smoke test does not test generated graphs for correctness. Instead, it just tests if graph generation does not
 # fail on the inputs.
-# Provide files to test in the ./configs/-folder
+# Provide files to test in the "./configs/"-folder. This script will test all files (including those in subfolders)
+# whose names end in the ".xml"-extension.
 
 import glob
 import os
