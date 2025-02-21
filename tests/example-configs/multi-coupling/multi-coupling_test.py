@@ -234,12 +234,6 @@ G_expected = nx.Graph()
 for (node_a, node_b, attr) in edges:
     G_expected.add_edge(node_a, node_b, attr=attr)
 
-print(nx.to_dict_of_dicts(G_expected))
-print("------------------------")
-print(nx.to_dict_of_dicts(G_actual))
-graph.print_graph(G_actual)
-graph.print_graph(G_expected)
-
 assert nx.is_isomorphic(G_expected, G_actual), \
     f"Graphs did not match. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "\
     + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
