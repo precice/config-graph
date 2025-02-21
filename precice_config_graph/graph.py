@@ -458,7 +458,7 @@ def print_graph(graph: nx.Graph):
             case _:
                 node_labels[node] = ""
 
-    pos = nx.spring_layout(graph)
+    pos = nx.spring_layout(graph, seed=1) # set the seed so that generated graph always has same layout
     nx.draw(
         graph, pos,
         with_labels=True, arrows=True,
