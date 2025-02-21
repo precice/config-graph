@@ -209,7 +209,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                         assert control_participant is None  # there must not be multiple control participants
                         control_participant = participant
 
-                assert control_participant is not None
+                assert control_participant is not None, "There must be a control participant"
 
                 coupling_scheme = n.MultiCouplingSchemeNode(control_participant, participants)
 
