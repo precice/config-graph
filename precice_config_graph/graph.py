@@ -436,9 +436,9 @@ def print_graph(graph: nx.Graph):
             case n.ParticipantNode() | n.MeshNode() | n.DataNode() | n.WatchPointNode() | n.WatchIntegralNode():
                 node_labels[node] = node.name
             case n.CouplingSchemeNode():
-                node_labels[node] = f"Coupling scheme ({node.type.value})"
+                node_labels[node] = f"Coupling Scheme ({node.type.value})"
             case n.MultiCouplingSchemeNode():
-                node_labels[node] = "Coupling scheme (multi)"
+                node_labels[node] = "Multi Coupling Scheme"
             case n.ExchangeNode():
                 node_labels[node] = "Exchange"
             case n.MappingNode():
