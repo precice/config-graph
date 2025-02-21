@@ -248,8 +248,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
             case "mpi":
                 # TODO: Implement MPI. Maybe raise a warning instead of an error.
                 raise NotImplementedError("MPI M2N type is not implemented")
+            case "mpi-multiple-ports":
+                raise NotImplementedError("Multiple ports M2N type is not implemented")
             case _:
-                raise ValueError("Unknown m2n type")
+                raise ValueError("Unknown M2N type")
 
     # BUILD GRAPH
     # from found nodes and inferred edges
