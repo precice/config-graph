@@ -9,7 +9,7 @@ xml = xml_processing.parse_file("tests/example-configs/actions/precice-config.xm
 G_actual = graph.get_graph(xml)
 
 
-G_expected = nx.Graph()
+edges = []
 
 # Data
 n_color = n.DataNode("Color", DataType.SCALAR)
@@ -23,13 +23,14 @@ n_generator_participant = n.ParticipantNode("Generator", provide_meshes=[n_gener
 n_generator_write_data = n.WriteDataNode(n_generator_participant, n_color, n_generator_mesh)
 n_generator_participant.write_data.append(n_generator_write_data)
 
-G_expected.add_edge(n_generator_mesh, n_color, attr=Edge.USE_DATA)
+edges += [
+    (n_generator_mesh, n_color, Edge.USE_DATA),
+    (n_generator_mesh, n_generator_participant, Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES),
 
-G_expected.add_edge(n_generator_mesh, n_generator_participant, attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
-
-G_expected.add_edge(n_generator_write_data, n_generator_participant, attr=Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO)
-G_expected.add_edge(n_generator_write_data, n_generator_mesh, attr=Edge.WRITE_DATA__WRITES_TO_MESH)
-G_expected.add_edge(n_generator_write_data, n_color, attr=Edge.WRITE_DATA__WRITES_TO_DATA)
+    (n_generator_write_data, n_generator_participant, Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO),
+    (n_generator_write_data, n_generator_mesh, Edge.WRITE_DATA__WRITES_TO_MESH),
+    (n_generator_write_data, n_color, Edge.WRITE_DATA__WRITES_TO_DATA),
+]
 
 
 # Propagator
@@ -55,29 +56,32 @@ n_action = n.ActionNode(
 )
 n_propagator_participant.actions.append(n_action)
 
-G_expected.add_edge(n_propagator_mesh, n_color, attr=Edge.USE_DATA)
+edges += [
+    (n_propagator_mesh, n_color, Edge.USE_DATA),
+    (n_propagator_mesh, n_propagator_participant, Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES),
 
-G_expected.add_edge(n_propagator_mesh, n_propagator_participant, attr=Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES)
+    (n_propagator_receive_mesh, n_propagator_participant, Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO),
+    (n_propagator_receive_mesh, n_generator_participant, Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM),
+    (n_propagator_receive_mesh, n_generator_mesh, Edge.RECEIVE_MESH__MESH),
 
-G_expected.add_edge(n_propagator_receive_mesh, n_propagator_participant, attr=Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO)
-G_expected.add_edge(n_propagator_receive_mesh, n_generator_participant, attr=Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM)
-G_expected.add_edge(n_propagator_receive_mesh, n_generator_mesh, attr=Edge.RECEIVE_MESH__MESH)
+    (n_mapping, n_propagator_participant, Edge.MAPPING__PARTICIPANT__BELONGS_TO),
+    (n_mapping, n_generator_mesh, Edge.MAPPING__FROM_MESH),
+    (n_mapping, n_propagator_mesh, Edge.MAPPING__TO_MESH),
 
-G_expected.add_edge(n_mapping, n_propagator_participant, attr=Edge.MAPPING__PARTICIPANT__BELONGS_TO)
-G_expected.add_edge(n_mapping, n_generator_mesh, attr=Edge.MAPPING__FROM_MESH)
-G_expected.add_edge(n_mapping, n_propagator_mesh, attr=Edge.MAPPING__TO_MESH)
+    (n_read_data, n_propagator_participant, Edge.READ_DATA__PARTICIPANT__BELONGS_TO),
+    (n_read_data, n_color, Edge.READ_DATA__DATA_READ_BY),
+    (n_read_data, n_propagator_mesh, Edge.READ_DATA__MESH_READ_BY),
 
-G_expected.add_edge(n_read_data, n_propagator_participant, attr=Edge.READ_DATA__PARTICIPANT__BELONGS_TO)
-G_expected.add_edge(n_read_data, n_color, attr=Edge.READ_DATA__DATA_READ_BY)
-G_expected.add_edge(n_read_data, n_propagator_mesh, attr=Edge.READ_DATA__MESH_READ_BY)
-
-G_expected.add_edge(n_action, n_propagator_participant, attr=Edge.ACTION__PARTICIPANT__BELONGS_TO)
-G_expected.add_edge(n_action, n_propagator_mesh, attr=Edge.ACTION__MESH)
-G_expected.add_edge(n_action, n_color, attr=Edge.ACTION__TARGET_DATA)
+    (n_action, n_propagator_participant, Edge.ACTION__PARTICIPANT__BELONGS_TO),
+    (n_action, n_propagator_mesh, Edge.ACTION__MESH),
+    (n_action, n_color, Edge.ACTION__TARGET_DATA),
+]
 
 
 # M2N Sockets edge
-G_expected.add_edge(n_generator_participant, n_propagator_participant, attr=Edge.SOCKET)
+edges += [
+    (n_generator_participant, n_propagator_participant, Edge.SOCKET)
+]
 
 # Couping scheme
 n_coupling_scheme = n.CouplingSchemeNode(
@@ -91,15 +95,20 @@ n_exchange = n.ExchangeNode(
 )
 n_coupling_scheme.exchanges.append(n_exchange)
 
-G_expected.add_edge(n_coupling_scheme, n_generator_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)
-G_expected.add_edge(n_coupling_scheme, n_propagator_participant, attr=Edge.COUPLING_SCHEME__PARTICIPANT_SECOND)
+edges += [
+    (n_coupling_scheme, n_generator_participant, Edge.COUPLING_SCHEME__PARTICIPANT_FIRST),
+    (n_coupling_scheme, n_propagator_participant, Edge.COUPLING_SCHEME__PARTICIPANT_SECOND),
 
-G_expected.add_edge(n_exchange, n_coupling_scheme, attr=Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)
-G_expected.add_edge(n_exchange, n_color, attr=Edge.EXCHANGE__DATA)
-G_expected.add_edge(n_exchange, n_generator_mesh, attr=Edge.EXCHANGE__MESH)
-G_expected.add_edge(n_exchange, n_generator_participant, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
-G_expected.add_edge(n_exchange, n_propagator_participant, attr=Edge.EXCHANGE__EXCHANGES_TO)
+    (n_exchange, n_coupling_scheme, Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO),
+    (n_exchange, n_color, Edge.EXCHANGE__DATA),
+    (n_exchange, n_generator_mesh,Edge.EXCHANGE__MESH),
+    (n_exchange, n_generator_participant,Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY),
+    (n_exchange, n_propagator_participant, Edge.EXCHANGE__EXCHANGES_TO),
+]
 
+G_expected = nx.Graph()
+for (node_a, node_b, attr) in edges:
+    G_expected.add_edge(node_a, node_b, attr=attr)
 
 assert nx.is_isomorphic(G_expected, G_actual),\
     f"Graphs did not match: {nx.to_dict_of_dicts(G_actual)}, {nx.to_dict_of_dicts(G_expected)}"
