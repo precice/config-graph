@@ -71,7 +71,7 @@ This edge connects a mapping and the to-mesh of it.
 
 ## Mapping - mesh
 
-This edge connects a mapping and the to-mesh of it.
+This edge connects a mapping and the from-mesh of it.
 
 - `type`: MAPPING__FROM_MESH
 - `from`: Mapping
