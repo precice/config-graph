@@ -178,7 +178,13 @@ def get_graph(root: etree.Element) -> nx.Graph:
             from_participant_name = receive_mesh_el.attrib['from']  # TODO: Error on not found
             from_participant = participant_nodes[from_participant_name]
 
-            receive_mesh = n.ReceiveMeshNode(participant, mesh, from_participant)
+            direct_access_name = receive_mesh_el.attrib.get('direct-access')
+            if direct_access_name == 'true':
+                direct_access = True
+            else:
+                direct_access = False
+
+            receive_mesh = n.ReceiveMeshNode(participant, mesh, from_participant, direct_access)
             participant.receive_meshes.append(receive_mesh)
             receive_mesh_nodes.append(receive_mesh)
 
