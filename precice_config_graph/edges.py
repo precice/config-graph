@@ -38,8 +38,11 @@ class Edge(Enum):
     # The connection between exchange and coupling scheme it is part of
     EXCHANGE__COUPLING_SCHEME__BELONGS_TO = "exchange_belongs-to"
 
-    # participant (connector) -> participant (acceptor)
-    SOCKET = "socket"
+    # m2n edges
+    # m2n <--> acceptor
+    ACCEPTOR = "acceptor"
+    # m2n <--> connector
+    CONNECTOR = "connector"
 
     # participant (first) <--> coupling-scheme
     COUPLING_SCHEME__PARTICIPANT_FIRST = "coupling-scheme_participant-first"
