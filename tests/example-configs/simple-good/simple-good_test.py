@@ -3,7 +3,7 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import DataType, Direction, CouplingSchemeType
+from precice_config_graph.nodes import DataType, Direction, CouplingSchemeType, M2NType
 
 xml = xml_processing.parse_file("tests/example-configs/simple-good/precice-config.xml")
 G_actual = graph.get_graph(xml)
@@ -51,7 +51,8 @@ n_coupling_scheme_generator_propagator = n.CouplingSchemeNode(CouplingSchemeType
                                                               [n_exchange_color_generator_mesh_generator_propagator])
 n_exchange_color_generator_mesh_generator_propagator.coupling_scheme = n_coupling_scheme_generator_propagator
 
-# TODO m2n?
+# m2n
+n_m2n_generator_propagator = n.M2NNode(M2NType.SOCKETS, n_participant_generator, n_participant_propagator, )
 
 # Edges in the order specified by docs/Edges.md
 
@@ -96,8 +97,9 @@ edges += [(n_exchange_color_generator_mesh_generator_propagator, n_mesh_generato
 edges += [(n_coupling_scheme_generator_propagator, n_exchange_color_generator_mesh_generator_propagator,
            Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)]
 
-# Participant -- participant
-edges += [(n_participant_propagator, n_participant_generator, Edge.SOCKET)]
+# M2N -- participant
+edges += [(n_m2n_generator_propagator, n_participant_generator, Edge.ACCEPTOR)]
+edges += [(n_m2n_generator_propagator, n_participant_propagator, Edge.CONNECTOR)]
 
 # Coupling-scheme -- participant
 edges += [(n_coupling_scheme_generator_propagator, n_participant_generator, Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)]
@@ -133,13 +135,23 @@ G_expected = nx.Graph()
 for (node_a, node_b, attr) in edges:
     G_expected.add_edge(node_a, node_b, attr=attr)
 
-print(nx.to_dict_of_dicts(G_expected))
-print("------------------------")
-print(nx.to_dict_of_dicts(G_actual))
+
+# print(nx.to_dict_of_dicts(G_expected))
+# print("------------------------")
+# print(nx.to_dict_of_dicts(G_actual))
 # graph.print_graph(G_actual)
 # graph.print_graph(G_expected)
 
+def node_match(node_a, node_b):
+    return node_a == node_b
 
-assert nx.is_isomorphic(G_expected, G_actual), \
+
+def edge_match(edge_a, edge_b):
+    return edge_a['attr'] == edge_b['attr']
+
+
+assert nx.is_isomorphic(G_expected, G_actual, node_match=node_match, edge_match=edge_match), \
     f"Graphs did not match. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), " \
     + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
+
+print("\nGraphs are isomorphic.")
