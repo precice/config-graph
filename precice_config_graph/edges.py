@@ -40,9 +40,9 @@ class Edge(Enum):
 
     # m2n edges
     # m2n <--> acceptor
-    M2N_ACCEPTOR = "m2n_acceptor"
+    M2N__PARTICIPANT_ACCEPTOR = "m2n_participant-acceptor"
     # m2n <--> connector
-    M2N_CONNECTOR = "m2n_connector"
+    M2N__PARTICIPANT_CONNECTOR = "m2n_participant-connector"
 
     # participant (first) <--> coupling-scheme
     COUPLING_SCHEME__PARTICIPANT_FIRST = "coupling-scheme_participant-first"
