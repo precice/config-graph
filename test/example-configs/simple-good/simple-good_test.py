@@ -5,7 +5,7 @@ from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
 from precice_config_graph.nodes import DataType, Direction, CouplingSchemeType
 
-xml = xml_processing.parse_file("test/example-configs/simple-good/precice-config.xml")
+xml = xml_processing.parse_file("precice-config.xml")
 G_actual = graph.get_graph(xml)
 
 edges = []
@@ -63,7 +63,7 @@ edges += [(n_participant_generator, n_receive_mesh_propagator_generator_mesh_gen
 edges += [(n_receive_mesh_propagator_generator_mesh_generator, n_mesh_generator, Edge.RECEIVE_MESH__MESH)]
 
 # Receive-mesh -- participant
-edges += [(n_receive_mesh_propagator_generator_mesh_generator, n_participant_generator,
+edges += [(n_receive_mesh_propagator_generator_mesh_generator, n_participant_propagator,
            Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO)]
 
 # Participant -- mesh
@@ -136,8 +136,9 @@ for (node_a, node_b, attr) in edges:
 print(nx.to_dict_of_dicts(G_expected))
 print("------------------------")
 print(nx.to_dict_of_dicts(G_actual))
-graph.print_graph(G_actual)
-graph.print_graph(G_expected)
+# graph.print_graph(G_actual)
+# graph.print_graph(G_expected)
+
 
 assert nx.is_isomorphic(G_expected, G_actual), \
     f"Graphs did not match. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), " \
