@@ -211,7 +211,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                         assert control_participant is None  # there must not be multiple control participants
                         control_participant = participant
 
-                assert control_participant is not None
+                assert control_participant is not None, "There must be a control participant"
 
                 coupling_scheme = n.MultiCouplingSchemeNode(control_participant, participants)
 
@@ -223,11 +223,11 @@ def get_graph(root: etree.Element) -> nx.Graph:
             data = data_nodes[data_name]
             mesh_name = exchange_el.attrib['mesh']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
-            from_participant_name = exchange_el.attrib[
-                'from']  # TODO: Error on not found and different from first or second participant
+            from_participant_name = exchange_el.attrib['from']
+                # TODO: Error on not found and different from first or second participant
             from_participant = participant_nodes[from_participant_name]
-            to_participant_name = exchange_el.attrib[
-                'to']  # TODO: Error on not found and different from first or second participant
+            to_participant_name = exchange_el.attrib['to']
+                # TODO: Error on not found and different from first or second participant
             to_participant = participant_nodes[to_participant_name]
 
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
@@ -461,7 +461,7 @@ def print_graph(graph: nx.Graph):
             case _:
                 node_labels[node] = ""
 
-    pos = nx.spring_layout(graph)
+    pos = nx.spring_layout(graph, seed=1) # set the seed so that generated graph always has same layout
     nx.draw(
         graph, pos,
         with_labels=True, arrows=True,
