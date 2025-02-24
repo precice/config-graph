@@ -5,7 +5,7 @@ from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
 from precice_config_graph.nodes import DataType, Direction, CouplingSchemeType
 
-xml = xml_processing.parse_file("precice-config.xml")
+xml = xml_processing.parse_file("tests/example-configs/simple-good/precice-config.xml")
 G_actual = graph.get_graph(xml)
 
 edges = []
