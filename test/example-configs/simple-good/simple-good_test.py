@@ -116,8 +116,8 @@ edges += [(n_write_data_generator_color_generator_mesh, n_data_color, Edge.WRITE
 edges += [(n_write_data_generator_color_generator_mesh, n_mesh_generator, Edge.WRITE_DATA__WRITES_TO_MESH)]
 
 # Write-data -- participant
-edges += [
-    (n_write_data_generator_color_generator_mesh, n_participant_generator, Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO)]
+edges += [(n_write_data_generator_color_generator_mesh, n_participant_generator,
+           Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO)]
 
 # Data -- read-data
 edges += [(n_data_color, n_read_data_propagator_color_propagator_mesh, Edge.READ_DATA__DATA_READ_BY)]
@@ -126,8 +126,8 @@ edges += [(n_data_color, n_read_data_propagator_color_propagator_mesh, Edge.READ
 edges += [(n_mesh_propagator, n_read_data_propagator_color_propagator_mesh, Edge.READ_DATA__MESH_READ_BY)]
 
 # Participant -- read-data
-edges += [
-    (n_participant_propagator, n_read_data_propagator_color_propagator_mesh, Edge.READ_DATA__PARTICIPANT__BELONGS_TO)]
+edges += [(n_participant_propagator, n_read_data_propagator_color_propagator_mesh,
+           Edge.READ_DATA__PARTICIPANT__BELONGS_TO)]
 
 G_expected = nx.Graph()
 for (node_a, node_b, attr) in edges:
