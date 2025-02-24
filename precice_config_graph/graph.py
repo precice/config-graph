@@ -179,11 +179,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
             from_participant_name = receive_mesh_el.attrib['from']  # TODO: Error on not found
             from_participant = participant_nodes[from_participant_name]
 
-            direct_access_name = receive_mesh_el.attrib.get('direct-access')
-            if direct_access_name == 'true':
-                direct_access = True
-            else:
-                direct_access = False
+            direct_access_str = receive_mesh_el.attrib.get('direct-access')
+            direct_access = convert_string_to_bool(direct_access_str)
 
             receive_mesh = n.ReceiveMeshNode(participant, mesh, from_participant, direct_access)
             participant.receive_meshes.append(receive_mesh)
@@ -232,10 +229,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh_name = exchange_el.attrib['mesh']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
             from_participant_name = exchange_el.attrib['from']
-                # TODO: Error on not found and different from first or second participant
+            # TODO: Error on not found and different from first or second participant
             from_participant = participant_nodes[from_participant_name]
             to_participant_name = exchange_el.attrib['to']
-                # TODO: Error on not found and different from first or second participant
+            # TODO: Error on not found and different from first or second participant
             to_participant = participant_nodes[to_participant_name]
 
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
@@ -470,7 +467,7 @@ def print_graph(graph: nx.Graph):
             case _:
                 node_labels[node] = ""
 
-    pos = nx.spring_layout(graph, seed=1) # set the seed so that generated graph always has same layout
+    pos = nx.spring_layout(graph, seed=1)  # set the seed so that generated graph always has same layout
     nx.draw(
         graph, pos,
         with_labels=True, arrows=True,
