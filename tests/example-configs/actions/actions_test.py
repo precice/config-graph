@@ -38,7 +38,7 @@ def test_graph():
     n_propagator_participant = n.ParticipantNode("Propagator", provide_meshes=[n_propagator_mesh])
 
     n_propagator_receive_mesh = n.ReceiveMeshNode(
-        n_propagator_participant, from_participant=n_generator_participant, mesh=n_generator_mesh
+        n_propagator_participant, from_participant=n_generator_participant, mesh=n_generator_mesh, direct_access=False
     )
 
     n_mapping = n.MappingNode(

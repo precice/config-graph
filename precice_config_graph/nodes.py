@@ -127,10 +127,12 @@ class MeshNode:
 
 
 class ReceiveMeshNode:
-    def __init__(self, participant: ParticipantNode, mesh: MeshNode, from_participant: ParticipantNode):
+    def __init__(self, participant: ParticipantNode, mesh: MeshNode, from_participant: ParticipantNode,
+                 direct_access: bool):
         self.participant = participant
         self.mesh = mesh
         self.from_participant = from_participant
+        self.direct_access = direct_access
 
 
 class CouplingSchemeNode:
