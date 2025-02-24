@@ -45,6 +45,7 @@ class ActionType(Enum):
     DIVIDE_BY_AREA = "divide-by-area"
     SUMMATION = "summation"
     PYTHON = "python"
+    RECORDER = "recorder"
 
 
 class ExportFormat(Enum):
