@@ -149,3 +149,11 @@ participants.
 - `name`: The name of the watchpoint.
 - `participant`: The participant who the watch-integral belongs to.
 - `mesh`: The mesh which gets observed
+
+## M2N
+
+To let participants exchange information (physically), they have to be connected via an m2n node. 
+
+- `type`: The type of the m2n node. Possible values are `sockets`, `mpi` and `mpi-multiple-ports`.
+- `acceptor`: The participant defined as `acceptor=...`.
+- `connector`: The participant defined as `conntector=...`.
