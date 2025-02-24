@@ -137,7 +137,7 @@ This edge connects a coupling scheme with its exchanges.
 
 This edge connects the "acceptor" participant and its m2n node.
 
-- `type`: ACCEPTOR
+- `type`: M2N_ACCEPTOR
 - `from`: M2N
 - `to`: Participant
 - `label`: acceptor
@@ -146,7 +146,7 @@ This edge connects the "acceptor" participant and its m2n node.
 
 This edge connects the "connector" participant and its m2n node.
 
-- `type`: CONNECTOR
+- `type`: M2N_CONNECTOR
 - `from`: M2N
 - `to`: Participant
 - `label`: connector

@@ -162,16 +162,16 @@ m2n_nastin_solidz2 = n.M2NNode(M2NType.SOCKETS, n_participant_nastin, n_particip
 m2n_nastin_solidz3 = n.M2NNode(M2NType.SOCKETS, n_participant_nastin, n_participant_solizd3)
 
 edges += [
-    (m2n_nastin_solidz1, n_participant_nastin, Edge.ACCEPTOR),
-    (m2n_nastin_solidz1, n_participant_solizd1, Edge.CONNECTOR),
+    (m2n_nastin_solidz1, n_participant_nastin, Edge.M2N_ACCEPTOR),
+    (m2n_nastin_solidz1, n_participant_solizd1, Edge.M2N_CONNECTOR),
 ]
 edges += [
-    (m2n_nastin_solidz2, n_participant_nastin, Edge.ACCEPTOR),
-    (m2n_nastin_solidz2, n_participant_solizd2, Edge.CONNECTOR),
+    (m2n_nastin_solidz2, n_participant_nastin, Edge.M2N_ACCEPTOR),
+    (m2n_nastin_solidz2, n_participant_solizd2, Edge.M2N_CONNECTOR),
 ]
 edges += [
-    (m2n_nastin_solidz3, n_participant_nastin, Edge.ACCEPTOR),
-    (m2n_nastin_solidz3, n_participant_solizd3, Edge.CONNECTOR),
+    (m2n_nastin_solidz3, n_participant_nastin, Edge.M2N_ACCEPTOR),
+    (m2n_nastin_solidz3, n_participant_solizd3, Edge.M2N_CONNECTOR),
 ]
 
 # Couping scheme

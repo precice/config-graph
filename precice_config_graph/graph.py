@@ -340,8 +340,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for m2n in m2n_nodes:
         g.add_node(m2n)
-        g.add_edge(m2n, m2n.acceptor, attr=Edge.ACCEPTOR)
-        g.add_edge(m2n, m2n.connector, attr=Edge.CONNECTOR)
+        g.add_edge(m2n, m2n.acceptor, attr=Edge.M2N_ACCEPTOR)
+        g.add_edge(m2n, m2n.connector, attr=Edge.M2N_CONNECTOR)
 
     return g
 
@@ -411,9 +411,9 @@ def print_graph(graph: nx.Graph):
                 return "mesh"
             case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
                 return "exchanged by"
-            case Edge.ACCEPTOR:
+            case Edge.M2N_ACCEPTOR:
                 return "acceptor"
-            case Edge.CONNECTOR:
+            case Edge.M2N_CONNECTOR:
                 return "connector"
             case Edge.COUPLING_SCHEME__PARTICIPANT_FIRST:
                 return "first"

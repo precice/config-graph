@@ -79,8 +79,8 @@ edges += [
 
 # M2N Edges
 edges += [
-    (n_m2n, n_generator_participant, Edge.ACCEPTOR),
-    (n_m2n, n_propagator_participant, Edge.CONNECTOR)
+    (n_m2n, n_generator_participant, Edge.M2N_ACCEPTOR),
+    (n_m2n, n_propagator_participant, Edge.M2N_CONNECTOR)
 ]
 
 # Couping scheme

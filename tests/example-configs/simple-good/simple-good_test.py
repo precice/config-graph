@@ -98,8 +98,8 @@ edges += [(n_coupling_scheme_generator_propagator, n_exchange_color_generator_me
            Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)]
 
 # M2N -- participant
-edges += [(n_m2n_generator_propagator, n_participant_generator, Edge.ACCEPTOR)]
-edges += [(n_m2n_generator_propagator, n_participant_propagator, Edge.CONNECTOR)]
+edges += [(n_m2n_generator_propagator, n_participant_generator, Edge.M2N_ACCEPTOR)]
+edges += [(n_m2n_generator_propagator, n_participant_propagator, Edge.M2N_CONNECTOR)]
 
 # Coupling-scheme -- participant
 edges += [(n_coupling_scheme_generator_propagator, n_participant_generator, Edge.COUPLING_SCHEME__PARTICIPANT_FIRST)]
