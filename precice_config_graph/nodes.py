@@ -11,6 +11,12 @@ from __future__ import annotations
 from enum import Enum
 
 
+class M2NType(Enum):
+    SOCKETS = "sockets"
+    MPI = "mpi"
+    MPI_MULTIPLE_PORTS = "mpi-multiple-ports"
+
+
 class Direction(Enum):
     READ = "read"
     WRITE = "write"
@@ -233,3 +239,10 @@ class WatchIntegralNode:
         self.name = name
         self.participant = participant
         self.mesh = mesh
+
+
+class M2NNode:
+    def __init__(self, type: M2NType, acceptor: ParticipantNode, connector: ParticipantNode):
+        self.type = type
+        self.acceptor = acceptor
+        self.connector = connector

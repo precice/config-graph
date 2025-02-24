@@ -12,7 +12,7 @@ from lxml import etree
 
 from . import nodes as n
 from .edges import Edge
-from .nodes import CouplingSchemeType, ActionType
+from .nodes import CouplingSchemeType, ActionType, M2NType
 
 
 def get_graph(root: etree.Element) -> nx.Graph:
@@ -40,8 +40,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
     mapping_nodes: list[n.MappingNode] = []
     export_nodes: list[n.ExportNode] = []
     exchange_nodes: list[n.ExchangeNode] = []
-    socket_edges: list[(n.ParticipantNode, n.ParticipantNode)] = []
     action_nodes: list[n.ActionNode] = []
+    m2n_nodes: list[n.M2NNode] = []
     watch_point_nodes: list[n.WatchPointNode] = []
     watch_integral_nodes: list[n.WatchIntegralNode] = []
 
@@ -215,7 +215,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
                 coupling_scheme = n.MultiCouplingSchemeNode(control_participant, participants)
 
-        assert coupling_scheme is not None # there must always be one participant that is in control
+        assert coupling_scheme is not None  # there must always be one participant that is in control
 
         # Exchanges – <exchange />
         for exchange_el in coupling_scheme_el.findall("exchange"):
@@ -223,9 +223,11 @@ def get_graph(root: etree.Element) -> nx.Graph:
             data = data_nodes[data_name]
             mesh_name = exchange_el.attrib['mesh']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
-            from_participant_name = exchange_el.attrib['from']  # TODO: Error on not found and different from first or second participant
+            from_participant_name = exchange_el.attrib['from']
+                # TODO: Error on not found and different from first or second participant
             from_participant = participant_nodes[from_participant_name]
-            to_participant_name = exchange_el.attrib['to']  # TODO: Error on not found and different from first or second participant
+            to_participant_name = exchange_el.attrib['to']
+                # TODO: Error on not found and different from first or second participant
             to_participant = participant_nodes[to_participant_name]
 
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
@@ -240,21 +242,13 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     # M2N – <m2n:… />
     for (m2n, kind) in find_all_with_prefix(root, "m2n"):
-        match kind:
-            case "sockets":
-                acceptor_name = m2n.attrib['acceptor']  # TODO: Error on not found
-                acceptor = participant_nodes[acceptor_name]
-                connector_name = m2n.attrib['connector']  # TODO: Error on not found
-                connector = participant_nodes[connector_name]
-                socket_edges.append((acceptor, connector))
-            case "mpi":
-                # TODO: Implement MPI. Maybe raise a warning instead of an error.
-                raise NotImplementedError("MPI M2N type is not implemented")
-            case "mpi-multiple-ports":
-                # TODO: Implement multiple ports MPI.
-                raise NotImplementedError("Multiple ports MPI M2N type is not implemented")
-            case _:
-                raise ValueError("Unknown M2N type")
+        type = M2NType(kind)
+        acceptor_name = m2n.attrib['acceptor']  # TODO: Error on not found
+        acceptor = participant_nodes[acceptor_name]
+        connector_name = m2n.attrib['connector']  # TODO: Error on not found
+        connector = participant_nodes[connector_name]
+        m2n = n.M2NNode(type, acceptor, connector)
+        m2n_nodes.append(m2n)
 
     # BUILD GRAPH
     # from found nodes and inferred edges
@@ -331,9 +325,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for coupling in multi_coupling_nodes:
         g.add_node(coupling)
-        g.add_edge(coupling, coupling.control_participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL)
         for participant in coupling.participants:
             g.add_edge(coupling, participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT)
+        # Previous, “regular” multi-coupling scheme participant edge, gets overwritten
+        g.add_edge(coupling, coupling.control_participant, attr=Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL)
 
     for exchange in exchange_nodes:
         g.add_node(exchange)
@@ -343,8 +338,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
         g.add_edge(exchange, exchange.mesh, attr=Edge.EXCHANGE__MESH)
         g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)
 
-    for (acceptor, connector) in socket_edges:
-        g.add_edge(connector, acceptor, attr=Edge.SOCKET)
+    for m2n in m2n_nodes:
+        g.add_node(m2n)
+        g.add_edge(m2n, m2n.acceptor, attr=Edge.M2N__PARTICIPANT_ACCEPTOR)
+        g.add_edge(m2n, m2n.connector, attr=Edge.M2N__PARTICIPANT_CONNECTOR)
 
     return g
 
@@ -394,7 +391,7 @@ def print_graph(graph: nx.Graph):
                   Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
                   Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO |
                   Edge.ACTION__PARTICIPANT__BELONGS_TO | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO |
-                Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO):
+                  Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO):
                 return "belongs to"
             case Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM:
                 return "received from"
@@ -414,8 +411,10 @@ def print_graph(graph: nx.Graph):
                 return "mesh"
             case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
                 return "exchanged by"
-            case Edge.SOCKET:
-                return "socket"
+            case Edge.M2N__PARTICIPANT_ACCEPTOR:
+                return "acceptor"
+            case Edge.M2N__PARTICIPANT_CONNECTOR:
+                return "connector"
             case Edge.COUPLING_SCHEME__PARTICIPANT_FIRST:
                 return "first"
             case Edge.COUPLING_SCHEME__PARTICIPANT_SECOND:
@@ -458,6 +457,8 @@ def print_graph(graph: nx.Graph):
                 node_labels[node] = f"Read {node.data.name}"
             case n.ReceiveMeshNode():
                 node_labels[node] = f"Receive {node.mesh.name}"
+            case n.M2NNode():
+                node_labels[node] = f"M2N {node.type.value}"
             case _:
                 node_labels[node] = ""
 

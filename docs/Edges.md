@@ -133,15 +133,23 @@ This edge connects a coupling scheme with its exchanges.
 - `to`: Coupling-scheme
 - `label`: belongs to
 
-## Participant - participant
+## M2N - participant
 
-This edge connects two participants as specified by the socket connection.<br>
-The "connector"-participant is the source node, the "acceptor" participant is the destination.
+This edge connects the "acceptor" participant and its m2n node.
 
-- `type`: SOCKET
-- `from`: Participant
+- `type`: M2N__PARTICIPANT_ACCEPTOR
+- `from`: M2N
 - `to`: Participant
-- `label`: socket
+- `label`: acceptor
+
+## M2N - participant
+
+This edge connects the "connector" participant and its m2n node.
+
+- `type`: M2N__PARTICIPANT_CONNECTOR
+- `from`: M2N
+- `to`: Participant
+- `label`: connector
 
 ## Coupling-scheme - participant
 
@@ -235,8 +243,7 @@ This edge connects an export node to the participant who specified it.
 
 ## Multi-coupling-scheme - participant
 
-This edge connects a multi-coupling-scheme with its "control" participant. Note that for the control participant, there
-is also a `MULTI_COUPLING_SCHEME__PARTICIPANT` edge in addition to this `_CONTROL`-edge.
+This edge connects a multi-coupling-scheme with its "control" participant.
 
 - `type`: MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL
 - `from`: MultiCouplingScheme
@@ -245,7 +252,7 @@ is also a `MULTI_COUPLING_SCHEME__PARTICIPANT` edge in addition to this `_CONTRO
 
 ## Multi-coupling-scheme - participant
 
-This edge connects a multi-coupling-scheme with its participants, both "regular" ones and the control participant.
+This edge connects a multi-coupling-scheme with its _regular_ participants.
 
 - `type`: MULTI_COUPLING_SCHEME__PARTICIPANT
 - `from`: MultiCouplingScheme

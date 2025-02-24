@@ -3,12 +3,11 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import DataType, Direction
+from precice_config_graph.nodes import DataType, Direction, M2NType
 
 def test_graph():
     xml = xml_processing.parse_file("tests/example-configs/multi-coupling/precice-config.xml")
     G_actual = graph.get_graph(xml)
-
 
     edges = []
 
@@ -19,7 +18,6 @@ def test_graph():
     n_data_displacements1 = n.DataNode("Displacements1", DataType.VECTOR)
     n_data_displacements2 = n.DataNode("Displacements2", DataType.VECTOR)
     n_data_displacements3 = n.DataNode("Displacements3", DataType.VECTOR)
-
 
     # Meshes
     n_mesh_nastin1 = n.MeshNode("NASTIN_Mesh1", [n_data_forces1])
@@ -32,7 +30,6 @@ def test_graph():
     meshes = [n_mesh_nastin1, n_mesh_solidz1, n_mesh_nastin2, n_mesh_solidz2, n_mesh_nastin3, n_mesh_solidz3]
     for mesh in meshes:
         edges += [(mesh, data, Edge.USE_DATA) for data in mesh.use_data]
-
 
     # SOLIDZ participants
     n_participant_solizd1 = n.ParticipantNode("SOLIDZ1", provide_meshes=[n_mesh_solidz1])
@@ -58,7 +55,6 @@ def test_graph():
     n_participant_solizd3.read_data = [
         n.ReadDataNode(data=n_data_forces3, mesh=n_mesh_solidz3, participant=n_participant_solizd3)
     ]
-
 
     # NASTIN participant
     n_participant_nastin = n.ParticipantNode(
@@ -88,7 +84,8 @@ def test_graph():
         ]
     ]
     n_participant_nastin.mappings = [
-        n.MappingNode(parent_participant=n_participant_nastin, direction=Direction.WRITE, from_mesh=from_mesh, to_mesh=to_mesh)
+        n.MappingNode(parent_participant=n_participant_nastin, direction=Direction.WRITE, from_mesh=from_mesh,
+                      to_mesh=to_mesh)
         for (from_mesh, to_mesh) in [
             (n_mesh_nastin1, n_mesh_solidz1),
             (n_mesh_nastin2, n_mesh_solidz2),
@@ -160,12 +157,22 @@ def test_graph():
         for mapping in participant.mappings
     ]
 
+    # M2N nodes
+    m2n_nastin_solidz1 = n.M2NNode(M2NType.SOCKETS, n_participant_nastin, n_participant_solizd1)
+    m2n_nastin_solidz2 = n.M2NNode(M2NType.SOCKETS, n_participant_nastin, n_participant_solizd2)
+    m2n_nastin_solidz3 = n.M2NNode(M2NType.SOCKETS, n_participant_nastin, n_participant_solizd3)
 
-    # M2N Sockets edge
     edges += [
-        (n_participant_nastin, n_participant_solizd1, Edge.SOCKET),
-        (n_participant_nastin, n_participant_solizd2, Edge.SOCKET),
-        (n_participant_nastin, n_participant_solizd3, Edge.SOCKET),
+        (m2n_nastin_solidz1, n_participant_nastin, Edge.M2N__PARTICIPANT_ACCEPTOR),
+        (m2n_nastin_solidz1, n_participant_solizd1, Edge.M2N__PARTICIPANT_CONNECTOR),
+    ]
+    edges += [
+        (m2n_nastin_solidz2, n_participant_nastin, Edge.M2N__PARTICIPANT_ACCEPTOR),
+        (m2n_nastin_solidz2, n_participant_solizd2, Edge.M2N__PARTICIPANT_CONNECTOR),
+    ]
+    edges += [
+        (m2n_nastin_solidz3, n_participant_nastin, Edge.M2N__PARTICIPANT_ACCEPTOR),
+        (m2n_nastin_solidz3, n_participant_solizd3, Edge.M2N__PARTICIPANT_CONNECTOR),
     ]
 
     # Couping scheme
@@ -228,12 +235,18 @@ def test_graph():
         for exchange in exchanges
     ]
 
-
-
     G_expected = nx.Graph()
     for (node_a, node_b, attr) in edges:
         G_expected.add_edge(node_a, node_b, attr=attr)
 
-    assert nx.is_isomorphic(G_expected, G_actual), \
-        f"Graphs did not match. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "\
+    def node_match(node_a, node_b):
+        return node_a == node_b
+
+    def edge_match(edge_a, edge_b):
+        return edge_a['attr'] == edge_b['attr']
+
+    assert nx.is_isomorphic(G_expected, G_actual, node_match=node_match, edge_match=edge_match), \
+        f"Graphs did not match. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), " \
         + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
+
+    print("\nGraphs are isomorphic.")

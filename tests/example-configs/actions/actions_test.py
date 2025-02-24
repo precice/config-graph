@@ -3,18 +3,16 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import DataType, Direction, TimingType, CouplingSchemeType, ActionType
+from precice_config_graph.nodes import DataType, Direction, TimingType, CouplingSchemeType, ActionType, M2NType
 
 def test_graph():
     xml = xml_processing.parse_file("tests/example-configs/actions/precice-config.xml")
     G_actual = graph.get_graph(xml)
 
-
     edges = []
 
     # Data
     n_color = n.DataNode("Color", DataType.SCALAR)
-
 
     # Generator
     n_generator_mesh = n.MeshNode("Generator-Mesh", [n_color])
@@ -27,12 +25,12 @@ def test_graph():
     edges += [
         (n_generator_mesh, n_color, Edge.USE_DATA),
         (n_generator_mesh, n_generator_participant, Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES),
-
+    ]
+    edges += [
         (n_generator_write_data, n_generator_participant, Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO),
         (n_generator_write_data, n_generator_mesh, Edge.WRITE_DATA__WRITES_TO_MESH),
         (n_generator_write_data, n_color, Edge.WRITE_DATA__WRITES_TO_DATA),
     ]
-
 
     # Propagator
     n_propagator_mesh = n.MeshNode("Propagator-Mesh", [n_color])
@@ -57,6 +55,8 @@ def test_graph():
     )
     n_propagator_participant.actions.append(n_action)
 
+    n_m2n = n.M2NNode(type=M2NType.SOCKETS, acceptor=n_generator_participant, connector=n_propagator_participant)
+
     edges += [
         (n_propagator_mesh, n_color, Edge.USE_DATA),
         (n_propagator_mesh, n_propagator_participant, Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES),
@@ -78,10 +78,10 @@ def test_graph():
         (n_action, n_color, Edge.ACTION__TARGET_DATA),
     ]
 
-
-    # M2N Sockets edge
+    # M2N Edges
     edges += [
-        (n_generator_participant, n_propagator_participant, Edge.SOCKET)
+        (n_m2n, n_generator_participant, Edge.M2N__PARTICIPANT_ACCEPTOR),
+        (n_m2n, n_propagator_participant, Edge.M2N__PARTICIPANT_CONNECTOR)
     ]
 
     # Couping scheme
@@ -102,8 +102,8 @@ def test_graph():
 
         (n_exchange, n_coupling_scheme, Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO),
         (n_exchange, n_color, Edge.EXCHANGE__DATA),
-        (n_exchange, n_generator_mesh,Edge.EXCHANGE__MESH),
-        (n_exchange, n_generator_participant,Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY),
+        (n_exchange, n_generator_mesh, Edge.EXCHANGE__MESH),
+        (n_exchange, n_generator_participant, Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY),
         (n_exchange, n_propagator_participant, Edge.EXCHANGE__EXCHANGES_TO),
     ]
 
@@ -111,5 +111,16 @@ def test_graph():
     for (node_a, node_b, attr) in edges:
         G_expected.add_edge(node_a, node_b, attr=attr)
 
-    assert nx.is_isomorphic(G_expected, G_actual),\
+
+    def node_match(node_a, node_b):
+        return node_a == node_b
+
+
+    def edge_match(edge_a, edge_b):
+        return edge_a['attr'] == edge_b['attr']
+
+
+    assert nx.is_isomorphic(G_expected, G_actual, node_match=node_match, edge_match=edge_match), \
         f"Graphs did not match: {nx.to_dict_of_dicts(G_actual)}, {nx.to_dict_of_dicts(G_expected)}"
+
+    print("\nGraphs are isomorphic.")
