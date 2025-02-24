@@ -34,7 +34,7 @@ n_participant_propagator.read_data = [n_read_data_propagator_color_propagator_me
 
 # Receive Mesh
 n_receive_mesh_propagator_generator_mesh_generator = n.ReceiveMeshNode(n_participant_propagator, n_mesh_generator,
-                                                                       n_participant_generator)
+                                                                       n_participant_generator, False)
 n_participant_propagator.receive_meshes = [n_receive_mesh_propagator_generator_mesh_generator]
 
 # Mappings
