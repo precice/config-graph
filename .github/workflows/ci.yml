@@ -23,6 +23,8 @@ jobs:
         run: |
           cd tests/smoke-tests/configs
           git clone https://github.com/precice/precice
+          mv precice/tests ./tests
+          rm -rf precice
           cd ../../..
       - name: Test with pytest
         run: |
