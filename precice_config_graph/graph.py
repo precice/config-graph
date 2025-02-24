@@ -13,6 +13,7 @@ from lxml import etree
 from . import nodes as n
 from .edges import Edge
 from .nodes import CouplingSchemeType, ActionType, M2NType
+from .xml_processing import convert_string_to_bool
 
 
 def get_graph(root: etree.Element) -> nx.Graph:
@@ -206,7 +207,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     participant = participant_nodes[name]
                     participants.append(participant)
 
-                    control = ('control' in participant_el.attrib) and (participant_el.attrib['control'] == 'yes')
+                    control = ('control' in participant_el.attrib and
+                               convert_string_to_bool(participant_el.attrib['control']))
                     if control:
                         assert control_participant is None  # there must not be multiple control participants
                         control_participant = participant
