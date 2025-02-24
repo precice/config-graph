@@ -12,6 +12,7 @@ dependencies = [
     "elementpath",
     "matplotlib",
     "networkx",
+    "pytest"
 ]
 
 [project.urls]
