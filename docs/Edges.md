@@ -243,8 +243,7 @@ This edge connects an export node to the participant who specified it.
 
 ## Multi-coupling-scheme - participant
 
-This edge connects a multi-coupling-scheme with its "control" participant. Note that for the control participant, there
-is also a `MULTI_COUPLING_SCHEME__PARTICIPANT` edge in addition to this `_CONTROL`-edge.
+This edge connects a multi-coupling-scheme with its "control" participant.
 
 - `type`: MULTI_COUPLING_SCHEME__PARTICIPANT_CONTROL
 - `from`: MultiCouplingScheme
@@ -253,7 +252,7 @@ is also a `MULTI_COUPLING_SCHEME__PARTICIPANT` edge in addition to this `_CONTRO
 
 ## Multi-coupling-scheme - participant
 
-This edge connects a multi-coupling-scheme with its participants, both "regular" ones and the control participant.
+This edge connects a multi-coupling-scheme with its _regular_ participants.
 
 - `type`: MULTI_COUPLING_SCHEME__PARTICIPANT
 - `from`: MultiCouplingScheme
