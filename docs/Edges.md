@@ -133,15 +133,23 @@ This edge connects a coupling scheme with its exchanges.
 - `to`: Coupling-scheme
 - `label`: belongs to
 
-## Participant - participant
+## M2N - participant
 
-This edge connects two participants as specified by the socket connection.<br>
-The "connector"-participant is the source node, the "acceptor" participant is the destination.
+This edge connects the "acceptor" participant and its m2n node.
 
-- `type`: SOCKET
-- `from`: Participant
+- `type`: ACCEPTOR
+- `from`: M2N
 - `to`: Participant
-- `label`: socket
+- `label`: acceptor
+
+## M2N - participant
+
+This edge connects the "connector" participant and its m2n node.
+
+- `type`: CONNECTOR
+- `from`: M2N
+- `to`: Participant
+- `label`: connector
 
 ## Coupling-scheme - participant
 
