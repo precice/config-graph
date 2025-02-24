@@ -227,7 +227,6 @@ edges += [
     for exchange in exchanges
 ]
 
-# TODO: Add relative-converge-measure and acceleration once implemented in the graph
 
 
 G_expected = nx.Graph()
