@@ -34,4 +34,4 @@ def main():
     g.print_graph(G)
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
