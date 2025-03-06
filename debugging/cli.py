@@ -12,12 +12,12 @@ import sys
 from precice_config_graph import graph as g
 from precice_config_graph.xml_processing import parse_file
 
-file_path:str = None
 color_cyan:str = "\033[1;36m"
 color_red:str = "\033[1;31m"
 color_reset:str = "\033[0m"
 
-if __name__ == "__main__":
+def main():
+    file_path:str = None
     parser = argparse.ArgumentParser(usage='%(prog)s', description='Creates a graph from a config.xml file for preCICE.')
     parser.add_argument('src', type=argparse.FileType('r'), help='Path of the config.xml source file.')
     args = parser.parse_args()
@@ -32,3 +32,6 @@ if __name__ == "__main__":
     G = g.get_graph(root)
 
     g.print_graph(G)
+
+if __name__ == "__main__":
+    sys.exit(main())
