@@ -355,6 +355,15 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
 
 def print_graph(graph: nx.Graph):
+    def size_for_node(node):
+        match node:
+            case n.ParticipantNode() | n.MeshNode():
+                return 1200
+            case n.DataNode() | n.ExchangeNode() | n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
+                return 600
+            case _:
+                return 300
+
     def color_for_node(node):
         match node:
             case n.DataNode():
@@ -368,9 +377,9 @@ def print_graph(graph: nx.Graph):
             case n.ParticipantNode():
                 return [0.3, 0.6, 1.0]
             case n.ExchangeNode():
-                return [0.9, 0.9, 0.9]
+                return [0.8, 0.8, 0.8]
             case n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
-                return [0.7, 0.7, 0.7]
+                return [0.65, 0.65, 0.65]
             case n.WriteDataNode():
                 return [0.7, 0, 1.0]
             case n.MappingNode():
@@ -384,14 +393,32 @@ def print_graph(graph: nx.Graph):
             case _:
                 return [0.5, 0.5, 0.5]
 
-    def size_for_node(node):
+    def append_list(list, node, size, color):
+        list[1].append(node)
+        list[2].append(size)
+        list[3].append(color)
+    
+    nodes_p = ['p',[],[],[]]
+    nodes_s = ['s',[],[],[]]
+    nodes_H = ['H',[],[],[]]
+    nodes_d = ['d',[],[],[]]
+    nodes_o = ['o',[],[],[]]
+    node_lists = [nodes_p, nodes_s, nodes_H, nodes_d, nodes_o]
+
+    for node in graph.nodes():
+        size = size_for_node(node)
+        color = color_for_node(node)
         match node:
             case n.ParticipantNode():
-                return 800
-            case n.DataNode(), n.MeshNode():
-                return 600
+                append_list(nodes_p, node, size, color)
+            case n.MeshNode():
+                append_list(nodes_s, node, size, color)
+            case n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
+                append_list(nodes_H, node, size, color)
+            case n.DataNode():
+                append_list(nodes_d, node, size, color)
             case _:
-                return 300
+                append_list(nodes_o, node, size, color)
 
     def label_for_edge(edge):
         match edge['attr']:
@@ -440,8 +467,6 @@ def print_graph(graph: nx.Graph):
             case _:
                 return ""
 
-    node_colors = [color_for_node(node) for node in graph.nodes()]
-    node_sizes = [size_for_node(node) for node in graph.nodes()]
     node_labels = dict()
     for node in graph.nodes():
         match node:
@@ -471,31 +496,44 @@ def print_graph(graph: nx.Graph):
                 node_labels[node] = ""
 
     pos = nx.spring_layout(graph, seed=1) # set the seed so that generated graph always has same layout
-    nx.draw(
+
+    for list in node_lists:
+        nx.draw_networkx_nodes(
+            graph, pos,
+            nodelist=list[1],
+            node_size=list[2],
+            node_color=list[3],
+            node_shape=list[0]
+        )
+    nx.draw_networkx_labels(
         graph, pos,
-        with_labels=True, arrows=True,
-        node_color=node_colors, node_size=node_sizes, labels=node_labels
+        labels=node_labels
+    )
+    nx.draw_networkx_edges(
+        graph, pos
     )
     nx.draw_networkx_edge_labels(
         graph, pos,
-        edge_labels={tuple(edge): label_for_edge(d) for *edge, d in graph.edges(data=True)},
+        edge_labels={tuple(edge): label_for_edge(d) for *edge, d in graph.edges(data=True)}
     )
 
     # Create a plot for the debugging view of the graph
     handles = []
     unique_types = []
-    for node in graph.nodes():
-        name = node.__class__.__name__
-        # Only display each node type once
-        if name not in unique_types:
-            unique_types.append(node.__class__.__name__)
-            # Remove the 'Node' suffix
-            label = name[:-4]
-            size = 15
-            handles.append(
-                plt.Line2D([], [], marker='o', color='w', markerfacecolor=color_for_node(node),
-                           markersize=size, label=label)
-            )
+    for list in node_lists:
+        marker_type = list[0]
+        for node in list[1]:
+            name = node.__class__.__name__
+            # Only display each node type once
+            if name not in unique_types:
+                unique_types.append(name)
+                # Remove the 'Node' suffix
+                label = name[:-4]
+                handles.append(
+                    plt.Line2D(
+                        [], [], marker=marker_type, color='w', markerfacecolor=color_for_node(node), markersize=12, label=label
+                    )
+                )
 
     plt.legend(handles=handles, loc='upper left', title='Nodes types:')
 
