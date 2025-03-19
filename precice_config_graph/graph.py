@@ -511,6 +511,8 @@ def print_graph(graph: nx.Graph):
     pos = nx.spring_layout(graph, seed=1) # set the seed so that generated graph always has same layout
 
     for list in node_lists:
+        if len(list[2]) == 0:
+            continue
         nx.draw_networkx_nodes(
             graph, pos, node_shape=list[0],
             nodelist=list[2],
