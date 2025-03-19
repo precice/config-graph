@@ -363,14 +363,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
 
 def print_graph(graph: nx.Graph):
-    def size_for_node(node):
-        match node:
-            case n.ParticipantNode() | n.MeshNode():
-                return 1200
-            case n.DataNode() | n.ExchangeNode() | n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
-                return 600
-            case _:
-                return 300
+    SIZE = 300
 
     def color_for_node(node):
         match node:
@@ -401,32 +394,44 @@ def print_graph(graph: nx.Graph):
             case _:
                 return [0.5, 0.5, 0.5]
 
-    def append_list(list, node, size, color):
-        list[1].append(node)
-        list[2].append(size)
+    def append_list(list, node, color, size=SIZE):
+        list[2].append(node)
         list[3].append(color)
+        list[4].append(size*list[1])
     
-    nodes_p = ['p',[],[],[]]
-    nodes_s = ['s',[],[],[]]
-    nodes_H = ['H',[],[],[]]
-    nodes_d = ['d',[],[],[]]
-    nodes_o = ['o',[],[],[]]
-    node_lists = [nodes_p, nodes_s, nodes_H, nodes_d, nodes_o]
+    nodes_circle = ['o',1,[],[],[]]
+    nodes_circle_small = ['.',1,[],[],[]]
+    nodes_triangle_up = ['^',1,[],[],[]]
+    nodes_triangle_down = ['v',1,[],[],[]]
+    nodes_triangle_left = ['<',1,[],[],[]]
+    nodes_triangle_right = ['>',1,[],[],[]]
+    nodes_square = ['s',0.9,[],[],[]]
+    nodes_diamond = ['d',0.9,[],[],[]]
+    nodes_diamond_wide = ['D',0.8,[],[],[]]
+    nodes_pentagon = ['p',1.4,[],[],[]]
+    nodes_hexagon_vertical = ['h',1.4,[],[],[]]
+    nodes_hexagon_horizontal = ['H',1.4,[],[],[]]
+    nodes_octagon = ['8',1.2,[],[],[]]
+    nodes_plus = ['P',1.1,[],[],[]]
+    nodes_cross = ['X',1,[],[],[]]
+    nodes_star = ['*',1.5,[],[],[]]
+    node_lists = [nodes_circle, nodes_circle_small, nodes_triangle_up, nodes_triangle_down, nodes_triangle_left, nodes_triangle_right,
+                  nodes_square, nodes_diamond, nodes_diamond_wide, nodes_pentagon, nodes_hexagon_vertical, nodes_hexagon_horizontal,
+                  nodes_octagon, nodes_plus, nodes_cross, nodes_star]
 
     for node in graph.nodes():
-        size = size_for_node(node)
         color = color_for_node(node)
         match node:
             case n.ParticipantNode():
-                append_list(nodes_p, node, size, color)
+                append_list(nodes_star, node, color)
             case n.MeshNode():
-                append_list(nodes_s, node, size, color)
+                append_list(nodes_square, node, color)
             case n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
-                append_list(nodes_H, node, size, color)
+                append_list(nodes_octagon, node, color)
             case n.DataNode():
-                append_list(nodes_d, node, size, color)
+                append_list(nodes_diamond_wide, node, color)
             case _:
-                append_list(nodes_o, node, size, color)
+                append_list(nodes_circle, node, color)
 
     def label_for_edge(edge):
         match edge['attr']:
@@ -507,11 +512,10 @@ def print_graph(graph: nx.Graph):
 
     for list in node_lists:
         nx.draw_networkx_nodes(
-            graph, pos,
-            nodelist=list[1],
-            node_size=list[2],
+            graph, pos, node_shape=list[0],
+            nodelist=list[2],
             node_color=list[3],
-            node_shape=list[0]
+            node_size=list[4]
         )
     nx.draw_networkx_labels(
         graph, pos,
@@ -530,7 +534,8 @@ def print_graph(graph: nx.Graph):
     unique_types = []
     for list in node_lists:
         marker_type = list[0]
-        for node in list[1]:
+        marker_mult = list[1]
+        for node in list[2]:
             name = node.__class__.__name__
             # Only display each node type once
             if name not in unique_types:
@@ -539,7 +544,7 @@ def print_graph(graph: nx.Graph):
                 label = name[:-4]
                 handles.append(
                     plt.Line2D(
-                        [], [], marker=marker_type, color='w', markerfacecolor=color_for_node(node), markersize=12, label=label
+                        [], [], marker=marker_type, color='w', markerfacecolor=color_for_node(node), markersize=12*marker_mult, label=label
                     )
                 )
 
