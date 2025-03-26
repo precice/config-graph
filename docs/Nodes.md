@@ -49,7 +49,7 @@ They are also meshes, with the additional information of who they get received b
 - `participant`: The participant the mesh gets received by.
 - `mesh`: The mesh that gets received.
 - `from_participant`: The participant that provides the mesh.
-- `direct-access`: `True`, if the tag `direct-access="true"` exists, otherwise `False`.
+- `api-access`: `True`, if the tag `api-access="true"` exists, otherwise `False`.
 
 ## CouplingScheme
 

@@ -68,7 +68,7 @@ def test_graph():
     ]
 
     n_participant_nastin.receive_meshes = [
-        n.ReceiveMeshNode(mesh=mesh, from_participant=from_participant, participant=n_participant_nastin,direct_access=False)
+        n.ReceiveMeshNode(mesh=mesh, from_participant=from_participant, participant=n_participant_nastin,api_access=False)
         for (mesh, from_participant) in [
             (n_mesh_solidz1, n_participant_solizd1),
             (n_mesh_solidz2, n_participant_solizd2),
