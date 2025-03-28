@@ -176,8 +176,10 @@ class MappingNode:
         self.parent_participant = parent_participant
         self.direction = direction
         self.just_in_time = just_in_time
-        self.from_mesh = from_mesh
-        self.to_mesh = to_mesh
+        if from_mesh:
+            self.from_mesh = from_mesh
+        if to_mesh:
+            self.to_mesh = to_mesh
 
 
 class WriteDataNode:
