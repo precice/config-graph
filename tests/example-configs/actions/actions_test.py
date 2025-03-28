@@ -42,7 +42,7 @@ def test_graph():
     )
 
     n_mapping = n.MappingNode(
-        n_propagator_participant, Direction.READ, from_mesh=n_generator_mesh, to_mesh=n_propagator_mesh
+        n_propagator_participant, Direction.READ, False, from_mesh=n_generator_mesh, to_mesh=n_propagator_mesh
     )
     n_propagator_participant.mappings.append(n_mapping)
 

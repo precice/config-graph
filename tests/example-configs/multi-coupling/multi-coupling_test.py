@@ -84,7 +84,7 @@ def test_graph():
         ]
     ]
     n_participant_nastin.mappings = [
-        n.MappingNode(parent_participant=n_participant_nastin, direction=Direction.WRITE, from_mesh=from_mesh,
+        n.MappingNode(parent_participant=n_participant_nastin, direction=Direction.WRITE, just_in_time=False, from_mesh=from_mesh,
                       to_mesh=to_mesh)
         for (from_mesh, to_mesh) in [
             (n_mesh_nastin1, n_mesh_solidz1),

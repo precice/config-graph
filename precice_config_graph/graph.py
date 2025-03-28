@@ -110,7 +110,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             to_mesh_name = mapping_el.attrib['to']  # TODO: Error on not found
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
             
-            mapping
+            mapping = None
             if from_mesh and to_mesh:
                 mapping = n.MappingNode(participant, n.Direction(direction), False, from_mesh, to_mesh)
             elif from_mesh or to_mesh:
