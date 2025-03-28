@@ -105,9 +105,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
         # Mapping
         for (mapping_el, kind) in find_all_with_prefix(participant_el, "mapping"):
             direction = mapping_el.attrib['direction']  # TODO: Error on not found
-            from_mesh_name = mapping_el.attrib['from']  # TODO: Error on not found
+            from_mesh_name = mapping_el.attrib.get('from')  # TODO: Error on not found
             from_mesh = mesh_nodes[from_mesh_name] if from_mesh_name else None
-            to_mesh_name = mapping_el.attrib['to']  # TODO: Error on not found
+            to_mesh_name = mapping_el.attrib.get('to')  # TODO: Error on not found
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
             
             mapping = None
