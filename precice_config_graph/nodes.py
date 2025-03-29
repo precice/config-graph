@@ -128,11 +128,11 @@ class MeshNode:
 
 class ReceiveMeshNode:
     def __init__(self, participant: ParticipantNode, mesh: MeshNode, from_participant: ParticipantNode,
-                 direct_access: bool):
+                 api_access: bool):
         self.participant = participant
         self.mesh = mesh
         self.from_participant = from_participant
-        self.direct_access = direct_access
+        self.api_access = api_access
 
 
 class CouplingSchemeNode:
@@ -171,10 +171,11 @@ class DataNode:
 
 
 class MappingNode:
-    def __init__(self, parent_participant: ParticipantNode, direction: Direction,
-                 from_mesh: MeshNode, to_mesh: MeshNode):
+    def __init__(self, parent_participant: ParticipantNode, direction: Direction, just_in_time:bool,
+                 from_mesh: MeshNode|None = None, to_mesh: MeshNode|None = None):
         self.parent_participant = parent_participant
         self.direction = direction
+        self.just_in_time = just_in_time
         self.from_mesh = from_mesh
         self.to_mesh = to_mesh
 

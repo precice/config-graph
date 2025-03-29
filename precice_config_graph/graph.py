@@ -105,12 +105,18 @@ def get_graph(root: etree.Element) -> nx.Graph:
         # Mapping
         for (mapping_el, kind) in find_all_with_prefix(participant_el, "mapping"):
             direction = mapping_el.attrib['direction']  # TODO: Error on not found
-            from_mesh_name = mapping_el.attrib['from']  # TODO: Error on not found
-            from_mesh = mesh_nodes[from_mesh_name]
-            to_mesh_name = mapping_el.attrib['to']  # TODO: Error on not found
-            to_mesh = mesh_nodes[to_mesh_name]
-
-            mapping = n.MappingNode(participant, n.Direction(direction), from_mesh, to_mesh)
+            from_mesh_name = mapping_el.attrib.get('from')  # TODO: Error on not found
+            from_mesh = mesh_nodes[from_mesh_name] if from_mesh_name else None
+            to_mesh_name = mapping_el.attrib.get('to')  # TODO: Error on not found
+            to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
+            
+            mapping = None
+            if from_mesh and to_mesh:
+                mapping = n.MappingNode(participant, n.Direction(direction), False, from_mesh, to_mesh)
+            elif from_mesh or to_mesh:
+                mapping = n.MappingNode(participant, n.Direction(direction), True, from_mesh, to_mesh)
+            else:
+                pass # TODO: Error on not found (from and to)
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
 
@@ -179,13 +185,13 @@ def get_graph(root: etree.Element) -> nx.Graph:
             from_participant_name = receive_mesh_el.attrib['from']  # TODO: Error on not found
             from_participant = participant_nodes[from_participant_name]
 
-            direct_access_str = receive_mesh_el.attrib.get('direct-access')
-            if direct_access_str:
-                direct_access = convert_string_to_bool(direct_access_str)
+            api_access_str = receive_mesh_el.attrib.get('api-access')
+            if api_access_str:
+                api_access = convert_string_to_bool(api_access_str)
             else:
-                direct_access = False
+                api_access = False
 
-            receive_mesh = n.ReceiveMeshNode(participant, mesh, from_participant, direct_access)
+            receive_mesh = n.ReceiveMeshNode(participant, mesh, from_participant, api_access)
             participant.receive_meshes.append(receive_mesh)
             receive_mesh_nodes.append(receive_mesh)
 
@@ -298,8 +304,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for mapping in mapping_nodes:
         g.add_node(mapping)
-        g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
-        g.add_edge(mapping, mapping.from_mesh, attr=Edge.MAPPING__FROM_MESH)
+        if mapping.from_mesh:
+            g.add_edge(mapping, mapping.from_mesh, attr=Edge.MAPPING__FROM_MESH)
+        if mapping.to_mesh:
+            g.add_edge(mapping, mapping.to_mesh, attr=Edge.MAPPING__TO_MESH)
         g.add_edge(mapping, mapping.parent_participant, attr=Edge.MAPPING__PARTICIPANT__BELONGS_TO)
 
     for export in export_nodes:
