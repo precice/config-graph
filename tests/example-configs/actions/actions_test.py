@@ -3,7 +3,9 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import DataType, Direction, TimingType, CouplingSchemeType, ActionType, M2NType
+from precice_config_graph.nodes import DataType, Direction, TimingType, CouplingSchemeType, ActionType, M2NType, \
+    MappingConstraint, MappingType
+
 
 def test_graph():
     xml = xml_processing.parse_file("tests/example-configs/actions/precice-config.xml")
@@ -42,7 +44,8 @@ def test_graph():
     )
 
     n_mapping = n.MappingNode(
-        n_propagator_participant, Direction.READ, False, from_mesh=n_generator_mesh, to_mesh=n_propagator_mesh
+        n_propagator_participant, Direction.READ, False, MappingType.NEAREST_NEIGHBOR,
+        MappingConstraint.CONSISTENT, from_mesh=n_generator_mesh, to_mesh=n_propagator_mesh
     )
     n_propagator_participant.mappings.append(n_mapping)
 
@@ -91,7 +94,8 @@ def test_graph():
     )
 
     n_exchange = n.ExchangeNode(
-        coupling_scheme=n_coupling_scheme, data=n_color, mesh=n_generator_mesh, from_participant=n_generator_participant,
+        coupling_scheme=n_coupling_scheme, data=n_color, mesh=n_generator_mesh,
+        from_participant=n_generator_participant,
         to_participant=n_propagator_participant,
     )
     n_coupling_scheme.exchanges.append(n_exchange)
@@ -111,14 +115,11 @@ def test_graph():
     for (node_a, node_b, attr) in edges:
         G_expected.add_edge(node_a, node_b, attr=attr)
 
-
     def node_match(node_a, node_b):
         return node_a == node_b
 
-
     def edge_match(edge_a, edge_b):
         return edge_a['attr'] == edge_b['attr']
-
 
     assert nx.is_isomorphic(G_expected, G_actual, node_match=node_match, edge_match=edge_match), \
         f"Graphs did not match: {nx.to_dict_of_dicts(G_actual)}, {nx.to_dict_of_dicts(G_expected)}"
