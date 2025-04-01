@@ -192,10 +192,13 @@ class DataNode:
 
 class MappingNode:
     def __init__(self, parent_participant: ParticipantNode, direction: Direction, just_in_time: bool,
-                 from_mesh: MeshNode | None = None, to_mesh: MeshNode | None = None):
+                 type: MappingType, constraint: MappingConstraint, from_mesh: MeshNode | None = None,
+                 to_mesh: MeshNode | None = None):
         self.parent_participant = parent_participant
         self.direction = direction
         self.just_in_time = just_in_time
+        self.type = type
+        self.constraint = constraint
         self.from_mesh = from_mesh
         self.to_mesh = to_mesh
 
