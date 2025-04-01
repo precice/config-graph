@@ -12,7 +12,7 @@ from lxml import etree
 
 from . import nodes as n
 from .edges import Edge
-from .nodes import CouplingSchemeType, ActionType, M2NType
+from .nodes import CouplingSchemeType, ActionType, M2NType, MappingType, MappingConstraint
 from .xml_processing import convert_string_to_bool
 
 
@@ -105,18 +105,26 @@ def get_graph(root: etree.Element) -> nx.Graph:
         # Mapping
         for (mapping_el, kind) in find_all_with_prefix(participant_el, "mapping"):
             direction = mapping_el.attrib['direction']  # TODO: Error on not found
+            # From mesh might not exist due to just-in-time mapping
             from_mesh_name = mapping_el.attrib.get('from')  # TODO: Error on not found
             from_mesh = mesh_nodes[from_mesh_name] if from_mesh_name else None
+            # From mesh might not exist due to just-in-time mapping
             to_mesh_name = mapping_el.attrib.get('to')  # TODO: Error on not found
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
-            
+
+            type = MappingType(kind)
+            constraint = MappingConstraint(mapping_el.attrib['constraint'])
+
             mapping = None
             if from_mesh and to_mesh:
-                mapping = n.MappingNode(participant, n.Direction(direction), False, from_mesh, to_mesh)
+                mapping = n.MappingNode(participant, n.Direction(direction), False, type, constraint,
+                                        from_mesh, to_mesh)
             elif from_mesh or to_mesh:
-                mapping = n.MappingNode(participant, n.Direction(direction), True, from_mesh, to_mesh)
+                mapping = n.MappingNode(participant, n.Direction(direction), True, type, constraint,
+                                        from_mesh, to_mesh)
             else:
-                pass # TODO: Error on not found (from and to)
+                pass  # TODO: Error on not found (from and to)
+
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
 
@@ -238,10 +246,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh_name = exchange_el.attrib['mesh']  # TODO: Error on not found
             mesh = mesh_nodes[mesh_name]
             from_participant_name = exchange_el.attrib['from']
-                # TODO: Error on not found and different from first or second participant
+            # TODO: Error on not found and different from first or second participant
             from_participant = participant_nodes[from_participant_name]
             to_participant_name = exchange_el.attrib['to']
-                # TODO: Error on not found and different from first or second participant
+            # TODO: Error on not found and different from first or second participant
             to_participant = participant_nodes[to_participant_name]
 
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
@@ -397,26 +405,28 @@ def print_graph(graph: nx.Graph):
     def append_list(list, node, color, size=SIZE):
         list[2].append(node)
         list[3].append(color)
-        list[4].append(size*list[1])
-    
-    nodes_circle = ['o',1,[],[],[]]
-    nodes_circle_small = ['.',1,[],[],[]]
-    nodes_triangle_up = ['^',1,[],[],[]]
-    nodes_triangle_down = ['v',1,[],[],[]]
-    nodes_triangle_left = ['<',1,[],[],[]]
-    nodes_triangle_right = ['>',1,[],[],[]]
-    nodes_square = ['s',0.9,[],[],[]]
-    nodes_diamond = ['d',0.9,[],[],[]]
-    nodes_diamond_wide = ['D',0.8,[],[],[]]
-    nodes_pentagon = ['p',1.4,[],[],[]]
-    nodes_hexagon_vertical = ['h',1.4,[],[],[]]
-    nodes_hexagon_horizontal = ['H',1.4,[],[],[]]
-    nodes_octagon = ['8',1.2,[],[],[]]
-    nodes_plus = ['P',1.1,[],[],[]]
-    nodes_cross = ['X',1,[],[],[]]
-    nodes_star = ['*',1.5,[],[],[]]
-    node_lists = [nodes_circle, nodes_circle_small, nodes_triangle_up, nodes_triangle_down, nodes_triangle_left, nodes_triangle_right,
-                  nodes_square, nodes_diamond, nodes_diamond_wide, nodes_pentagon, nodes_hexagon_vertical, nodes_hexagon_horizontal,
+        list[4].append(size * list[1])
+
+    nodes_circle = ['o', 1, [], [], []]
+    nodes_circle_small = ['.', 1, [], [], []]
+    nodes_triangle_up = ['^', 1, [], [], []]
+    nodes_triangle_down = ['v', 1, [], [], []]
+    nodes_triangle_left = ['<', 1, [], [], []]
+    nodes_triangle_right = ['>', 1, [], [], []]
+    nodes_square = ['s', 0.9, [], [], []]
+    nodes_diamond = ['d', 0.9, [], [], []]
+    nodes_diamond_wide = ['D', 0.8, [], [], []]
+    nodes_pentagon = ['p', 1.4, [], [], []]
+    nodes_hexagon_vertical = ['h', 1.4, [], [], []]
+    nodes_hexagon_horizontal = ['H', 1.4, [], [], []]
+    nodes_octagon = ['8', 1.2, [], [], []]
+    nodes_plus = ['P', 1.1, [], [], []]
+    nodes_cross = ['X', 1, [], [], []]
+    nodes_star = ['*', 1.5, [], [], []]
+    node_lists = [nodes_circle, nodes_circle_small, nodes_triangle_up, nodes_triangle_down, nodes_triangle_left,
+                  nodes_triangle_right,
+                  nodes_square, nodes_diamond, nodes_diamond_wide, nodes_pentagon, nodes_hexagon_vertical,
+                  nodes_hexagon_horizontal,
                   nodes_octagon, nodes_plus, nodes_cross, nodes_star]
 
     for node in graph.nodes():
@@ -508,7 +518,7 @@ def print_graph(graph: nx.Graph):
             case _:
                 node_labels[node] = ""
 
-    pos = nx.spring_layout(graph, seed=1) # set the seed so that generated graph always has same layout
+    pos = nx.spring_layout(graph, seed=1)  # set the seed so that generated graph always has same layout
 
     for list in node_lists:
         if len(list[2]) == 0:
@@ -546,7 +556,8 @@ def print_graph(graph: nx.Graph):
                 label = name[:-4]
                 handles.append(
                     plt.Line2D(
-                        [], [], marker=marker_type, color='w', markerfacecolor=color_for_node(node), markersize=12*marker_mult, label=label
+                        [], [], marker=marker_type, color='w', markerfacecolor=color_for_node(node),
+                        markersize=12 * marker_mult, label=label
                     )
                 )
 
