@@ -88,8 +88,10 @@ another.
 - `direction`: This specifies the direction of the data mapping.
 - `just-in-time`: A bool, which indicates, if the mapping is a "just-in-time"-mapping. A JIT mapping is missing either
   the `to` or `from` tag.
-- `from_mesh`: The mesh as specified in the `from=“”` tag
-- `to_mesh`: The mesh as specified in the `to=“”` tag
+- `type`: The type of the mesh as specified by `<mapping:type .../>`
+- `constraint`: The constraint as specified in the `constraint=“”` tag.
+- `from_mesh`: The mesh as specified in the `from=“”` tag, if any.
+- `to_mesh`: The mesh as specified in the `to=“”` tag, if any.
 
 ## WriteData
 
