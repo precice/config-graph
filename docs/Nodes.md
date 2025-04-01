@@ -86,8 +86,12 @@ another.
 
 - `parent_participant`: This links to the participant that specifies the mapping.
 - `direction`: This specifies the direction of the data mapping.
-- `from_mesh`: The mesh as specified in the `from=“”` tag
-- `to_mesh`: The mesh as specified in the `to=“”` tag
+- `just-in-time`: A bool, which indicates, if the mapping is a "just-in-time"-mapping. A JIT mapping is missing either
+  the `to` or `from` tag.
+- `type`: The type of the mesh as specified by `<mapping:type .../>`
+- `constraint`: The constraint as specified in the `constraint=“”` tag.
+- `from_mesh`: The mesh as specified in the `from=“”` tag, if any.
+- `to_mesh`: The mesh as specified in the `to=“”` tag, if any.
 
 ## WriteData
 
@@ -126,7 +130,7 @@ Export nodes are another way a user can receive data from a coupled simulation u
 ## Action
 
 - `participant`: The participant specifying this action.
-- `type`: The type of the action, as specified by `<action:…` …/>. Possible values are `multiply-by-area`, 
+- `type`: The type of the action, as specified by `<action:…` …/>. Possible values are `multiply-by-area`,
   `divide-by-area`, `summation` and `python`.
 - `mesh`: The mesh this action will operate on.
 - `timing`: When this action will be executed. One value is `write-mapping-post`, the other `read-mapping-post`.
@@ -153,7 +157,7 @@ participants.
 
 ## M2N
 
-To let participants exchange information (physically), they have to be connected via an m2n node. 
+To let participants exchange information (physically), they have to be connected via an m2n node.
 
 - `type`: The type of the m2n node. Possible values are `sockets`, `mpi` and `mpi-multiple-ports`.
 - `acceptor`: The participant defined as `acceptor=...`.

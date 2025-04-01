@@ -11,6 +11,26 @@ from __future__ import annotations
 from enum import Enum
 
 
+class MappingType(Enum):
+    NEAREST_NEIGHBOR = "nearest-neighbor"
+    NEAREST_PROJECTION = "nearest-projection"
+    NEAREST_NEIGHBOR_GRADIENT = "nearest-neighbor-gradient"
+    LINEAR_CELL_INTERPOLATION = "linear-cell-interpolation"
+    RBF_GLOBAL_ITERATIVE = "rbf-global-iterative"
+    RBF_GLOBAL_DIRECT = "rbf-global-direct"
+    RBF_PUM_DIRECT = "rbf-pum-direct"
+    RBF = "rbf"
+    AXIAL_GEOMETRIC_MULTISCALE = "axial-geometric-multiscale"
+    RADIAL_GEOMETRIC_MULTISCALE = "radial-geometric-multiscale"
+
+
+class MappingConstraint(Enum):
+    CONSERVATIVE = "conservative"
+    CONSISTENT = "consistent"
+    SCALED_CONSISTENT_SURFACE = "scaled-consistent-surface"
+    SCALED_CONSISTENT_VOLUME = "scaled-consistent-volume"
+
+
 class M2NType(Enum):
     SOCKETS = "sockets"
     MPI = "mpi"
@@ -171,11 +191,14 @@ class DataNode:
 
 
 class MappingNode:
-    def __init__(self, parent_participant: ParticipantNode, direction: Direction, just_in_time:bool,
-                 from_mesh: MeshNode|None = None, to_mesh: MeshNode|None = None):
+    def __init__(self, parent_participant: ParticipantNode, direction: Direction, just_in_time: bool,
+                 type: MappingType, constraint: MappingConstraint, from_mesh: MeshNode | None = None,
+                 to_mesh: MeshNode | None = None):
         self.parent_participant = parent_participant
         self.direction = direction
         self.just_in_time = just_in_time
+        self.type = type
+        self.constraint = constraint
         self.from_mesh = from_mesh
         self.to_mesh = to_mesh
 
