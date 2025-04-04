@@ -113,10 +113,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
         for (mapping_el, kind) in find_all_with_prefix(participant_el, "mapping"):
             direction = get_attribute(mapping_el, 'direction')
             # From mesh might not exist due to just-in-time mapping
-            from_mesh_name = get_attribute(mapping_el, 'from')
+            from_mesh_name =  mapping_el.get('from')
             from_mesh = mesh_nodes[from_mesh_name] if from_mesh_name else None
             # From mesh might not exist due to just-in-time mapping
-            to_mesh_name = get_attribute(mapping_el, 'to')
+            to_mesh_name =  mapping_el.get('to')
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
 
             type = MappingType(kind)
@@ -130,7 +130,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 mapping = n.MappingNode(participant, n.Direction(direction), True, type, constraint,
                                         from_mesh, to_mesh)
             else:
-                pass  # TODO: Error on not found (from and to)
+                sys.exit(ERROR + ' (exiting graph generation) Missing attribute in \'' + mapping_el.tag + '\': << from >> and/or << to >>')
 
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
