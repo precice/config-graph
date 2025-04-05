@@ -168,9 +168,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 for source_data_el in source_data_els:
                     source_data.append(data_nodes[get_attribute(source_data_el, 'name')])
 
-            kind = ActionType(kind)
+            type = ActionType(kind)
 
-            action = n.ActionNode(participant, kind, mesh, timing, target_data, source_data)
+            action = n.ActionNode(participant, type, mesh, timing, target_data, source_data)
             action_nodes.append(action)
 
         # Watch-Points
