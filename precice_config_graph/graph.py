@@ -87,9 +87,14 @@ def get_graph(root: etree.Element) -> nx.Graph:
     watch_integral_nodes: list[n.WatchIntegralNode] = []
 
     # Data items – <data:… />
-    for (data_el, kind) in find_all_with_prefix(root, "data"):  # TODO: Error on unknown kind
+    for (data_el, kind) in find_all_with_prefix(root, "data"):
         name = get_attribute(data_el, 'name')
-        node = n.DataNode(name, n.DataType(kind))
+        try:
+            type = n.DataType(kind)
+        except ValueError:
+            possible_types_list = get_enum_values(n.DataType)
+            error_unknown_type(data_el, kind, possible_types_list)
+        node = n.DataNode(name, type)
         data_nodes[name] = node
 
     # Meshes – <mesh />
@@ -151,7 +156,11 @@ def get_graph(root: etree.Element) -> nx.Graph:
             to_mesh_name =  mapping_el.get('to')
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
 
+            try:
                 type = n.MappingType(kind)
+            except ValueError:
+                possible_types_list = get_enum_values(n.MappingType)
+                error_unknown_type(mapping_el, kind, possible_types_list)
             constraint = n.MappingConstraint(get_attribute(mapping_el, 'constraint'))
 
             mapping = None
@@ -170,7 +179,12 @@ def get_graph(root: etree.Element) -> nx.Graph:
         # Exports
         # <export:… />
         for (_, kind) in find_all_with_prefix(participant_el, "export"):
-            export = n.ExportNode(participant, n.ExportFormat(kind))
+            try:
+                type = n.ExportFormat(kind)
+            except ValueError:
+                possible_types_list = get_enum_values(n.ExportFormat)
+                error_unknown_type(_, kind, possible_types_list)
+            export = n.ExportNode(participant, type)
             export_nodes.append(export)
 
         # Actions
@@ -191,7 +205,11 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 for source_data_el in source_data_els:
                     source_data.append(data_nodes[get_attribute(source_data_el, 'name')])
 
+            try:
                 type = n.ActionType(kind)
+            except ValueError:
+                possible_types_list = get_enum_values(n.ActionType)
+                error_unknown_type(action_el, kind, possible_types_list)
 
             action = n.ActionNode(participant, type, mesh, timing, target_data, source_data)
             action_nodes.append(action)
@@ -260,7 +278,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 second_participant_name = get_attribute(participants, 'second')
                 second_participant = participant_nodes[second_participant_name]
 
-                type = n.CouplingSchemeType(kind)  # TODO: unknown kind (multi not in CouplingSchemeType)
+                type = n.CouplingSchemeType(kind)
 
                 coupling_scheme = n.CouplingSchemeNode(type, first_participant, second_participant)
             case "multi":
@@ -281,6 +299,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 assert control_participant is not None, "There must be a control participant"
 
                 coupling_scheme = n.MultiCouplingSchemeNode(control_participant, participants)
+            case _:
+                possible_types_list = ["serial-explicit", "serial-implicit", "parallel-explicit", "parallel-implicit", "multi"]
+                error_unknown_type(coupling_scheme_el, kind, possible_types_list)
 
         assert coupling_scheme is not None  # there must always be one participant that is in control
 
@@ -307,7 +328,11 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     # M2N – <m2n:… />
     for (m2n, kind) in find_all_with_prefix(root, "m2n"):
+        try:
             type = n.M2NType(kind)
+        except ValueError:
+            possible_types_list = get_enum_values(n.M2NType)
+            error_unknown_type(m2n, kind, possible_types_list)
         acceptor_name = get_attribute(m2n, 'acceptor')
         acceptor = participant_nodes[acceptor_name]
         connector_name = get_attribute(m2n, 'connector')
