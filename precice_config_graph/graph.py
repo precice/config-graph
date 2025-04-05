@@ -17,6 +17,7 @@ from .nodes import CouplingSchemeType, ActionType, M2NType, MappingType, Mapping
 from .xml_processing import convert_string_to_bool
 
 ERROR: str = "\033[1;31m[ERROR]\033[0m"
+LINK_GRAPH_ISSUES: str = "\'\033[1;36mhttps://github.com/precice-forschungsprojekt/config-graph/issues\033[0m\'"
 
 def get_graph(root: etree.Element) -> nx.Graph:
     assert root.tag == "precice-configuration"
@@ -29,12 +30,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 yield child, postfix
 
     def error_missing_attribute(e:etree.Element, key:str):
-        sys.exit(ERROR
-                 + ' Exiting graph generation.\nMissing attribute {'
-                 + key
-                 + '} for element {'
-                 + e.tag
-                 + '}.\nPlease run \"precice-tools check\" for syntax errors.'
+        sys.exit(ERROR + ' Exiting graph generation.'
+                 + '\nMissing attribute \"' + key + '\" for element \"' + e.tag + '\".'
+                 + '\nPlease run \'precice-tools check\' for syntax errors.'
+                 + '\n\nIf you are sure this behaviour is incorrect, please leave a report at ' + LINK_GRAPH_ISSUES
                 )
 
     def get_attribute(e:etree.Element, key:str):
@@ -139,7 +138,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 mapping = n.MappingNode(participant, n.Direction(direction), True, type, constraint,
                                         from_mesh, to_mesh)
             else:
-                error_missing_attribute(mapping_el, 'from | to')
+                error_missing_attribute(mapping_el, '\'from\' or \'to\'')
 
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
