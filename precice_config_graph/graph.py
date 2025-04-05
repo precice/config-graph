@@ -227,7 +227,13 @@ def get_graph(root: etree.Element) -> nx.Graph:
         match kind:
             case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
                 # <participants />
-                participants = coupling_scheme_el.find("participants")  # TODO: Error on multiple participants tags
+                participants_list = coupling_scheme_el.findall("participants")
+                if len(participants_list) > 1:
+                    message:str = 'Multiple \'participants\' tags in \'' + coupling_scheme_el.tag + '\''
+                    error(message)
+                elif  len(participants_list) < 1:
+                    error_missing_attribute(coupling_scheme_el, 'participants')
+                participants = participants_list[0]
                 first_participant_name = get_attribute(participants, 'first')
                 first_participant = participant_nodes[first_participant_name]
                 second_participant_name = get_attribute(participants, 'second')
