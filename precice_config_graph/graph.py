@@ -39,8 +39,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
         message:str = 'Missing attribute \"' + key + '\" for element \"' + e.tag + '\".'
         error(message)
 
-    def get_enum_values_as_string(enum:Enum):
-        values = list(map(lambda x: x.value, enum._member_map_.values()))
+    def get_enum_values(enum:Enum) -> list:
+        return list(map(lambda x: x.value, enum._member_map_.values()))
+    
+    def list_to_string(values:list) -> str:
         string:str = ''
         size = len(values)
         for i in range(size):
@@ -53,8 +55,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 string += '.'
         return string
 
-    def error_unknown_type(e:etree.Element, type:str, enum:Enum):
-        possible_types = get_enum_values_as_string(enum)
+    def error_unknown_type(e:etree.Element, type:str, possible_types_list:list):
+        possible_types = list_to_string(possible_types_list)
         message:str = 'Unknown type \"' + type + '\" for element \"' + e.tag + '\".\nUse one of ' + possible_types
         error(message)
 
