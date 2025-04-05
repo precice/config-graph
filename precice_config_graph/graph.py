@@ -13,7 +13,6 @@ from lxml import etree
 
 from . import nodes as n
 from .edges import Edge
-from .nodes import CouplingSchemeType, ActionType, M2NType, MappingType, MappingConstraint
 from .xml_processing import convert_string_to_bool
 
 LINK_GRAPH_ISSUES: str = "\'\033[1;36mhttps://github.com/precice-forschungsprojekt/config-graph/issues\033[0m\'"
@@ -130,8 +129,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
             to_mesh_name =  mapping_el.get('to')
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
 
-            type = MappingType(kind)
-            constraint = MappingConstraint(get_attribute(mapping_el, 'constraint'))
+                type = n.MappingType(kind)
+            constraint = n.MappingConstraint(get_attribute(mapping_el, 'constraint'))
 
             mapping = None
             if from_mesh and to_mesh:
@@ -170,7 +169,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 for source_data_el in source_data_els:
                     source_data.append(data_nodes[get_attribute(source_data_el, 'name')])
 
-            type = ActionType(kind)
+                type = n.ActionType(kind)
 
             action = n.ActionNode(participant, type, mesh, timing, target_data, source_data)
             action_nodes.append(action)
@@ -239,7 +238,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 second_participant_name = get_attribute(participants, 'second')
                 second_participant = participant_nodes[second_participant_name]
 
-                type = CouplingSchemeType(kind)
+                type = n.CouplingSchemeType(kind)  # TODO: unknown kind (multi not in CouplingSchemeType)
 
                 coupling_scheme = n.CouplingSchemeNode(type, first_participant, second_participant)
             case "multi":
@@ -286,7 +285,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     # M2N – <m2n:… />
     for (m2n, kind) in find_all_with_prefix(root, "m2n"):
-        type = M2NType(kind)
+            type = n.M2NType(kind)
         acceptor_name = get_attribute(m2n, 'acceptor')
         acceptor = participant_nodes[acceptor_name]
         connector_name = get_attribute(m2n, 'connector')
