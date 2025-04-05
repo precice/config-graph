@@ -260,9 +260,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
             data = data_nodes[data_name]
             mesh_name = get_attribute(exchange_el, 'mesh')
             mesh = mesh_nodes[mesh_name]
-            from_participant_name = get_attribute(exchange_el, 'from')  # TODO: Error on different from first or second participant
+            from_participant_name = get_attribute(exchange_el, 'from')
             from_participant = participant_nodes[from_participant_name]
-            to_participant_name = get_attribute(exchange_el, 'to')  # TODO: Error on different from first or second participant
+            to_participant_name = get_attribute(exchange_el, 'to')
             to_participant = participant_nodes[to_participant_name]
 
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
