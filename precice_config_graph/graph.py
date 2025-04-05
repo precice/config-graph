@@ -7,6 +7,7 @@ This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackerma
 """
 
 import sys
+from enum import Enum
 import matplotlib.pyplot as plt
 import networkx as nx
 from lxml import etree
@@ -36,6 +37,25 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     def error_missing_attribute(e:etree.Element, key:str):
         message:str = 'Missing attribute \"' + key + '\" for element \"' + e.tag + '\".'
+        error(message)
+
+    def get_enum_values_as_string(enum:Enum):
+        values = list(map(lambda x: x.value, enum._member_map_.values()))
+        string:str = ''
+        size = len(values)
+        for i in range(size):
+            string += '\"' + values[i] + '\"'
+            if i < size - 2:
+                string += ', '
+            elif i == size - 2:
+                string += ' or '
+            else:
+                string += '.'
+        return string
+
+    def error_unknown_type(e:etree.Element, type:str, enum:Enum):
+        possible_types = get_enum_values_as_string(enum)
+        message:str = 'Unknown type \"' + type + '\" for element \"' + e.tag + '\".\nUse one of ' + possible_types
         error(message)
 
     def get_attribute(e:etree.Element, key:str):
