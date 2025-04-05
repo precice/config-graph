@@ -16,7 +16,6 @@ from .edges import Edge
 from .nodes import CouplingSchemeType, ActionType, M2NType, MappingType, MappingConstraint
 from .xml_processing import convert_string_to_bool
 
-ERROR: str = "\033[1;31m[ERROR]\033[0m"
 LINK_GRAPH_ISSUES: str = "\'\033[1;36mhttps://github.com/precice-forschungsprojekt/config-graph/issues\033[0m\'"
 
 def get_graph(root: etree.Element) -> nx.Graph:
@@ -29,12 +28,16 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 postfix = child.tag[child.tag.find(":") + 1:]
                 yield child, postfix
 
-    def error_missing_attribute(e:etree.Element, key:str):
-        sys.exit(ERROR + ' Exiting graph generation.'
-                 + '\nMissing attribute \"' + key + '\" for element \"' + e.tag + '\".'
-                 + '\nPlease run \'precice-tools check\' for syntax errors.'
-                 + '\n\nIf you are sure this behaviour is incorrect, please leave a report at ' + LINK_GRAPH_ISSUES
+    def error(message:str):
+        sys.exit("\033[1;31m[ERROR]\033[0m Exiting graph generation."
+                 + "\n" + message
+                 + "\nPlease run \'precice-tools check\' for syntax errors."
+                 + "\n\nIf you are sure this behaviour is incorrect, please leave a report at " + LINK_GRAPH_ISSUES
                 )
+
+    def error_missing_attribute(e:etree.Element, key:str):
+        message:str = 'Missing attribute \"' + key + '\" for element \"' + e.tag + '\".'
+        error(message)
 
     def get_attribute(e:etree.Element, key:str):
         attribute = e.get(key)
