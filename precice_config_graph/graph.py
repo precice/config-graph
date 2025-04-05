@@ -138,7 +138,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 mapping = n.MappingNode(participant, n.Direction(direction), True, type, constraint,
                                         from_mesh, to_mesh)
             else:
-                error_missing_attribute(mapping_el, '\'from\' or \'to\'')
+                error_missing_attribute(mapping_el, 'from\" or \"to')
 
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
