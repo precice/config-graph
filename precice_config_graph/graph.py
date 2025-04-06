@@ -45,14 +45,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
     def list_to_string(values:list) -> str:
         string:str = ''
         size = len(values)
-        for i in range(size):
-            string += '\"' + values[i] + '\"'
-            if i < size - 2:
-                string += ', '
-            elif i == size - 2:
-                string += ' or '
-            else:
-                string += '.'
+        for i in range(size - 2):
+            string += f'\"{values[i]}\", '
+        string += f'\"{values[size-2]}\" or \"{values[size-1]}\".'
         return string
 
     def error_unknown_type(e:etree.Element, type:str, possible_types_list:list):
