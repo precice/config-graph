@@ -419,7 +419,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for exchange in exchange_nodes:
         g.add_node(exchange)
-        g.add_edge(exchange, exchange.from_participant, attr=Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
+        g.add_edge(exchange, exchange.from_participant, attr=Edge.EXCHANGE__EXCHANGED_FROM)
         g.add_edge(exchange, exchange.to_participant, attr=Edge.EXCHANGE__EXCHANGES_TO)
         g.add_edge(exchange, exchange.data, attr=Edge.EXCHANGE__DATA)
         g.add_edge(exchange, exchange.mesh, attr=Edge.EXCHANGE__MESH)
@@ -520,7 +520,7 @@ def print_graph(graph: nx.Graph):
                 return "provides"
             case Edge.MAPPING__TO_MESH | Edge.EXCHANGE__EXCHANGES_TO:
                 return "to"
-            case Edge.MAPPING__FROM_MESH:
+            case Edge.MAPPING__FROM_MESH | Edge.EXCHANGE__EXCHANGED_FROM:
                 return "from"
             case Edge.ACTION__MESH:
                 return "mesh"
@@ -530,8 +530,6 @@ def print_graph(graph: nx.Graph):
                 return "target data"
             case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH:
                 return "mesh"
-            case Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY:
-                return "exchanged by"
             case Edge.M2N__PARTICIPANT_ACCEPTOR:
                 return "acceptor"
             case Edge.M2N__PARTICIPANT_CONNECTOR:
