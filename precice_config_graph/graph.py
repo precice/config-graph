@@ -522,13 +522,11 @@ def print_graph(graph: nx.Graph):
                 return "to"
             case Edge.MAPPING__FROM_MESH | Edge.EXCHANGE__EXCHANGED_FROM:
                 return "from"
-            case Edge.ACTION__MESH:
-                return "mesh"
             case Edge.ACTION__SOURCE_DATA:
                 return "source data"
             case Edge.ACTION__TARGET_DATA:
                 return "target data"
-            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH:
+            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH | Edge.ACTION__MESH:
                 return "mesh"
             case Edge.M2N__PARTICIPANT_ACCEPTOR:
                 return "acceptor"
