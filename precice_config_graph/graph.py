@@ -158,15 +158,12 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 error_unknown_type(mapping_el, kind, possible_types_list)
             constraint = n.MappingConstraint(get_attribute(mapping_el, 'constraint'))
 
-            mapping = None
-            if from_mesh and to_mesh:
-                mapping = n.MappingNode(participant, n.Direction(direction), False, type, constraint,
-                                        from_mesh, to_mesh)
-            elif from_mesh or to_mesh:
-                mapping = n.MappingNode(participant, n.Direction(direction), True, type, constraint,
-                                        from_mesh, to_mesh)
-            else:
+            if not from_mesh and not to_mesh:
                 error_missing_attribute(mapping_el, 'from\" or \"to')
+            just_in_time = not (from_mesh and to_mesh)
+
+            mapping = n.MappingNode(participant, n.Direction(direction), just_in_time, type, constraint,
+                                    from_mesh, to_mesh)
 
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
