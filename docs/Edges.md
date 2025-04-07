@@ -91,7 +91,7 @@ This edge connects a mapping and the participant it is part of.
 
 This edge connects a participant with an exchange. This edge is to identify the "from" participant.
 
-- `type`: EXCHANGE__PARTICIPANT_EXCHANGED_BY
+- `type`: EXCHANGE__EXCHANGED_FROM
 - `from`: Participant
 - `to`: Exchange
 - `label`: exchanged by

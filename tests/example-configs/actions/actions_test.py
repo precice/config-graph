@@ -107,7 +107,7 @@ def test_graph():
         (n_exchange, n_coupling_scheme, Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO),
         (n_exchange, n_color, Edge.EXCHANGE__DATA),
         (n_exchange, n_generator_mesh, Edge.EXCHANGE__MESH),
-        (n_exchange, n_generator_participant, Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY),
+        (n_exchange, n_generator_participant, Edge.EXCHANGE__EXCHANGED_FROM),
         (n_exchange, n_propagator_participant, Edge.EXCHANGE__EXCHANGES_TO),
     ]
 

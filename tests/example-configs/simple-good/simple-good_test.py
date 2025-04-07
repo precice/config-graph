@@ -90,7 +90,7 @@ def test_graph():
 
     # Participant -- exchange
     edges += [(n_participant_generator, n_exchange_color_generator_mesh_generator_propagator,
-               Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)]
+               Edge.EXCHANGE__EXCHANGED_FROM)]
 
     # Exchange -- participant
     edges += [

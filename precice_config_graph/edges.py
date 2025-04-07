@@ -27,8 +27,8 @@ class Edge(Enum):
     # The connection between mapping and participant it is part of
     MAPPING__PARTICIPANT__BELONGS_TO = "mapping_belongs-to"
 
-    # participant (from) --exchanged_by--> exchange
-    EXCHANGE__PARTICIPANT_EXCHANGED_BY = "exchange_participant-exchanged-by"
+    # participant (from) --exchanged_from--> exchange
+    EXCHANGE__EXCHANGED_FROM = "exchange_exchanged-from"
     # exchange --exchanges-to--> participant (to)
     EXCHANGE__EXCHANGES_TO = "exchange_exchanges-to"
     # exchange <--> data

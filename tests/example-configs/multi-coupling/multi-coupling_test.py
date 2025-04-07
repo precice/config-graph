@@ -234,7 +234,7 @@ def test_graph():
                  (exchange, exchange.mesh, Edge.EXCHANGE__MESH)
                  for exchange in exchanges
              ] + [
-                 (exchange, exchange.from_participant, Edge.EXCHANGE__PARTICIPANT_EXCHANGED_BY)
+                 (exchange, exchange.from_participant, Edge.EXCHANGE__EXCHANGED_FROM)
                  for exchange in exchanges
              ] + [
                  (exchange, exchange.to_participant, Edge.EXCHANGE__EXCHANGES_TO)
