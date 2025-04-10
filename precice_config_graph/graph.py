@@ -152,17 +152,18 @@ def get_graph(root: etree.Element) -> nx.Graph:
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
 
             try:
-                type = n.MappingType(kind)
+                methode = n.MappingMethode(kind)
             except ValueError:
-                possible_types_list = get_enum_values(n.MappingType)
-                error_unknown_type(mapping_el, kind, possible_types_list)
+                possible_methode_list = get_enum_values(n.MappingMethode)
+                possible_methodes:str = list_to_string(possible_methode_list)
+                message:str = 'Unknown methode \"' + kind + '\" for element \"' + mapping_el.tag + '\".\nUse one of ' + possible_methodes
             constraint = n.MappingConstraint(get_attribute(mapping_el, 'constraint'))
 
             if not from_mesh and not to_mesh:
                 error_missing_attribute(mapping_el, 'from\" or \"to')
             just_in_time = not (from_mesh and to_mesh)
 
-            mapping = n.MappingNode(participant, n.Direction(direction), just_in_time, type, constraint,
+            mapping = n.MappingNode(participant, n.Direction(direction), just_in_time, methode, constraint,
                                     from_mesh, to_mesh)
 
             participant.mappings.append(mapping)

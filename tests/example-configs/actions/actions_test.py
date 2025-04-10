@@ -4,7 +4,7 @@ from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
 from precice_config_graph.nodes import DataType, Direction, TimingType, CouplingSchemeType, ActionType, M2NType, \
-    MappingConstraint, MappingType
+    MappingConstraint, MappingMethode
 
 
 def test_graph():
@@ -44,7 +44,7 @@ def test_graph():
     )
 
     n_mapping = n.MappingNode(
-        n_propagator_participant, Direction.READ, False, MappingType.NEAREST_NEIGHBOR,
+        n_propagator_participant, Direction.READ, False, MappingMethode.NEAREST_NEIGHBOR,
         MappingConstraint.CONSISTENT, from_mesh=n_generator_mesh, to_mesh=n_propagator_mesh
     )
     n_propagator_participant.mappings.append(n_mapping)
