@@ -3,7 +3,7 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import DataType, Direction, M2NType, MappingType, MappingConstraint
+from precice_config_graph.nodes import DataType, Direction, M2NType, MappingMethod, MappingConstraint
 
 
 def test_graph():
@@ -87,7 +87,7 @@ def test_graph():
     ]
     n_participant_nastin.mappings = [
         n.MappingNode(parent_participant=n_participant_nastin, direction=Direction.WRITE, just_in_time=False,
-                      type=MappingType.NEAREST_NEIGHBOR, constraint=MappingConstraint.CONSERVATIVE,
+                      method=MappingMethod.NEAREST_NEIGHBOR, constraint=MappingConstraint.CONSERVATIVE,
                       from_mesh=from_mesh, to_mesh=to_mesh)
         for (from_mesh, to_mesh) in [
             (n_mesh_nastin1, n_mesh_solidz1),
