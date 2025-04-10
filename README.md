@@ -10,7 +10,7 @@ A Library that builds a graph from a preCICE configuration file for validation a
 
 ## Requirements
 
-- Python 3.12+
+- Python 3.10+
 - Pip
 - Git for cloning the repository
 - PyQt6
