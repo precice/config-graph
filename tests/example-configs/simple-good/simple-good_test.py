@@ -3,7 +3,7 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import DataType, Direction, CouplingSchemeType, M2NType, MappingMethode, MappingConstraint
+from precice_config_graph.nodes import DataType, Direction, CouplingSchemeType, M2NType, MappingMethod, MappingConstraint
 
 
 def test_graph():
@@ -43,7 +43,7 @@ def test_graph():
 
     # Mappings
     n_mapping_propagator = n.MappingNode(n_participant_propagator, Direction.READ, False,
-                                         MappingMethode.NEAREST_NEIGHBOR, MappingConstraint.CONSISTENT,
+                                         MappingMethod.NEAREST_NEIGHBOR, MappingConstraint.CONSISTENT,
                                          n_mesh_generator, n_mesh_propagator)
     n_participant_propagator.mapping = [n_mapping_propagator]
 

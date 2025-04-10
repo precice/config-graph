@@ -11,7 +11,7 @@ from __future__ import annotations
 from enum import Enum
 
 
-class MappingMethode(Enum):
+class MappingMethod(Enum):
     NEAREST_NEIGHBOR = "nearest-neighbor"
     NEAREST_PROJECTION = "nearest-projection"
     NEAREST_NEIGHBOR_GRADIENT = "nearest-neighbor-gradient"
@@ -192,12 +192,12 @@ class DataNode:
 
 class MappingNode:
     def __init__(self, parent_participant: ParticipantNode, direction: Direction, just_in_time: bool,
-                 methode: MappingMethode, constraint: MappingConstraint, from_mesh: MeshNode | None = None,
+                 method: MappingMethod, constraint: MappingConstraint, from_mesh: MeshNode | None = None,
                  to_mesh: MeshNode | None = None):
         self.parent_participant = parent_participant
         self.direction = direction
         self.just_in_time = just_in_time
-        self.methode = methode
+        self.method = method
         self.constraint = constraint
         self.from_mesh = from_mesh
         self.to_mesh = to_mesh
