@@ -157,6 +157,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 possible_method_list = get_enum_values(n.MappingMethod)
                 possible_methods:str = list_to_string(possible_method_list)
                 message:str = 'Unknown method \"' + kind + '\" for element \"' + mapping_el.tag + '\".\nUse one of ' + possible_methods
+                error(message)
             constraint = n.MappingConstraint(get_attribute(mapping_el, 'constraint'))
 
             if not from_mesh and not to_mesh:
