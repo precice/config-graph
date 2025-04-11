@@ -41,11 +41,11 @@ class Edge(Enum):
     # The connection between acceleration and coupling scheme it is part of
     ACCELERATION__COUPLING_SCHEME__BELONGS_TO = "acceleration_belongs-to"
     # acceleration <--> data
-    ACCELERATION__DATA = "acceleration_data"
+    ACCELERATION_DATA__DATA = "acceleration_data"
     # acceleration <--> mesh
-    ACCELERATION__MESH = "acceleration_mesh"
+    ACCELERATION_DATA__MESH = "acceleration_mesh"
     # acceleration <--> acceleration_data
-    ACCELERATION__ACCELERATION_DATA__BELONGS_TO = "data_belongs-to"
+    ACCELERATION_DATA__ACCELERATION__BELONGS_TO = "acceleration-data_belongs-to"
 
     # m2n edges
     # m2n <--> acceptor

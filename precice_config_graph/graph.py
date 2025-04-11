@@ -451,9 +451,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
     for acceleration_data in acceleration_data_nodes:
         g.add_node(acceleration_data)
-        g.add_edge(acceleration_data, acceleration_data.acceleration, attr=Edge.ACCELERATION__ACCELERATION_DATA__BELONGS_TO)
-        g.add_edge(acceleration_data, acceleration_data.data, attr=Edge.ACCELERATION__DATA)
-        g.add_edge(acceleration_data, acceleration_data.mesh, attr=Edge.ACCELERATION__MESH)
+        g.add_edge(acceleration_data, acceleration_data.acceleration, attr=Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO)
+        g.add_edge(acceleration_data, acceleration_data.data, attr=Edge.ACCELERATION_DATA__DATA)
+        g.add_edge(acceleration_data, acceleration_data.mesh, attr=Edge.ACCELERATION_DATA__MESH)
 
     for m2n in m2n_nodes:
         g.add_node(m2n)
@@ -544,9 +544,9 @@ def print_graph(graph: nx.Graph):
                   Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
                   Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO |
                   Edge.ACTION__PARTICIPANT__BELONGS_TO | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO |
-                  Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO):
+                  Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO):
                 return "belongs to"
-            case (Edge.ACCELERATION__ACCELERATION_DATA__BELONGS_TO | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO):
+            case Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO:
                 return "accelerates"
             case Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM:
                 return "received from"
@@ -560,9 +560,9 @@ def print_graph(graph: nx.Graph):
                 return "source data"
             case Edge.ACTION__TARGET_DATA:
                 return "target data"
-            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH | Edge.ACTION__MESH | Edge.ACCELERATION__MESH:
+            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH | Edge.ACTION__MESH | Edge.ACCELERATION_DATA__MESH:
                 return "mesh"
-            case Edge.ACCELERATION__DATA:
+            case Edge.ACCELERATION_DATA__DATA:
                 return "data"
             case Edge.M2N__PARTICIPANT_ACCEPTOR:
                 return "acceptor"
