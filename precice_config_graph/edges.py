@@ -44,6 +44,8 @@ class Edge(Enum):
     ACCELERATION__DATA = "acceleration_data"
     # acceleration <--> mesh
     ACCELERATION__MESH = "acceleration_mesh"
+    # acceleration <--> acceleration_data
+    ACCELERATION__ACCELERATION_DATA__BELONGS_TO = "data_belongs-to"
 
     # m2n edges
     # m2n <--> acceptor
