@@ -321,7 +321,6 @@ def get_graph(root: etree.Element) -> nx.Graph:
             if a_kind in possible_types_list:
                 type = n.AccelerationType(a_kind)
                 acceleration = n.AccelerationNode(coupling_scheme, type)
-                acceleration_nodes.append(acceleration)
             
                 for (a_data) in acceleration_el.findall("data"):
                     a_data_name = get_attribute(a_data, 'name')
@@ -331,6 +330,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     a_data_node = n.AccelerationDataNode(acceleration, data, mesh)
                     acceleration.data.append(a_data_node)
                     acceleration_data_nodes.append(a_data_node)
+
+                acceleration_nodes.append(acceleration)
 
         match kind:
             case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
