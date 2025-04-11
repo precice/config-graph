@@ -82,28 +82,6 @@ class AccelerationType(Enum):
     #CONSTANT = "constant"
 
 
-#class PreconditionerType(Enum):
-#    CONSTANT = "constant"
-#    VALUE = "value"
-#    RESIDUAL = "residual"
-#    RESIDUAL_SUM = "residual-sum"
-
-
-#class FilterType(Enum):
-#    QR1 = "QR1"
-#    QR1_ABSOLUTE = "QR1-absolute"
-#    QR2 = "QR2"
-#    QR3 = "QR3"
-
-
-#class ImvjRestartModeType(Enum):
-#    NO_RESTART = "no-restart"
-#    RS_0 = "RS-0"
-#    RS_LS = "RS-LS"
-#    RS_SVD = "RS-SVD"
-#    RS_SLIDE = "RS-SLIDE"
-
-
 class ParticipantNode:
     def __init__(
             self, name: str,
@@ -313,7 +291,10 @@ class AccelerationDataNode:
 
 class AccelerationNode:
     def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
-                 type: AccelerationType, data: list[AccelerationDataNode]):
+                 type: AccelerationType, data: list[AccelerationDataNode] = None):
         self.coupling_scheme = coupling_scheme
         self.type = type
-        self.data = data
+        if not data:
+            self.data = []
+        else:
+            self.data = data

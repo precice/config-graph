@@ -76,6 +76,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
     mapping_nodes: list[n.MappingNode] = []
     export_nodes: list[n.ExportNode] = []
     exchange_nodes: list[n.ExchangeNode] = []
+    acceleration_nodes: list[n.AccelerationNode] = []
+    acceleration_data_nodes: list[n.AccelerationDataNode] = []
     action_nodes: list[n.ActionNode] = []
     m2n_nodes: list[n.M2NNode] = []
     watch_point_nodes: list[n.WatchPointNode] = []
@@ -313,6 +315,20 @@ def get_graph(root: etree.Element) -> nx.Graph:
             exchange = n.ExchangeNode(coupling_scheme, data, mesh, from_participant, to_participant)
             coupling_scheme.exchanges.append(exchange)
             exchange_nodes.append(exchange)
+
+        for (acceleration_el, a_kind) in find_all_with_prefix(coupling_scheme_el, "acceleration"):
+            type = n.AccelerationType(a_kind)
+            acceleration = n.AccelerationNode(coupling_scheme, type)
+            acceleration_nodes.append(acceleration)
+            
+            for (a_data) in acceleration_el.findall("data"):
+                a_data_name = get_attribute(a_data, 'name')
+                data = data_node[a_data_name]
+                a_mesh_name = get_attribute(a_data, 'mesh')
+                mesh = mesh_nodes[a_mesh_name]
+                a_data_node = n.AccelerationDataNode(acceleration, data, mesh)
+                acceleration.data.append(a_data_node)
+                acceleration_data_nodes.append(a_data_node)
 
         match kind:
             case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
