@@ -323,15 +323,17 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 possible_types_list = get_enum_values(n.AccelerationType)
                 error_unknown_type(acceleration_el, a_kind, possible_types_list)
             acceleration = n.AccelerationNode(coupling_scheme, type)
-            
-            for (a_data) in acceleration_el.findall("data"):
-                a_data_name = get_attribute(a_data, 'name')
-                data = data_nodes[a_data_name]
-                a_mesh_name = get_attribute(a_data, 'mesh')
-                mesh = mesh_nodes[a_mesh_name]
-                a_data_node = n.AccelerationDataNode(acceleration, data, mesh)
-                acceleration.data.append(a_data_node)
-                acceleration_data_nodes.append(a_data_node)
+
+            possible_types_list = ["serial-implicit", "parallel-implicit", "multi"]
+            if a_kind in possible_types_list:
+                for (a_data) in acceleration_el.findall("data"):
+                    a_data_name = get_attribute(a_data, 'name')
+                    data = data_nodes[a_data_name]
+                    a_mesh_name = get_attribute(a_data, 'mesh')
+                    mesh = mesh_nodes[a_mesh_name]
+                    a_data_node = n.AccelerationDataNode(acceleration, data, mesh)
+                    acceleration.data.append(a_data_node)
+                    acceleration_data_nodes.append(a_data_node)
 
             coupling_scheme.accelerations.append(acceleration)
             acceleration_nodes.append(acceleration)
