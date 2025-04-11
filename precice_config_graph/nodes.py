@@ -312,7 +312,7 @@ class AccelerationDataNode:
 
 
 class AccelerationNode:
-    def __init__(self, coupling_scheme: CouplingSchemeType | MultiCouplingSchemeNode,
+    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
                  type: AccelerationType, data: list[AccelerationDataNode] = None):
         self.coupling_scheme = coupling_scheme
         self.type = type
