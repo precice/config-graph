@@ -240,6 +240,28 @@ def test_graph():
                  (exchange, exchange.to_participant, Edge.EXCHANGE__EXCHANGES_TO)
                  for exchange in exchanges
              ]
+    
+    acceleration = n.AccelerationNode(n_coupling_scheme, n.AccelerationType.IQN_ILS)
+    n_coupling_scheme.accelerations.append(acceleration)
+    acceleration_data1 = n.AccelerationDataNode(acceleration, n_data_forces1, n_mesh_solidz1)
+    acceleration_data2 = n.AccelerationDataNode(acceleration, n_data_forces2, n_mesh_solidz2)
+    acceleration_data3 = n.AccelerationDataNode(acceleration, n_data_forces3, n_mesh_solidz3)
+    acceleration.data.append(acceleration_data1)
+    acceleration.data.append(acceleration_data2)
+    acceleration.data.append(acceleration_data3)
+
+    edges += [
+                (acceleration, acceleration.coupling_scheme, Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO)
+            ] + [
+                (data_node, data_node.acceleration, Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO)
+                for data_node in acceleration.data
+            ] + [
+                (data_node, data_node.data, Edge.ACCELERATION_DATA__DATA)
+                for data_node in acceleration.data
+            ] + [
+                (data_node, data_node.mesh, Edge.ACCELERATION_DATA__MESH)
+                for data_node in acceleration.data
+            ]
 
     G_expected = nx.Graph()
     for (node_a, node_b, attr) in edges:
