@@ -333,6 +333,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 acceleration.data.append(a_data_node)
                 acceleration_data_nodes.append(a_data_node)
 
+            coupling_scheme.accelerations.append(acceleration)
             acceleration_nodes.append(acceleration)
 
         match kind:

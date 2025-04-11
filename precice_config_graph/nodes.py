@@ -164,7 +164,8 @@ class ReceiveMeshNode:
 
 class CouplingSchemeNode:
     def __init__(self, type: CouplingSchemeType, first_participant: ParticipantNode,
-                 second_participant: ParticipantNode, exchanges: list[ExchangeNode] = None):
+                 second_participant: ParticipantNode, exchanges: list[ExchangeNode] = None,
+                 accelerations: list[AccelerationNode] = None):
         self.type = type
         self.first_participant = first_participant
         self.second_participant = second_participant
@@ -174,10 +175,15 @@ class CouplingSchemeNode:
         else:
             self.exchanges = exchanges
 
+        if not accelerations:
+            self.accelerations = []
+        else:
+            self.accelerations = accelerations
+
 
 class MultiCouplingSchemeNode:
     def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode] = None,
-                 exchanges: list[ExchangeNode] = None):
+                 exchanges: list[ExchangeNode] = None, accelerations: list[AccelerationNode] = None):
         self.control_participant = control_participant
 
         if participants is None:
@@ -189,6 +195,11 @@ class MultiCouplingSchemeNode:
             self.exchanges = []
         else:
             self.exchanges = exchanges
+
+        if not accelerations:
+            self.accelerations = []
+        else:
+            self.accelerations = accelerations
 
 
 class DataNode:
