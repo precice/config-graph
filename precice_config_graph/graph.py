@@ -324,7 +324,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 error_unknown_type(acceleration_el, a_kind, possible_types_list)
             acceleration = n.AccelerationNode(coupling_scheme, type)
 
-            possible_types_list = ["serial-implicit", "parallel-implicit", "multi"]
+            possible_types_list = ["aitken", "IQN-ILS", "IQN-IMVJ"]
             if a_kind in possible_types_list:
                 for (a_data) in acceleration_el.findall("data"):
                     a_data_name = get_attribute(a_data, 'name')

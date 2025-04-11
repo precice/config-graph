@@ -79,7 +79,7 @@ class AccelerationType(Enum):
     AITKEN = "aitken"
     IQN_ILS = "IQN-ILS"
     IQN_IMVJ = "IQN-IMVJ"
-    #CONSTANT = "constant"
+    CONSTANT = "constant"
 
 
 class ParticipantNode:
