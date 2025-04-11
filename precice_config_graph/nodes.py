@@ -76,10 +76,10 @@ class ExportFormat(Enum):
 
 
 class AccelerationType(Enum):
-    CONSTANT = "constant"
     AITKEN = "aitken"
     IQN_ILS = "IQN-ILS"
     IQN_IMVJ = "IQN-IMVJ"
+    #CONSTANT = "constant"
 
 
 #class PreconditionerType(Enum):
@@ -313,10 +313,7 @@ class AccelerationDataNode:
 
 class AccelerationNode:
     def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
-                 type: AccelerationType, data: list[AccelerationDataNode] = None):
+                 type: AccelerationType, data: list[AccelerationDataNode]):
         self.coupling_scheme = coupling_scheme
         self.type = type
-        if not data:
-            self.data = []
-        else:
-            self.data = data
+        self.data = data
