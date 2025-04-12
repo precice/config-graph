@@ -627,6 +627,8 @@ def print_graph(graph: nx.Graph):
                 node_labels[node] = f"M2N {node.type.value}"
             case n.AccelerationNode():
                 node_labels[node] = f"Acceleration {node.type.value}"
+            case n.AccelerationDataNode():
+                node_labels[node] = f"Accelerate {node.data.name}"
             case _:
                 node_labels[node] = ""
 
