@@ -175,7 +175,7 @@ class CouplingSchemeNode:
         else:
             self.exchanges = exchanges
 
-        if not accelerations:
+        if accelerations is None:
             self.accelerations = []
         else:
             self.accelerations = accelerations
@@ -196,7 +196,7 @@ class MultiCouplingSchemeNode:
         else:
             self.exchanges = exchanges
 
-        if not accelerations:
+        if accelerations is None:
             self.accelerations = []
         else:
             self.accelerations = accelerations
@@ -305,7 +305,7 @@ class AccelerationNode:
                  type: AccelerationType, data: list[AccelerationDataNode] = None):
         self.coupling_scheme = coupling_scheme
         self.type = type
-        if not data:
+        if data is None:
             self.data = []
         else:
             self.data = data
