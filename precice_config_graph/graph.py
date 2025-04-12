@@ -319,7 +319,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
         for (acceleration_el, a_kind) in find_all_with_prefix(coupling_scheme_el, "acceleration"):
             if kind in ["serial-explicit", "parallel-explicit"]:
                 possible_types = list_to_string(["serial-implicit", "parallel-implicit", "multi"])
-                message:str = f"The coupling scheme of type \'{kind}\' does not support acceleration.\nUse one of " + possible_types + "\nOr remove the acceleration tag."
+                message:str = f"The coupling scheme of type \'{kind}\' does not support acceleration.\nUse one of " + possible_types + "\nOtherwise remove the acceleration tag."
                 error(message)
 
             try:
@@ -334,7 +334,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
             if a_kind == "constant" and acceleration_el.find("data"):
                 possible_types:str = list_to_string(possible_types_list)
-                message:str = "No data tag is expected for \'constant\' acceleration.\nUse one of " + possible_types + "\nOr remove the acceleration tag."
+                message:str = "No data tag is expected for \'constant\' acceleration.\nUse one of " + possible_types + "\nOtherwise remove the acceleration tag."
                 error(message)
 
             if a_kind in possible_types_list:
