@@ -76,6 +76,8 @@ def get_graph(root: etree.Element) -> nx.Graph:
     mapping_nodes: list[n.MappingNode] = []
     export_nodes: list[n.ExportNode] = []
     exchange_nodes: list[n.ExchangeNode] = []
+    acceleration_nodes: list[n.AccelerationNode] = []
+    acceleration_data_nodes: list[n.AccelerationDataNode] = []
     action_nodes: list[n.ActionNode] = []
     m2n_nodes: list[n.M2NNode] = []
     watch_point_nodes: list[n.WatchPointNode] = []
@@ -314,6 +316,40 @@ def get_graph(root: etree.Element) -> nx.Graph:
             coupling_scheme.exchanges.append(exchange)
             exchange_nodes.append(exchange)
 
+        for (acceleration_el, a_kind) in find_all_with_prefix(coupling_scheme_el, "acceleration"):
+            if kind in ["serial-explicit", "parallel-explicit"]:
+                possible_types = list_to_string(["serial-implicit", "parallel-implicit", "multi"])
+                message:str = f"The coupling scheme of type \'{kind}\' does not support acceleration.\nUse one of " + possible_types + "\nOtherwise remove the acceleration tag."
+                error(message)
+
+            try:
+                type = n.AccelerationType(a_kind)
+            except ValueError:
+                possible_types_list = get_enum_values(n.AccelerationType)
+                error_unknown_type(acceleration_el, a_kind, possible_types_list)
+
+            acceleration = n.AccelerationNode(coupling_scheme, type)
+
+            possible_types_list = ["aitken", "IQN-ILS", "IQN-IMVJ"]
+
+            if a_kind == "constant" and acceleration_el.find("data"):
+                possible_types:str = list_to_string(possible_types_list)
+                message:str = "No data tag is expected for \'constant\' acceleration.\nUse one of " + possible_types + "\nOtherwise remove the acceleration tag."
+                error(message)
+
+            if a_kind in possible_types_list:
+                for (a_data) in acceleration_el.findall("data"):
+                    a_data_name = get_attribute(a_data, 'name')
+                    data = data_nodes[a_data_name]
+                    a_mesh_name = get_attribute(a_data, 'mesh')
+                    mesh = mesh_nodes[a_mesh_name]
+                    a_data_node = n.AccelerationDataNode(acceleration, data, mesh)
+                    acceleration.data.append(a_data_node)
+                    acceleration_data_nodes.append(a_data_node)
+
+            coupling_scheme.accelerations.append(acceleration)
+            acceleration_nodes.append(acceleration)
+
         match kind:
             case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
                 coupling_nodes.append(coupling_scheme)
@@ -424,6 +460,16 @@ def get_graph(root: etree.Element) -> nx.Graph:
         g.add_edge(exchange, exchange.mesh, attr=Edge.EXCHANGE__MESH)
         g.add_edge(exchange, exchange.coupling_scheme, attr=Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO)
 
+    for acceleration in acceleration_nodes:
+        g.add_node(acceleration)
+        g.add_edge(acceleration, acceleration.coupling_scheme, attr=Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO)
+
+    for acceleration_data in acceleration_data_nodes:
+        g.add_node(acceleration_data)
+        g.add_edge(acceleration_data, acceleration_data.acceleration, attr=Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO)
+        g.add_edge(acceleration_data, acceleration_data.data, attr=Edge.ACCELERATION_DATA__DATA)
+        g.add_edge(acceleration_data, acceleration_data.mesh, attr=Edge.ACCELERATION_DATA__MESH)
+
     for m2n in m2n_nodes:
         g.add_node(m2n)
         g.add_edge(m2n, m2n.acceptor, attr=Edge.M2N__PARTICIPANT_ACCEPTOR)
@@ -502,6 +548,8 @@ def print_graph(graph: nx.Graph):
                 append_list(nodes_octagon, node, color)
             case n.DataNode():
                 append_list(nodes_diamond_wide, node, color)
+            case n.AccelerationNode():
+                append_list(nodes_plus, node, color)
             case _:
                 append_list(nodes_circle, node, color)
 
@@ -511,8 +559,10 @@ def print_graph(graph: nx.Graph):
                   Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
                   Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO |
                   Edge.ACTION__PARTICIPANT__BELONGS_TO | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO |
-                  Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO):
+                  Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO):
                 return "belongs to"
+            case Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO:
+                return "accelerates"
             case Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM:
                 return "received from"
             case Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES:
@@ -525,8 +575,10 @@ def print_graph(graph: nx.Graph):
                 return "source data"
             case Edge.ACTION__TARGET_DATA:
                 return "target data"
-            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH | Edge.ACTION__MESH:
+            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH | Edge.ACTION__MESH | Edge.ACCELERATION_DATA__MESH:
                 return "mesh"
+            case Edge.ACCELERATION_DATA__DATA:
+                return "data"
             case Edge.M2N__PARTICIPANT_ACCEPTOR:
                 return "acceptor"
             case Edge.M2N__PARTICIPANT_CONNECTOR:
@@ -573,6 +625,10 @@ def print_graph(graph: nx.Graph):
                 node_labels[node] = f"Receive {node.mesh.name}"
             case n.M2NNode():
                 node_labels[node] = f"M2N {node.type.value}"
+            case n.AccelerationNode():
+                node_labels[node] = f"Acceleration {node.type.value}"
+            case n.AccelerationDataNode():
+                node_labels[node] = f"Accelerate {node.data.name}"
             case _:
                 node_labels[node] = ""
 

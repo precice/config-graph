@@ -75,6 +75,13 @@ class ExportFormat(Enum):
     CSV = "csv"
 
 
+class AccelerationType(Enum):
+    AITKEN = "aitken"
+    IQN_ILS = "IQN-ILS"
+    IQN_IMVJ = "IQN-IMVJ"
+    CONSTANT = "constant"
+
+
 class ParticipantNode:
     def __init__(
             self, name: str,
@@ -157,7 +164,8 @@ class ReceiveMeshNode:
 
 class CouplingSchemeNode:
     def __init__(self, type: CouplingSchemeType, first_participant: ParticipantNode,
-                 second_participant: ParticipantNode, exchanges: list[ExchangeNode] = None):
+                 second_participant: ParticipantNode, exchanges: list[ExchangeNode] = None,
+                 accelerations: list[AccelerationNode] = None):
         self.type = type
         self.first_participant = first_participant
         self.second_participant = second_participant
@@ -167,10 +175,15 @@ class CouplingSchemeNode:
         else:
             self.exchanges = exchanges
 
+        if accelerations is None:
+            self.accelerations = []
+        else:
+            self.accelerations = accelerations
+
 
 class MultiCouplingSchemeNode:
     def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode] = None,
-                 exchanges: list[ExchangeNode] = None):
+                 exchanges: list[ExchangeNode] = None, accelerations: list[AccelerationNode] = None):
         self.control_participant = control_participant
 
         if participants is None:
@@ -182,6 +195,11 @@ class MultiCouplingSchemeNode:
             self.exchanges = []
         else:
             self.exchanges = exchanges
+
+        if accelerations is None:
+            self.accelerations = []
+        else:
+            self.accelerations = accelerations
 
 
 class DataNode:
@@ -273,3 +291,21 @@ class M2NNode:
         self.type = type
         self.acceptor = acceptor
         self.connector = connector
+
+
+class AccelerationDataNode:
+    def __init__(self, acceleration: AccelerationNode, data: DataNode, mesh: MeshNode):
+        self.acceleration = acceleration
+        self.data = data
+        self.mesh = mesh
+
+
+class AccelerationNode:
+    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
+                 type: AccelerationType, data: list[AccelerationDataNode] = None):
+        self.coupling_scheme = coupling_scheme
+        self.type = type
+        if data is None:
+            self.data = []
+        else:
+            self.data = data
