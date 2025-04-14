@@ -675,6 +675,6 @@ def print_graph(graph: nx.Graph):
                     )
                 )
 
-    plt.legend(handles=handles, loc='upper left', title='Nodes types:')
+    plt.legend(handles=handles, loc='upper left', title='Node types:')
 
     plt.show()
