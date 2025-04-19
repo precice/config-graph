@@ -262,6 +262,36 @@ def test_graph():
                 (data_node, data_node.mesh, Edge.ACCELERATION_DATA__MESH)
                 for data_node in acceleration.data
             ]
+    
+    convergence_measure_d1 = n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_displacements1, n_mesh_solidz1)
+    convergence_measure_d2 = n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_displacements2, n_mesh_solidz2)
+    convergence_measure_d3 = n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_displacements3, n_mesh_solidz3)
+    convergence_measure_f1 = n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_forces1, n_mesh_solidz1)
+    convergence_measure_f2 = n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_forces2, n_mesh_solidz2)
+    convergence_measure_f3 = n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_forces3, n_mesh_solidz3)
+
+    edges += [
+                (convergence_measure_d1, convergence_measure_d1.coupling_scheme, Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO),
+                (convergence_measure_d2, convergence_measure_d2.coupling_scheme, Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO),
+                (convergence_measure_d3, convergence_measure_d3.coupling_scheme, Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO),
+                (convergence_measure_f1, convergence_measure_f1.coupling_scheme, Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO),
+                (convergence_measure_f2, convergence_measure_f2.coupling_scheme, Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO),
+                (convergence_measure_f3, convergence_measure_f3.coupling_scheme, Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO)
+            ] + [
+                (convergence_measure_d1, convergence_measure_d1.data, Edge.CONVERGENCE_MEASURE__DATA),
+                (convergence_measure_d2, convergence_measure_d2.data, Edge.CONVERGENCE_MEASURE__DATA),
+                (convergence_measure_d3, convergence_measure_d3.data, Edge.CONVERGENCE_MEASURE__DATA),
+                (convergence_measure_f1, convergence_measure_f1.data, Edge.CONVERGENCE_MEASURE__DATA),
+                (convergence_measure_f2, convergence_measure_f2.data, Edge.CONVERGENCE_MEASURE__DATA),
+                (convergence_measure_f3, convergence_measure_f3.data, Edge.CONVERGENCE_MEASURE__DATA)
+            ] + [
+                (convergence_measure_d1, convergence_measure_d1.mesh, Edge.CONVERGENCE_MEASURE__MESH),
+                (convergence_measure_d2, convergence_measure_d2.mesh, Edge.CONVERGENCE_MEASURE__MESH),
+                (convergence_measure_d3, convergence_measure_d3.mesh, Edge.CONVERGENCE_MEASURE__MESH),
+                (convergence_measure_f1, convergence_measure_f1.mesh, Edge.CONVERGENCE_MEASURE__MESH),
+                (convergence_measure_f2, convergence_measure_f2.mesh, Edge.CONVERGENCE_MEASURE__MESH),
+                (convergence_measure_f3, convergence_measure_f3.mesh, Edge.CONVERGENCE_MEASURE__MESH)
+            ]
 
     G_expected = nx.Graph()
     for (node_a, node_b, attr) in edges:
