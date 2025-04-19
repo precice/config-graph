@@ -49,8 +49,6 @@ class Edge(Enum):
 
     # The connection between convergence-measure and coupling scheme it is part of
     CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO = "convergence-measure_belongs-to"
-    # The connection between exchange and coupling scheme it is part of
-    CONVERGENCE_MEASURE__EXCHANGE__BELONGS_TO = "convergence-measure_belongs-to"
     # convergence-measure <--> data
     CONVERGENCE_MEASURE__DATA = "convergence-measure_data"
     # convergence-measure <--> mesh

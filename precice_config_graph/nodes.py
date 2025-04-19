@@ -83,10 +83,10 @@ class AccelerationType(Enum):
 
 
 class ConvergenceMeasureType(Enum):
-    ABSOLUTE = "absolute-convergence-measure"
-    ABSOLUTE_OR_RELATIVE = "absolute-or-relative-convergence-measure"
-    RELATIVE = "relative-convergence-measure"
-    RESIDUAL_RELATIVE = "residual-relative-convergence-measure"
+    ABSOLUTE = "absolute"
+    ABSOLUTE_OR_RELATIVE = "absolute-or-relative"
+    RELATIVE = "relative"
+    RESIDUAL_RELATIVE = "residual-relative"
 
 
 class ParticipantNode:
@@ -259,18 +259,12 @@ class ExchangeNode:
                  data: DataNode,
                  mesh: MeshNode,
                  from_participant: ParticipantNode,
-                 to_participant: ParticipantNode,
-                 convergence_measures: list[ConvergenceMeasureNode] = None):
+                 to_participant: ParticipantNode):
         self.coupling_scheme = coupling_scheme
         self.data = data
         self.mesh = mesh
         self.from_participant = from_participant
         self.to_participant = to_participant
-
-        if convergence_measures is None:
-            self.convergence_measures = []
-        else:
-            self.convergence_measures = convergence_measures
 
 
 class ExportNode:
@@ -339,10 +333,8 @@ class AccelerationNode:
 class ConvergenceMeasureNode:
     def __init__(self, type: ConvergenceMeasureType,
                  coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
-                 exchange: ExchangeNode,
                  data: DataNode, mesh: MeshNode):
         self.type = type
         self.coupling_scheme = coupling_scheme
-        self.exchange = exchange
         self.data = data
         self.mesh = mesh
