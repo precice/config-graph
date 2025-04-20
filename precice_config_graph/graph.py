@@ -28,6 +28,12 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 postfix = child.tag[child.tag.find(":") + 1:]
                 yield child, postfix
 
+    def find_all_with_postfix(e: etree.Element, postfix: str):
+        for child in e.iterchildren():
+            if child.tag.endswith(postfix):
+                prefix:str = child.tag.removesuffix(postfix)
+                yield child, prefix
+
     def error(message:str):
         sys.exit("\033[1;31m[ERROR]\033[0m Exiting graph generation."
                  + "\n" + message
@@ -78,6 +84,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
     exchange_nodes: list[n.ExchangeNode] = []
     acceleration_nodes: list[n.AccelerationNode] = []
     acceleration_data_nodes: list[n.AccelerationDataNode] = []
+    convergence_measure_nodes: list[n.ConvergenceMeasureNode] = []
     action_nodes: list[n.ActionNode] = []
     m2n_nodes: list[n.M2NNode] = []
     watch_point_nodes: list[n.WatchPointNode] = []
@@ -350,6 +357,29 @@ def get_graph(root: etree.Element) -> nx.Graph:
             coupling_scheme.accelerations.append(acceleration)
             acceleration_nodes.append(acceleration)
 
+        for (convergence_measure_el, c_kind) in find_all_with_postfix(coupling_scheme_el, "-convergence-measure"):
+            match kind:
+                case "serial-implicit" | "parallel-implicit" | "multi":
+                    try:
+                        type = n.ConvergenceMeasureType(c_kind)
+                    except ValueError:
+                        possible_types_list = get_enum_values(n.ConvergenceMeasureType)
+                        error_unknown_type(convergence_measure_el, c_kind, possible_types_list)
+
+                    c_data_name = get_attribute(convergence_measure_el, "data")
+                    c_data = data_nodes[c_data_name]
+                    c_mesh_name = get_attribute(convergence_measure_el, "mesh")
+                    c_mesh = mesh_nodes[c_mesh_name]
+
+                    convergence_measure = n.ConvergenceMeasureNode(type, coupling_scheme, c_data, c_mesh)
+                    coupling_scheme.convergence_measures.append(convergence_measure)
+                    convergence_measure_nodes.append(convergence_measure)
+
+                case "parallel-explicit" | "serial-explicit":
+                    possible_types:str = list_to_string(["serial-implicit", "parallel-implicit", "multi"])
+                    message:str = f"The coupling scheme of type \'{kind}\' does not support convergence-measure.\nUse one of " + possible_types + f"\nOtherwise remove the {c_kind}-convergence-measure tag."
+                    error(message)
+
         match kind:
             case "serial-explicit" | "serial-implicit" | "parallel-explicit" | "parallel-implicit":
                 coupling_nodes.append(coupling_scheme)
@@ -470,6 +500,12 @@ def get_graph(root: etree.Element) -> nx.Graph:
         g.add_edge(acceleration_data, acceleration_data.data, attr=Edge.ACCELERATION_DATA__DATA)
         g.add_edge(acceleration_data, acceleration_data.mesh, attr=Edge.ACCELERATION_DATA__MESH)
 
+    for convergence_measure in convergence_measure_nodes:
+        g.add_node(convergence_measure)
+        g.add_edge(convergence_measure, convergence_measure.coupling_scheme, attr=Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO)
+        g.add_edge(convergence_measure, convergence_measure.data, attr=Edge.CONVERGENCE_MEASURE__DATA)
+        g.add_edge(convergence_measure, convergence_measure.mesh, attr=Edge.CONVERGENCE_MEASURE__MESH)
+
     for m2n in m2n_nodes:
         g.add_node(m2n)
         g.add_edge(m2n, m2n.acceptor, attr=Edge.M2N__PARTICIPANT_ACCEPTOR)
@@ -559,7 +595,8 @@ def print_graph(graph: nx.Graph):
                   Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO |
                   Edge.READ_DATA__PARTICIPANT__BELONGS_TO | Edge.EXPORT__PARTICIPANT__BELONGS_TO |
                   Edge.ACTION__PARTICIPANT__BELONGS_TO | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO |
-                  Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO):
+                  Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO |
+                  Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO):
                 return "belongs to"
             case Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO:
                 return "accelerates"
@@ -575,9 +612,10 @@ def print_graph(graph: nx.Graph):
                 return "source data"
             case Edge.ACTION__TARGET_DATA:
                 return "target data"
-            case Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH | Edge.ACTION__MESH | Edge.ACCELERATION_DATA__MESH:
+            case (Edge.WATCH_POINT__MESH | Edge.WATCH_INTEGRAL__MESH | Edge.ACTION__MESH |
+                  Edge.ACCELERATION_DATA__MESH | Edge.CONVERGENCE_MEASURE__MESH):
                 return "mesh"
-            case Edge.ACCELERATION_DATA__DATA:
+            case Edge.ACCELERATION_DATA__DATA | Edge.CONVERGENCE_MEASURE__DATA:
                 return "data"
             case Edge.M2N__PARTICIPANT_ACCEPTOR:
                 return "acceptor"
@@ -629,6 +667,8 @@ def print_graph(graph: nx.Graph):
                 node_labels[node] = f"Acceleration {node.type.value}"
             case n.AccelerationDataNode():
                 node_labels[node] = f"Accelerate {node.data.name}"
+            case n.ConvergenceMeasureNode():
+                node_labels[node] = f"{node.type.value}-convergence-measure"
             case _:
                 node_labels[node] = ""
 
