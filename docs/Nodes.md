@@ -179,7 +179,7 @@ To let participants exchange information (physically), they have to be connected
 
 - `type`: The type of the m2n node. Possible values are `sockets`, `mpi` and `mpi-multiple-ports`.
 - `acceptor`: The participant defined as `acceptor=...`.
-- `connector`: The participant defined as `conntector=...`.
+- `connector`: The participant defined as `connector=...`.
 - `line`: The line number where the m2n is defined in the config.xml.
 
 ## AccelerationData
