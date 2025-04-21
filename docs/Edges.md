@@ -22,6 +22,15 @@ As the graph is undirected, the `to` and `from` entries correspond only to the r
 - `label`: The label as shown in the debugging view of the graph. If this is missing, then the edge does not have a
   label.
 
+## Receive-mesh - mesh
+
+This edge connects a receive-mesh node and the mesh that it actually refers to.
+
+- `type`: RECEIVE_MESH__MESH
+- `from`: ReceiveMesh
+- `to`: Mesh
+- `label`:
+
 ## Participant - Receive-mesh
 
 This edge connects a participant and a receive-mesh node. The participant is the one who the mesh is received from (the
@@ -32,15 +41,6 @@ participant).
 - `from`: Participant
 - `to`: ReceiveMesh
 - `label`: received from
-
-## Receive-mesh - mesh
-
-This edge connects a receive-mesh node and the mesh that it actually refers to.
-
-- `type`: RECEIVE_MESH__MESH
-- `from`: ReceiveMesh
-- `to`: Mesh
-- `label`:
 
 ## Receive-mesh - participant
 
@@ -94,7 +94,7 @@ This edge connects a participant with an exchange. This edge is to identify the 
 - `type`: EXCHANGE__EXCHANGED_FROM
 - `from`: Participant
 - `to`: Exchange
-- `label`: exchanged by
+- `label`: from
 
 ## Exchange - participant
 
@@ -104,7 +104,7 @@ exchange.
 - `type`: EXCHANGE__EXCHANGES_TO
 - `from`: Exchange
 - `to`: Participant
-- `label`: exchanges to
+- `label`: to
 
 ## Exchange - data
 
@@ -132,6 +132,69 @@ This edge connects a coupling scheme with its exchanges.
 - `from`: Exchange
 - `to`: Coupling-scheme
 - `label`: belongs to
+
+## Coupling-scheme - acceleration
+
+This edge connects a coupling scheme with its accelerations.
+
+- `type`: ACCELERATION__COUPLING_SCHEME__BELONGS_TO
+- `from`: Acceleration
+- `to`: Coupling-scheme
+- `label`: belongs to
+
+## Acceleration-data - data
+
+This edge connects a data with an acceleration-data.
+
+- `type`: ACCELERATION_DATA__DATA
+- `from`: Acceleration-data
+- `to`: Data
+- `label`: data
+
+## Acceleration-data - mesh
+
+This edge connects a mesh with an acceleration-data.
+
+- `type`: ACCELERATION_DATA__MESH
+- `from`: Acceleration-data
+- `to`: Mesh
+- `label`: mesh
+
+## Acceleration - acceleration-data
+
+This edge connects a acceleration with its acceleration-datas.
+
+- `type`: ACCELERATION_DATA__ACCELERATION__BELONGS_TO
+- `from`: Acceleration-data
+- `to`: Acceleration
+- `label`: accelerates
+
+## Coupling-scheme - convergence-measure
+
+This edge connects a coupling scheme with its convergence-measures.
+
+- `type`: CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO
+- `from`: Convergence-measure
+- `to`: Coupling-scheme
+- `label`: belongs to
+
+## Convergence-measure - data
+
+This edge connects a data with an convergence-measure.
+
+- `type`: CONVERGENCE_MEASURE__DATA
+- `from`: Convergence-measure
+- `to`: Data
+- `label`: data
+
+## Convergence-measure - mesh
+
+This edge connects a mesh with an convergence-measure.
+
+- `type`: CONVERGENCE_MEASURE__MESH
+- `from`: Convergence-measure
+- `to`: Mesh
+- `label`: mesh
 
 ## M2N - participant
 
@@ -263,10 +326,10 @@ This edge connects a multi-coupling-scheme with its _regular_ participants.
 
 This edge connects an action node to the participant who specified it.
 
-- `type`: ACTION_PARTICIPANT
+- `type`: ACTION__PARTICIPANT__BELONGS_TO
 - `from`: Action
 - `to`: Participant
-- `label`:
+- `label`: belongs to
 
 ## Action - mesh
 
@@ -275,49 +338,58 @@ This edge connects an action node to the mesh the action gets performed on.
 - `type`: ACTION_MESH
 - `from`: Action
 - `to`: Mesh
-- `label`:
+- `label`: mesh
 
-## Action - data
+## Action - target-data
 
 This edge connects an action node with the data node that is involved in the operation.
 
-- `type`: ACTION_DATA
+- `type`: ACTION__TARGET_DATA
 - `from`: Action
 - `to`: Data
-- `label`:
+- `label`: target data
+
+## Action - source-data
+
+This edge connects an action node with the data node that is involved in the operation.
+
+- `type`: ACTION__SOURCE_DATA
+- `from`: Action
+- `to`: Data
+- `label`: source data
 
 ## Watchpoint - participant
 
 This edge connects a watchpoint node to the participant specifying it.
 
-- `type`: WATCHPOINT_PARTICIPANT
+- `type`: WATCH_POINT__PARTICIPANT__BELONGS_TO
 - `from`: Watchpoint
 - `to`: Participant
-- `label`:
+- `label`: belongs to
 
 ## Watchpoint - mesh
 
-This edge connects a watchpoint node to the mesh it is watching 👁️👁️
+This edge connects a watchpoint node to the mesh it is watching.
 
-- `type`: WATCHPOINT_PARTICIPANT
+- `type`: WATCH_POINT__MESH
 - `from`: Watchpoint
 - `to`: Mesh
-- `label`:
+- `label`: mesh
 
 ## Watch-integral - participant
 
 This edge connects a watch-integral node to the participant specifying it.
 
-- `type`: WATCHPOINT_PARTICIPANT
+- `type`: WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO
 - `from`: WatchIntegral
 - `to`: Participant
-- `label`:
+- `label`: belongs to
 
 ## Watch-integral - mesh
 
 This edge connects a watch-integral node to the mesh it is watching.
 
-- `type`: WATCHPOINT_PARTICIPANT
+- `type`: WATCH_INTEGRAL__MESH
 - `from`: WatchIntegral
 - `to`: Mesh
-- `label`:
+- `label`: mesh
