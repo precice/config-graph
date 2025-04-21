@@ -263,12 +263,12 @@ def test_graph():
                 for data_node in acceleration.data
             ]
     
-    convergence_measures = [n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_displacements1, n_mesh_solidz1),
-                           n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_displacements2, n_mesh_solidz2),
-                           n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_displacements3, n_mesh_solidz3),
-                           n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_forces1, n_mesh_solidz1),
-                           n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_forces2, n_mesh_solidz2),
-                           n.ConvergenceMeasureNode(n.ConvergenceMeasureType.RELATIVE, n_coupling_scheme, n_data_forces3, n_mesh_solidz3)
+    convergence_measures = [n.ConvergenceMeasureNode(n_coupling_scheme, n.ConvergenceMeasureType.RELATIVE, n_data_displacements1, n_mesh_solidz1),
+                            n.ConvergenceMeasureNode(n_coupling_scheme, n.ConvergenceMeasureType.RELATIVE, n_data_displacements2, n_mesh_solidz2),
+                            n.ConvergenceMeasureNode(n_coupling_scheme, n.ConvergenceMeasureType.RELATIVE, n_data_displacements3, n_mesh_solidz3),
+                            n.ConvergenceMeasureNode(n_coupling_scheme, n.ConvergenceMeasureType.RELATIVE, n_data_forces1, n_mesh_solidz1),
+                            n.ConvergenceMeasureNode(n_coupling_scheme, n.ConvergenceMeasureType.RELATIVE, n_data_forces2, n_mesh_solidz2),
+                            n.ConvergenceMeasureNode(n_coupling_scheme, n.ConvergenceMeasureType.RELATIVE, n_data_forces3, n_mesh_solidz3)
                            ]
     
     edges += [

@@ -91,7 +91,8 @@ class ConvergenceMeasureType(Enum):
 
 class ParticipantNode:
     def __init__(
-            self, name: str,
+            self,
+            name: str,
             write_data: list[WriteDataNode] = None,
             read_data: list[ReadDataNode] = None,
             receive_meshes: list[ReceiveMeshNode] = None,
@@ -101,7 +102,7 @@ class ParticipantNode:
             actions: list[ActionNode] = None,
             watchpoints: list[WatchPointNode] = None,
             watch_integrals: list[WatchIntegralNode] = None,
-            line:int = None
+            line: int = None
     ):
         self.name = name
 
@@ -154,7 +155,12 @@ class ParticipantNode:
 
 
 class MeshNode:
-    def __init__(self, name: str, use_data: list[DataNode] = None, line:int = None):
+    def __init__(
+            self,
+            name: str,
+            use_data: list[DataNode] = None,
+            line: int = None
+    ):
         self.name = name
 
         if use_data is None:
@@ -166,8 +172,14 @@ class MeshNode:
 
 
 class ReceiveMeshNode:
-    def __init__(self, participant: ParticipantNode, mesh: MeshNode, from_participant: ParticipantNode,
-                 api_access: bool, line:int = None):
+    def __init__(
+            self,
+            participant: ParticipantNode,
+            mesh: MeshNode,
+            from_participant: ParticipantNode,
+            api_access: bool,
+            line: int = None
+    ):
         self.participant = participant
         self.mesh = mesh
         self.from_participant = from_participant
@@ -176,11 +188,16 @@ class ReceiveMeshNode:
 
 
 class CouplingSchemeNode:
-    def __init__(self, type: CouplingSchemeType, first_participant: ParticipantNode,
-                 second_participant: ParticipantNode, exchanges: list[ExchangeNode] = None,
-                 accelerations: list[AccelerationNode] = None,
-                 convergence_measures: list[ConvergenceMeasureNode] = None,
-                 line:int = None):
+    def __init__(
+            self,
+            type: CouplingSchemeType, 
+            first_participant: ParticipantNode,
+            second_participant: ParticipantNode,
+            exchanges: list[ExchangeNode] = None,
+            accelerations: list[AccelerationNode] = None,
+            convergence_measures: list[ConvergenceMeasureNode] = None,
+            line: int = None
+    ):
         self.type = type
         self.first_participant = first_participant
         self.second_participant = second_participant
@@ -204,9 +221,15 @@ class CouplingSchemeNode:
 
 
 class MultiCouplingSchemeNode:
-    def __init__(self, control_participant: ParticipantNode, participants: list[ParticipantNode] = None,
-                 exchanges: list[ExchangeNode] = None, accelerations: list[AccelerationNode] = None,
-                 convergence_measures: list[ConvergenceMeasureNode] = None, line:int = None):
+    def __init__(
+            self,
+            control_participant: ParticipantNode,
+            participants: list[ParticipantNode] = None,
+            exchanges: list[ExchangeNode] = None,
+            accelerations: list[AccelerationNode] = None,
+            convergence_measures: list[ConvergenceMeasureNode] = None,
+            line: int = None
+    ):
         self.control_participant = control_participant
 
         if participants is None:
@@ -233,16 +256,29 @@ class MultiCouplingSchemeNode:
 
 
 class DataNode:
-    def __init__(self, name: str, data_type: DataType, line:int = None):
+    def __init__(
+            self,
+            name: str,
+            data_type: DataType,
+            line: int = None
+    ):
         self.name = name
         self.data_type = data_type
         self.line = line
 
 
 class MappingNode:
-    def __init__(self, parent_participant: ParticipantNode, direction: Direction, just_in_time: bool,
-                 method: MappingMethod, constraint: MappingConstraint, from_mesh: MeshNode | None = None,
-                 to_mesh: MeshNode | None = None, line:int = None):
+    def __init__(
+            self,
+            parent_participant: ParticipantNode,
+            direction: Direction,
+            just_in_time: bool,
+            method: MappingMethod,
+            constraint: MappingConstraint,
+            from_mesh: MeshNode | None = None,
+            to_mesh: MeshNode | None = None,
+            line: int = None
+    ):
         self.parent_participant = parent_participant
         self.direction = direction
         self.just_in_time = just_in_time
@@ -254,7 +290,13 @@ class MappingNode:
 
 
 class WriteDataNode:
-    def __init__(self, participant: ParticipantNode, data: DataNode, mesh: MeshNode, line:int = None):
+    def __init__(
+            self,
+            participant: ParticipantNode,
+            data: DataNode,
+            mesh: MeshNode,
+            line: int = None
+    ):
         self.participant = participant
         self.data = data
         self.mesh = mesh
@@ -262,7 +304,13 @@ class WriteDataNode:
 
 
 class ReadDataNode:
-    def __init__(self, participant: ParticipantNode, data: DataNode, mesh: MeshNode, line:int = None):
+    def __init__(
+            self,
+            participant: ParticipantNode,
+            data: DataNode,
+            mesh: MeshNode,
+            line: int = None
+    ):
         self.participant = participant
         self.data = data
         self.mesh = mesh
@@ -270,12 +318,15 @@ class ReadDataNode:
 
 
 class ExchangeNode:
-    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
-                 data: DataNode,
-                 mesh: MeshNode,
-                 from_participant: ParticipantNode,
-                 to_participant: ParticipantNode,
-                 line:int = None):
+    def __init__(
+            self,
+            coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
+            data: DataNode,
+            mesh: MeshNode,
+            from_participant: ParticipantNode,
+            to_participant: ParticipantNode,
+            line: int = None
+    ):
         self.coupling_scheme = coupling_scheme
         self.data = data
         self.mesh = mesh
@@ -285,20 +336,28 @@ class ExchangeNode:
 
 
 class ExportNode:
-    def __init__(self, participant: ParticipantNode, format: ExportFormat, line:int = None):
+    def __init__(
+            self,
+            participant: ParticipantNode,
+            format: ExportFormat,
+            line: int = None
+    ):
         self.participant = participant
         self.format = format
         self.line = line
 
 
 class ActionNode:
-    def __init__(self, participant: ParticipantNode,
-                 type: ActionType,
-                 mesh: MeshNode,
-                 timing: TimingType,
-                 target_data: DataNode = None,
-                 source_data: list[DataNode] = None,
-                 line:int = None):
+    def __init__(
+            self,
+            participant: ParticipantNode,
+            type: ActionType,
+            mesh: MeshNode,
+            timing: TimingType,
+            target_data: DataNode | None = None,
+            source_data: list[DataNode] = None,
+            line: int = None
+    ):
         self.participant = participant
         self.type = type
         self.mesh = mesh
@@ -314,7 +373,13 @@ class ActionNode:
 
 
 class WatchPointNode:
-    def __init__(self, name: str, participant: ParticipantNode, mesh: MeshNode, line:int = None):
+    def __init__(
+            self,
+            name: str,
+            participant: ParticipantNode,
+            mesh: MeshNode,
+            line: int = None
+    ):
         self.name = name
         self.participant = participant
         self.mesh = mesh
@@ -322,7 +387,13 @@ class WatchPointNode:
 
 
 class WatchIntegralNode:
-    def __init__(self, name: str, participant: ParticipantNode, mesh: MeshNode, line:int = None):
+    def __init__(
+            self,
+            name: str,
+            participant: ParticipantNode,
+            mesh: MeshNode,
+            line: int = None
+    ):
         self.name = name
         self.participant = participant
         self.mesh = mesh
@@ -330,7 +401,13 @@ class WatchIntegralNode:
 
 
 class M2NNode:
-    def __init__(self, type: M2NType, acceptor: ParticipantNode, connector: ParticipantNode, line:int = None):
+    def __init__(
+            self,
+            type: M2NType,
+            acceptor: ParticipantNode,
+            connector: ParticipantNode,
+            line: int = None
+    ):
         self.type = type
         self.acceptor = acceptor
         self.connector = connector
@@ -338,7 +415,13 @@ class M2NNode:
 
 
 class AccelerationDataNode:
-    def __init__(self, acceleration: AccelerationNode, data: DataNode, mesh: MeshNode, line:int = None):
+    def __init__(
+            self,
+            acceleration: AccelerationNode,
+            data: DataNode,
+            mesh: MeshNode,
+            line: int = None
+    ):
         self.acceleration = acceleration
         self.data = data
         self.mesh = mesh
@@ -346,8 +429,13 @@ class AccelerationDataNode:
 
 
 class AccelerationNode:
-    def __init__(self, coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
-                 type: AccelerationType, data: list[AccelerationDataNode] = None, line:int = None):
+    def __init__(
+            self,
+            coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
+            type: AccelerationType,
+            data: list[AccelerationDataNode] = None,
+            line: int = None
+    ):
         self.coupling_scheme = coupling_scheme
         self.type = type
 
@@ -360,9 +448,14 @@ class AccelerationNode:
 
 
 class ConvergenceMeasureNode:
-    def __init__(self, type: ConvergenceMeasureType,
-                 coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
-                 data: DataNode, mesh: MeshNode, line:int = None):
+    def __init__(
+            self,
+            coupling_scheme: CouplingSchemeNode | MultiCouplingSchemeNode,
+            type: ConvergenceMeasureType,    
+            data: DataNode,
+            mesh: MeshNode,
+            line: int = None
+    ):
         self.type = type
         self.coupling_scheme = coupling_scheme
         self.data = data
