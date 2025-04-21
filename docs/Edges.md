@@ -180,7 +180,7 @@ This edge connects a coupling scheme with its convergence-measures.
 
 ## Convergence-measure - data
 
-This edge connects a data with an convergence-measure.
+This edge connects a data with a convergence-measure.
 
 - `type`: CONVERGENCE_MEASURE__DATA
 - `from`: Convergence-measure

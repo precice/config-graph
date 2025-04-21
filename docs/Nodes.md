@@ -98,7 +98,7 @@ another.
 - `direction`: This specifies the direction of the data mapping.
 - `just-in-time`: A bool, which indicates, if the mapping is a "just-in-time"-mapping. A JIT mapping is missing either
   the `to` or `from` tag.
-- `method`: The method of the mesh as specified by `<mapping:method .../>`.
+- `method`: The method of the mapping as specified by `<mapping:method .../>`.
 - `constraint`: The constraint as specified in the `constraint=“”` tag.
 - `from_mesh`: The mesh as specified in the `from=“”` tag, if any.
 - `to_mesh`: The mesh as specified in the `to=“”` tag, if any.
@@ -160,7 +160,7 @@ participants.
 
 - `name`: The name of the watchpoint.
 - `participant`: The participant who the watchpoint belongs to.
-- `mesh`: The mesh which gets observed.
+- `mesh`: The mesh which is observed.
 - `line`: The line number where the watchpoint is defined in the config.xml.
 
 ## WatchIntegral
@@ -170,7 +170,7 @@ participants.
 
 - `name`: The name of the watch-integral.
 - `participant`: The participant who the watch-integral belongs to.
-- `mesh`: The mesh which gets observed.
+- `mesh`: The mesh which is observed.
 - `line`: The line number where the watch-integral is defined in the config.xml.
 
 ## M2N
