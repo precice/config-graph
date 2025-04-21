@@ -387,7 +387,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     c_mesh = mesh_nodes[c_mesh_name]
                     line:int = convergence_measure_el.sourceline
 
-                    convergence_measure = n.ConvergenceMeasureNode(type, coupling_scheme, c_data, c_mesh, line)
+                    convergence_measure = n.ConvergenceMeasureNode(coupling_scheme, type, c_data, c_mesh, line)
                     coupling_scheme.convergence_measures.append(convergence_measure)
                     convergence_measure_nodes.append(convergence_measure)
 

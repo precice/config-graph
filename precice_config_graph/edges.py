@@ -102,4 +102,3 @@ class Edge(Enum):
 
     WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO = "watch-integral_belongs-to"
     WATCH_INTEGRAL__MESH = "watch-integral_mesh"
-
