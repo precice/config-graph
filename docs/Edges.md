@@ -340,7 +340,7 @@ This edge connects an action node to the mesh the action gets performed on.
 - `to`: Mesh
 - `label`: mesh
 
-## Action - target-data
+## Action - data
 
 This edge connects an action node with the data node that is involved in the operation.
 
@@ -349,7 +349,7 @@ This edge connects an action node with the data node that is involved in the ope
 - `to`: Data
 - `label`: target data
 
-## Action - source-data
+## Action - data
 
 This edge connects an action node with the data node that is involved in the operation.
 
