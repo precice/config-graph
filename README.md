@@ -1,6 +1,6 @@
 # preCICE Config Graph
 
-A Library that builds a graph from a preCICE configuration file for validation and visualization purposes.
+A Python library that builds a graph from a preCICE configuration file for validation and visualization purposes.
 
 **How does this differ from [the preCICE Config-Visualizer](https://github.com/precice/config-visualizer)?** The graph built by this library is not (directly) meant to be displayed. The focus is on building a graph that represents the structure of a preCICE configuration in a way that is useful in checking for logical errors.
 
