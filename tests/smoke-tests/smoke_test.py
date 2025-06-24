@@ -9,6 +9,7 @@ import os
 from precice_config_graph import graph
 from precice_config_graph import xml_processing
 
+
 def test_smoke():
     search_pattern = os.getcwd() + "/tests/smoke-tests/configs/**/*.xml"
     files = glob.glob(search_pattern, recursive=True)

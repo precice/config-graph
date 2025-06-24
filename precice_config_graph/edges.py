@@ -8,6 +8,7 @@ This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackerma
 
 from enum import Enum
 
+
 class Edge(Enum):
     # receive mesh --> mesh
     RECEIVE_MESH__MESH = "receive-mesh_mesh"
