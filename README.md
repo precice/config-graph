@@ -38,7 +38,7 @@ pip install .
 config-graph
 ├── .github, .idea, etc…
 │
-├── docs                       # Useful information for unterstanding how this library works
+├── docs                       # Useful information for understanding how this library works
 │   └── …
 │
 ├── debugging                  # Utility for debugging graph generation. See section in this README on the topic.
