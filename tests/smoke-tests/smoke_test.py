@@ -3,31 +3,39 @@
 # Provide files to test in the "./configs/"-folder. This script will test all files (including those in subfolders)
 # whose names end in the ".xml"-extension.
 
-import glob
-import os
+import git
+import pathlib
+import pytest
 
 from precice_config_graph import graph
 from precice_config_graph import xml_processing
 
 
-def test_smoke():
-    search_pattern = os.getcwd() + "/tests/smoke-tests/configs/**/*.xml"
-    files = glob.glob(search_pattern, recursive=True)
+EXTERNAL_DIR = pathlib.Path(__file__).parent / "external"
+PRECICE_DIR = EXTERNAL_DIR / "precice"
+TUTORIALS_DIR = EXTERNAL_DIR / "tutorials"
 
-    print(f"Testing all {len(files)} files matching {search_pattern}")
 
-    errors = []
-    for file in glob.glob(search_pattern, recursive=True):
-        try:
-            xml = xml_processing.parse_file(file)
-            G = graph.get_graph(xml)
-        except Exception as e:
-            errors.append((file, e))
+def get_configs():
+    if not PRECICE_DIR.exists():
+        git.Repo.clone_from(
+            "https://github.com/precice/precice.git", PRECICE_DIR, depth=1
+        )
 
-    if errors:
-        for (file, error) in errors:
-            print(f"Error in {file}:\n     {error}")
-    else:
-        print("Graph generation did not fail on any files provided")
+    if not TUTORIALS_DIR.exists():
+        git.Repo.clone_from(
+            "https://github.com/precice/tutorials.git", TUTORIALS_DIR, depth=1
+        )
 
-    assert not errors, f"{len(errors)} files produced errors"
+    return list(TUTORIALS_DIR.rglob("*/precice-config.xml")) + list(
+        PRECICE_DIR.rglob("tests/*/precice-config.xml")
+    )
+
+
+@pytest.mark.parametrize("config", get_configs())
+def test_smoke(config):
+    print(f"Testing graph generation of {config}")
+    xml = xml_processing.parse_file(config)
+    assert xml is not None, "Parsing failed"
+    G = graph.get_graph(xml)
+    assert G
