@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools-git-versioning"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "precice_config_graph"
+dynamic = [ "version" ]
 description = "A Library that builds a graph from a preCICE configuration file for validation and visualization purposes"
-version = "0.0.1"
 
 readme = "README.md"
 license = {text = "GPL-3.0 License"}
