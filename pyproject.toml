@@ -8,7 +8,8 @@ dynamic = [ "version" ]
 description = "A Library that builds a graph from a preCICE configuration file for validation and visualization purposes"
 
 readme = "README.md"
-license = {text = "GPL-3.0 License"}
+license = "MIT"
+license-files = [ "LICENSE" ]
 
 requires-python = ">= 3.10"
 dependencies = [
