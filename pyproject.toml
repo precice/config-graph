@@ -27,6 +27,9 @@ Issues = "https://github.com/precice-forschungsprojekt/config-graph/issues"
 [tool.setuptools]
 packages = ["precice_config_graph"]
 
+[tool.setuptools-git-versioning]
+enabled = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test.py", "*_test.py"]
