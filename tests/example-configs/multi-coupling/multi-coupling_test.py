@@ -3,13 +3,7 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import (
-    DataType,
-    Direction,
-    M2NType,
-    MappingMethod,
-    MappingConstraint,
-)
+from precice_config_graph import enums as e
 
 
 def test_graph():
@@ -21,12 +15,12 @@ def test_graph():
     edges = []
 
     # Data
-    n_data_forces1 = n.DataNode("Forces1", DataType.VECTOR)
-    n_data_forces2 = n.DataNode("Forces2", DataType.VECTOR)
-    n_data_forces3 = n.DataNode("Forces3", DataType.VECTOR)
-    n_data_displacements1 = n.DataNode("Displacements1", DataType.VECTOR)
-    n_data_displacements2 = n.DataNode("Displacements2", DataType.VECTOR)
-    n_data_displacements3 = n.DataNode("Displacements3", DataType.VECTOR)
+    n_data_forces1 = n.DataNode("Forces1", e.DataType.VECTOR)
+    n_data_forces2 = n.DataNode("Forces2", e.DataType.VECTOR)
+    n_data_forces3 = n.DataNode("Forces3", e.DataType.VECTOR)
+    n_data_displacements1 = n.DataNode("Displacements1", e.DataType.VECTOR)
+    n_data_displacements2 = n.DataNode("Displacements2", e.DataType.VECTOR)
+    n_data_displacements3 = n.DataNode("Displacements3", e.DataType.VECTOR)
 
     # Meshes
     n_mesh_nastin1 = n.MeshNode("NASTIN_Mesh1", [n_data_forces1])
@@ -131,10 +125,10 @@ def test_graph():
     n_participant_nastin.mappings = [
         n.MappingNode(
             parent_participant=n_participant_nastin,
-            direction=Direction.WRITE,
+            direction=e.Direction.WRITE,
             just_in_time=False,
-            method=MappingMethod.NEAREST_NEIGHBOR,
-            constraint=MappingConstraint.CONSERVATIVE,
+            method=e.MappingMethod.NEAREST_NEIGHBOR,
+            constraint=e.MappingConstraint.CONSERVATIVE,
             from_mesh=from_mesh,
             to_mesh=to_mesh,
         )
@@ -240,13 +234,13 @@ def test_graph():
 
     # M2N nodes
     m2n_nastin_solidz1 = n.M2NNode(
-        M2NType.SOCKETS, n_participant_nastin, n_participant_solizd1
+        e.M2NType.SOCKETS, n_participant_nastin, n_participant_solizd1
     )
     m2n_nastin_solidz2 = n.M2NNode(
-        M2NType.SOCKETS, n_participant_nastin, n_participant_solizd2
+        e.M2NType.SOCKETS, n_participant_nastin, n_participant_solizd2
     )
     m2n_nastin_solidz3 = n.M2NNode(
-        M2NType.SOCKETS, n_participant_nastin, n_participant_solizd3
+        e.M2NType.SOCKETS, n_participant_nastin, n_participant_solizd3
     )
 
     edges += [
@@ -353,8 +347,8 @@ def test_graph():
         ]
     )
 
-    acceleration = n.AccelerationNode(n_coupling_scheme, n.AccelerationType.IQN_ILS)
-    n_coupling_scheme.accelerations.append(acceleration)
+    acceleration = n.AccelerationNode(n_coupling_scheme, e.AccelerationType.IQN_ILS)
+    n_coupling_scheme.accelerations.append(acceleration) # TODO acceleration
     acceleration_data1 = n.AccelerationDataNode(
         acceleration, n_data_forces1, n_mesh_solidz1
     )
@@ -397,37 +391,37 @@ def test_graph():
     convergence_measures = [
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
-            n.ConvergenceMeasureType.RELATIVE,
+            e.ConvergenceMeasureType.RELATIVE,
             n_data_displacements1,
             n_mesh_solidz1,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
-            n.ConvergenceMeasureType.RELATIVE,
+            e.ConvergenceMeasureType.RELATIVE,
             n_data_displacements2,
             n_mesh_solidz2,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
-            n.ConvergenceMeasureType.RELATIVE,
+            e.ConvergenceMeasureType.RELATIVE,
             n_data_displacements3,
             n_mesh_solidz3,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
-            n.ConvergenceMeasureType.RELATIVE,
+            e.ConvergenceMeasureType.RELATIVE,
             n_data_forces1,
             n_mesh_solidz1,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
-            n.ConvergenceMeasureType.RELATIVE,
+            e.ConvergenceMeasureType.RELATIVE,
             n_data_forces2,
             n_mesh_solidz2,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
-            n.ConvergenceMeasureType.RELATIVE,
+            e.ConvergenceMeasureType.RELATIVE,
             n_data_forces3,
             n_mesh_solidz3,
         ),

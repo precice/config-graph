@@ -14,6 +14,7 @@ from lxml import etree
 
 from . import nodes as n
 from .edges import Edge
+from . import enums as e
 from .xml_processing import convert_string_to_bool
 
 LINK_GRAPH_ISSUES: str = "'\033[1;36mhttps://github.com/precice-forschungsprojekt/config-graph/issues\033[0m'"
@@ -105,12 +106,12 @@ def get_graph(root: etree.Element) -> nx.Graph:
     for (data_el, kind) in find_all_with_prefix(root, "data"):
         name = get_attribute(data_el, "name")
         try:
-            type = n.DataType(kind)
+            type = e.DataType(kind)
         except ValueError:
-            possible_types_list = get_enum_values(n.DataType)
+            possible_types_list = get_enum_values(e.DataType)
             error_unknown_type(data_el, kind, possible_types_list)
         line: int = data_el.sourceline
-        node = n.DataNode(name, type, line)
+        node = n.DataNode(name, type, line=line)
         data_nodes[name] = node
 
     # Meshes – <mesh />
@@ -149,7 +150,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh = mesh_nodes[mesh_name]
             line: int = write_data_el.sourceline
 
-            write_data = n.WriteDataNode(participant, data, mesh, line)
+            write_data = n.WriteDataNode(participant, data, mesh, line=line)
             participant.write_data.append(write_data)
             write_data_nodes.append(write_data)
 
@@ -162,7 +163,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh = mesh_nodes[mesh_name]
             line: int = read_data_el.sourceline
 
-            read_data = n.ReadDataNode(participant, data, mesh, line)
+            read_data = n.ReadDataNode(participant, data, mesh, line=line)
             participant.read_data.append(read_data)
             read_data_nodes.append(read_data)
 
@@ -177,9 +178,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
             to_mesh = mesh_nodes[to_mesh_name] if to_mesh_name else None
 
             try:
-                method = n.MappingMethod(kind)
+                method = e.MappingMethod(kind)
             except ValueError:
-                possible_method_list = get_enum_values(n.MappingMethod)
+                possible_method_list = get_enum_values(e.MappingMethod)
                 possible_methods: str = list_to_string(possible_method_list)
                 message: str = (
                     'Unknown method "'
@@ -190,7 +191,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     + possible_methods
                 )
                 error(message)
-            constraint = n.MappingConstraint(get_attribute(mapping_el, "constraint"))
+            constraint = e.MappingConstraint(get_attribute(mapping_el, "constraint"))
 
             if not from_mesh and not to_mesh:
                 error_missing_attribute(mapping_el, 'from" or "to')
@@ -199,13 +200,13 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
             mapping = n.MappingNode(
                 participant,
-                n.Direction(direction),
+                e.Direction(direction),
                 just_in_time,
                 method,
                 constraint,
                 from_mesh,
                 to_mesh,
-                line,
+                line=line,
             )
 
             participant.mappings.append(mapping)
@@ -215,19 +216,19 @@ def get_graph(root: etree.Element) -> nx.Graph:
         # <export:… />
         for (_, kind) in find_all_with_prefix(participant_el, "export"):
             try:
-                type = n.ExportFormat(kind)
+                type = e.ExportFormat(kind)
             except ValueError:
-                possible_types_list = get_enum_values(n.ExportFormat)
+                possible_types_list = get_enum_values(e.ExportFormat)
                 error_unknown_type(_, kind, possible_types_list)
             line: int = _.sourceline
-            export = n.ExportNode(participant, type, line)
+            export = n.ExportNode(participant, type, line=line)
             export_nodes.append(export)
 
         # Actions
         # <action:… />
         for (action_el, kind) in find_all_with_prefix(participant_el, "action"):
             mesh = mesh_nodes[get_attribute(action_el, "mesh")]
-            timing = n.TimingType(get_attribute(action_el, "timing"))
+            timing = e.TimingType(get_attribute(action_el, "timing"))
 
             target_data = None
             if kind in ["multiply-by-area", "divide-by-area", "summation", "python"]:
@@ -244,14 +245,14 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     )
 
             try:
-                type = n.ActionType(kind)
+                type = e.ActionType(kind)
             except ValueError:
-                possible_types_list = get_enum_values(n.ActionType)
+                possible_types_list = get_enum_values(e.ActionType)
                 error_unknown_type(action_el, kind, possible_types_list)
             line: int = action_el.sourceline
 
             action = n.ActionNode(
-                participant, type, mesh, timing, target_data, source_data, line
+                participant, type, mesh, timing, target_data, source_data, line=line
             )
             action_nodes.append(action)
 
@@ -262,7 +263,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh = mesh_nodes[get_attribute(watch_point_el, "mesh")]
             line: int = watch_point_el.sourceline
 
-            watch_point = n.WatchPointNode(point_name, participant, mesh, line)
+            watch_point = n.WatchPointNode(point_name, participant, mesh, line=line)
             watch_point_nodes.append(watch_point)
 
         # Watch-Integral
@@ -272,7 +273,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh = mesh_nodes[get_attribute(watch_integral_el, "mesh")]
             line: int = watch_integral_el.sourceline
 
-            watch_integral = n.WatchIntegralNode(integral_name, participant, mesh, line)
+            watch_integral = n.WatchIntegralNode(integral_name, participant, mesh, line=line)
             watch_integral_nodes.append(watch_integral)
 
         # Now that participant_node is completely built, add it and children to the graph and our dictionary
@@ -303,7 +304,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             line: int = receive_mesh_el.sourceline
 
             receive_mesh = n.ReceiveMeshNode(
-                participant, mesh, from_participant, api_access, line
+                participant, mesh, from_participant, api_access, line=line
             )
             participant.receive_meshes.append(receive_mesh)
             receive_mesh_nodes.append(receive_mesh)
@@ -331,7 +332,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 second_participant_name = get_attribute(participants, "second")
                 second_participant = participant_nodes[second_participant_name]
 
-                type = n.CouplingSchemeType(kind)
+                type = e.CouplingSchemeType(kind)
 
                 coupling_scheme = n.CouplingSchemeNode(
                     type, first_participant, second_participant, line=line
@@ -389,7 +390,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             line: int = exchange_el.sourceline
 
             exchange = n.ExchangeNode(
-                coupling_scheme, data, mesh, from_participant, to_participant, line
+                coupling_scheme, data, mesh, from_participant, to_participant, line=line
             )
             coupling_scheme.exchanges.append(exchange)
             exchange_nodes.append(exchange)
@@ -409,9 +410,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 error(message)
 
             try:
-                type = n.AccelerationType(a_kind)
+                type = e.AccelerationType(a_kind)
             except ValueError:
-                possible_types_list = get_enum_values(n.AccelerationType)
+                possible_types_list = get_enum_values(e.AccelerationType)
                 error_unknown_type(acceleration_el, a_kind, possible_types_list)
             line: int = acceleration_el.sourceline
 
@@ -435,7 +436,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     a_mesh_name = get_attribute(a_data, "mesh")
                     mesh = mesh_nodes[a_mesh_name]
                     line: int = a_data.sourceline
-                    a_data_node = n.AccelerationDataNode(acceleration, data, mesh, line)
+                    a_data_node = n.AccelerationDataNode(acceleration, data, mesh, line=line)
                     acceleration.data.append(a_data_node)
                     acceleration_data_nodes.append(a_data_node)
 
@@ -448,9 +449,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
             match kind:
                 case "serial-implicit" | "parallel-implicit" | "multi":
                     try:
-                        type = n.ConvergenceMeasureType(c_kind)
+                        type = e.ConvergenceMeasureType(c_kind)
                     except ValueError:
-                        possible_types_list = get_enum_values(n.ConvergenceMeasureType)
+                        possible_types_list = get_enum_values(e.ConvergenceMeasureType)
                         error_unknown_type(
                             convergence_measure_el, c_kind, possible_types_list
                         )
@@ -462,7 +463,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     line: int = convergence_measure_el.sourceline
 
                     convergence_measure = n.ConvergenceMeasureNode(
-                        coupling_scheme, type, c_data, c_mesh, line
+                        coupling_scheme, type, c_data, c_mesh, line=line
                     )
                     coupling_scheme.convergence_measures.append(convergence_measure)
                     convergence_measure_nodes.append(convergence_measure)
@@ -487,9 +488,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
     # M2N – <m2n:… />
     for (m2n_el, kind) in find_all_with_prefix(root, "m2n"):
         try:
-            type = n.M2NType(kind)
+            type = e.M2NType(kind)
         except ValueError:
-            possible_types_list = get_enum_values(n.M2NType)
+            possible_types_list = get_enum_values(e.M2NType)
             error_unknown_type(m2n_el, kind, possible_types_list)
         acceptor_name = get_attribute(m2n_el, "acceptor")
         acceptor = participant_nodes[acceptor_name]
@@ -497,7 +498,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
         connector = participant_nodes[connector_name]
         line: int = m2n_el.sourceline
 
-        m2n = n.M2NNode(type, acceptor, connector, line)
+        m2n = n.M2NNode(type, acceptor, connector, line=line)
         m2n_nodes.append(m2n)
 
     # BUILD GRAPH

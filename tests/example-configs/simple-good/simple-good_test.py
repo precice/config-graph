@@ -3,7 +3,7 @@ import networkx as nx
 from precice_config_graph import graph, xml_processing
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
-from precice_config_graph.nodes import (
+from precice_config_graph.enums import (
     DataType,
     Direction,
     CouplingSchemeType,
