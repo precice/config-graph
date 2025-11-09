@@ -1,15 +1,23 @@
 # Nodes
 
-This project builds a graph based on a precice-config.xml file. The nodes in the graph correspond to the specified XML
+This project builds a graph based on a `precice-config.xml` file. The nodes in the graph correspond to the specified XML
 elements and tags.<br>
-The documentation for preCICE's config tags can be read
-at [preCICE XML reference](https://precice.org/configuration-XML-reference.html)
+The documentation for preCICE's config tags can be read at
+the [preCICE XML reference](https://precice.org/configuration-XML-reference.html).
 
 > [!NOTE]
-> This graph is built for the [preCICE logic checker](https://github.com/precice-forschungsprojekt/config-checker). This
-> means that there may be redundancies or “inconsistencies” in the building of the graph itself.
+> This graph is built for both [preCICE config check](https://github.com/precice/config-check/)
+> and [preCICE case-generate](https://github.com/precice/case-generate).
+> This means that there may be redundancies or “inconsistencies” in the building of the graph itself.
 
 Here you will find a list with brief explanations of each node and its parameters.
+
+> [!NOTE]
+> Please note that since version 1.1, each node additionally has a method `to_xml()`,
+> to convert it back to a `precice-config.xml` element (string). <br>
+> To allow this conversion to be as thorough as possible, additional, _optional_ attributes were added to many nodes,
+> which are not listed here and _not_ required for using the graph. Their meaning can be inferred from their name or
+> the [preCICE XML reference](https://precice.org/configuration-xml-reference.html).
 
 ## Participant
 
