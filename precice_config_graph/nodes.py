@@ -148,7 +148,7 @@ class CouplingSchemeNode:
             first_participant: ParticipantNode,
             second_participant: ParticipantNode,
             exchanges: list[ExchangeNode] = None,
-            accelerations: list[AccelerationNode] = None,
+            acceleration: AccelerationNode = None,
             convergence_measures: list[ConvergenceMeasureNode] = None,
             line: int = None,
             max_time_windows: int = 10,
@@ -163,10 +163,7 @@ class CouplingSchemeNode:
         else:
             self.exchanges = exchanges
 
-        if accelerations is None:
-            self.accelerations = []
-        else:
-            self.accelerations = accelerations
+        self.acceleration = acceleration
 
         if convergence_measures is None:
             self.convergence_measures = []
@@ -184,8 +181,8 @@ class CouplingSchemeNode:
         xml_str += f"  <time-window-size=\"{self.time_window_size}\" />\n"
         for exchange in self.exchanges:
             xml_str += f"  {exchange.to_xml()}\n"
-        for acceleration in self.accelerations:
-            xml_str += f"  {acceleration.to_xml()}\n"
+        if self.acceleration is not None:
+            xml_str += f"  {self.acceleration.to_xml()}\n"
         for convergence in self.convergence_measures:
             xml_str += f"  {convergence.to_xml()}\n"
         xml_str += f"</coupling-scheme:{self.type.value}>\n"
@@ -198,7 +195,7 @@ class MultiCouplingSchemeNode:
             control_participant: ParticipantNode,
             participants: list[ParticipantNode] = None,
             exchanges: list[ExchangeNode] = None,
-            accelerations: list[AccelerationNode] = None,
+            acceleration: AccelerationNode = None,
             convergence_measures: list[ConvergenceMeasureNode] = None,
             line: int = None,
     ):
@@ -214,10 +211,7 @@ class MultiCouplingSchemeNode:
         else:
             self.exchanges = exchanges
 
-        if accelerations is None:
-            self.accelerations = []
-        else:
-            self.accelerations = accelerations
+        self.acceleration = acceleration
 
         if convergence_measures is None:
             self.convergence_measures = []
@@ -235,8 +229,8 @@ class MultiCouplingSchemeNode:
                 xml_str += f"  <participant name=\"{participant.name}\" />\n"
         for exchange in self.exchanges:
             xml_str += f"  {exchange.to_xml()}\n"
-        for acceleration in self.accelerations:
-            xml_str += f"  {acceleration.to_xml()}\n"
+        if self.acceleration is not None:
+            xml_str += f"  {self.acceleration.to_xml()}\n"
         for convergence in self.convergence_measures:
             xml_str += f"  {convergence.to_xml()}\n"
 
