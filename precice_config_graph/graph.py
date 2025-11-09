@@ -440,7 +440,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     acceleration.data.append(a_data_node)
                     acceleration_data_nodes.append(a_data_node)
 
-            coupling_scheme.accelerations.append(acceleration)
+            coupling_scheme.acceleration = acceleration
             acceleration_nodes.append(acceleration)
 
         for (convergence_measure_el, c_kind) in find_all_with_postfix(
