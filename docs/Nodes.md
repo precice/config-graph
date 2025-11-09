@@ -63,8 +63,9 @@ A coupling-scheme node represents a coupling-scheme element of the XML file.
 - `first_participant`: The participant of the coupling-scheme that gets referred to as `first=“”`.
 - `second_participant`: The participant of the coupling-scheme that gets referred to as `second=“”`.
 - `exchanges`: A list of exchanges between the participants. This links to `Exchange` nodes for further references.
-- `accelerations`: A list of accelerations that are intended to accelerate data in exchanges.
-- `convergence_measures`: A list of convergence-measure. Defines the convergence criterion of certain data of a mesh in a coupling-scheme.
+- `accelerations`: The acceleration node that will contain references to all data-accelerations of the coupling-scheme.
+- `convergence_measures`: A list of convergence-measure. Defines the convergence criterion of certain data of a mesh in
+  a coupling-scheme.
 - `line`: The line number where the coupling-scheme is defined in the config.xml.
 
 ## MultiCouplingScheme
@@ -76,8 +77,9 @@ coupling-scheme to allow for more than two participants.
 - `participants`: A list of all participants taking part in the multi-coupling-scheme.
   This does _not_ include the control participant.
 - `exchanges`: A list of all exchanges being used to exchange data in this multi-coupling-scheme.
-- `accelerations`: A list of accelerations that are intended to accelerate data in exchanges.
-- `convergence_measures`: A list of convergence-measure. Defines the convergence criterion of certain data of a mesh in a multi-coupling-scheme.
+- `accelerations`: The acceleration node that will contain references to all data-accelerations of the coupling-scheme.
+- `convergence_measures`: A list of convergence-measure. Defines the convergence criterion of certain data of a mesh in
+  a multi-coupling-scheme.
 - `line`: The line number where the multi-coupling-scheme is defined in the config.xml.
 
 ## Data
@@ -206,7 +208,8 @@ Data is accelerated in a mesh in an exchange in the same coupling scheme.
 Defines the convergence criterion of certain data of a mesh in a coupling-scheme.
 
 - `coupling_scheme`: The coupling-scheme who the convergence-measure belongs to.
-- `type`: The type of the convergence-measure node. Possible values are `absolute`, `absolute-or-relative`, `relative` and `residual-relative`.
+- `type`: The type of the convergence-measure node. Possible values are `absolute`, `absolute-or-relative`, `relative`
+  and `residual-relative`.
 - `data`: Which data should converge by type.
 - `mesh`: In which mesh the data is to be converged according to the type.
 - `line`: The line number where the convergence-measure is defined in the config.xml.
