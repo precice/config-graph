@@ -19,7 +19,7 @@ A Python library that builds a graph from a preCICE configuration file for valid
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/precice-forschungsprojekt/config-graph
+git clone https://github.com/precice/config-graph
 cd config-graph
 ```
 2. Create a new Python Virtual Environment (optional, but recommended):
@@ -69,7 +69,7 @@ This library is not yet published to any package registry. Nonetheless, it can s
 ```toml
 # …
 dependencies = [
-    "precice_config_graph @ git+https://github.com/precice-forschungsprojekt/config-graph.git",
+    "precice_config_graph @ git+https://github.com/precice/config-graph.git",
     # …
 ]
 # …
