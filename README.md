@@ -1,12 +1,18 @@
 # preCICE Config Graph
 
-A Python library that builds a graph from a preCICE configuration file for validation and visualization purposes.
+A Python library that builds a graph from a preCICE configuration file for validation and visualization purposes
+and enables to recreate a precice-config.xml from it.
 
-**How does this differ from [the preCICE Config-Visualizer](https://github.com/precice/config-visualizer)?** The graph built by this library is not (directly) meant to be displayed. The focus is on building a graph that represents the structure of a preCICE configuration in a way that is useful in checking for logical errors.
+**How does this differ from [the preCICE Config-Visualizer](https://github.com/precice/config-visualizer)?** The graph
+built by this library is not (directly) meant to be displayed. The focus is on building a graph that represents the
+structure of a preCICE configuration in a way that is useful in checking for logical errors.
+This logic can also be used to generate a precice-config.xml from a given set of nodes.
 
 > [!NOTE]
 > This library assumes the config file to follow some basic rules. For example, references by name are assumed to exist.
-> If the config file passes the preCICE-built-in checks (`precice-tools check`) without errors, then it is also read correctly by this library. If `precice-tools check` does not succeed, the behavior of this library is undefined (it will probably crash).
+> If the config file passes the preCICE-built-in checks (`precice-cli config check`) without errors, then it is also
+> read correctly by this library. If `precice-cli config check` does not succeed, the behavior of this library is
+> undefined (it will probably crash).
 
 ## Requirements
 
@@ -18,16 +24,21 @@ A Python library that builds a graph from a preCICE configuration file for valid
 ## Installation
 
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/precice/config-graph
 cd config-graph
 ```
+
 2. Create a new Python Virtual Environment (optional, but recommended):
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 ```
+
 3. Install required dependencies:
+
 ```bash
 pip install .
 ```
@@ -48,6 +59,7 @@ config-graph
 │   ├── edges.py               # Definition of edge types
 │   ├── graph.py               # Main logic for building the graph from parsed XML
 │   ├── nodes.py               # Definition of node types
+│   ├── enums.py               # Definition enums used for node-creation
 │   └── xml_processing.py      # preCICE-specific utilities for reading XML files correctly
 │
 ├── test                       # All files for automated testing
@@ -64,7 +76,14 @@ config-graph
 
 ## Using in your project
 
-This library is not yet published to any package registry. Nonetheless, it can still be imported into your `pyproject.toml` like so:
+This library is published to PyPi as `precice-config-graph`.
+It can be installed via
+
+```bash
+pip install precice-config-graph
+```
+
+Otherwise, it can also be imported into your `pyproject.toml` like so:
 
 ```toml
 # …
@@ -91,7 +110,8 @@ graph.print_graph(G)
 
 ## Debugging graph generation
 
-This module includes a small utility that helps with debugging the output graph. You can pass a custom `precice-config.xml` and it displays the graph it built in a pop-up window.
+This module includes a small utility that helps with debugging the output graph. You can pass a custom
+`precice-config.xml` and it displays the graph it built in a pop-up window.
 
 To get started, run
 
