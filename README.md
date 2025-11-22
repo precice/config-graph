@@ -10,8 +10,8 @@ This logic can also be used to generate a precice-config.xml from a given set of
 
 > [!NOTE]
 > This library assumes the config file to follow some basic rules. For example, references by name are assumed to exist.
-> If the config file passes the preCICE-built-in checks (`precice-cli config check`) without errors, then it is also
-> read correctly by this library. If `precice-cli config check` does not succeed, the behavior of this library is
+> If the config file passes the preCICE-built-in checks (`precice-tools check` before preCICE version 3.3.0; `precice-config-validate` after preCICE version 3.3.0) without errors, then it is also
+> read correctly by this library. If `precice-config-validate` does not succeed, the behavior of this library is
 > undefined (it will probably crash).
 
 ## Requirements
