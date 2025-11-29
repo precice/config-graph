@@ -177,8 +177,8 @@ class CouplingSchemeNode:
     def to_xml(self):
         xml_str: str = f"<coupling-scheme:{self.type.value}>\n"
         xml_str += f"  <participants first=\"{self.first_participant.name}\" second=\"{self.second_participant.name}\" />\n"
-        xml_str += f"  <max-time-windows=\"{self.max_time_windows}\" />\n"
-        xml_str += f"  <time-window-size=\"{self.time_window_size}\" />\n"
+        xml_str += f"  <max-time-windows value=\"{self.max_time_windows}\" />\n"
+        xml_str += f"  <time-window-size value=\"{self.time_window_size}\" />\n"
         for exchange in self.exchanges:
             xml_str += f"  {exchange.to_xml()}\n"
         if self.acceleration is not None:
@@ -197,6 +197,8 @@ class MultiCouplingSchemeNode:
             exchanges: list[ExchangeNode] = None,
             acceleration: AccelerationNode = None,
             convergence_measures: list[ConvergenceMeasureNode] = None,
+            max_time_windows: int = 10,
+            time_window_size: float = 1e-1,
             line: int = None,
     ):
         self.control_participant = control_participant
@@ -218,10 +220,14 @@ class MultiCouplingSchemeNode:
         else:
             self.convergence_measures = convergence_measures
 
+        self.max_time_windows = max_time_windows
+        self.time_window_size = time_window_size
         self.line = line
 
     def to_xml(self):
         xml_str: str = f"<coupling-scheme:multi>\n"
+        xml_str += f"  <max-time-windows value=\"{self.max_time_windows}\" />\n"
+        xml_str += f"  <time-window-size value=\"{self.time_window_size}\" />\n"
         for participant in self.participants:
             if participant == self.control_participant:
                 xml_str += f"  <participant name=\"{participant.name}\" control=\"yes\" />\n"
@@ -497,15 +503,17 @@ class M2NNode:
             type: e.M2NType,
             acceptor: ParticipantNode,
             connector: ParticipantNode,
+            directory: str = ".",
             line: int = None,
     ):
         self.type = type
         self.acceptor = acceptor
         self.connector = connector
+        self.directory = directory
         self.line = line
 
     def to_xml(self) -> str:
-        return f"<m2n:{self.type.value} acceptor=\"{self.acceptor.name}\" connector=\"{self.connector.name}\" />\n"
+        return f"<m2n:{self.type.value} acceptor=\"{self.acceptor.name}\" connector=\"{self.connector.name}\" directory=\"{self.directory}\"/>\n"
 
 
 class AccelerationDataNode:
