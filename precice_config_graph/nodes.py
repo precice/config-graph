@@ -530,7 +530,7 @@ class AccelerationDataNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = f"<data name=\"{self.data.name} mesh=\"{self.mesh.name}\" />"
+        xml_str: str = f"<data name=\"{self.data.name}\" mesh=\"{self.mesh.name}\" />"
         return xml_str
 
 
