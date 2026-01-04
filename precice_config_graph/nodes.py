@@ -401,7 +401,7 @@ class ExchangeNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = (f"  <exchange data=\"{self.data.name}\" mesh=\"{self.mesh.name}\" "
+        xml_str: str = (f"<exchange data=\"{self.data.name}\" mesh=\"{self.mesh.name}\" "
                         f"from=\"{self.from_participant.name}\" to=\"{self.to_participant.name}\" />")
         return xml_str
 
