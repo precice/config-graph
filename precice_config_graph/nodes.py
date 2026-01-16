@@ -503,7 +503,7 @@ class M2NNode:
             type: e.M2NType,
             acceptor: ParticipantNode,
             connector: ParticipantNode,
-            directory: str = ".",
+            directory: str = "..",
             line: int = None,
     ):
         self.type = type
@@ -513,7 +513,8 @@ class M2NNode:
         self.line = line
 
     def to_xml(self) -> str:
-        return f"<m2n:{self.type.value} acceptor=\"{self.acceptor.name}\" connector=\"{self.connector.name}\" directory=\"{self.directory}\"/>\n"
+        return (f"<m2n:{self.type.value} acceptor=\"{self.acceptor.name}\" connector=\"{self.connector.name}\" "
+                f"exchange-directory=\"{self.directory}\"/>\n")
 
 
 class AccelerationDataNode:
