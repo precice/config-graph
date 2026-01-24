@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<precice-configuration>
+    <log>
+        <sink
+                filter="%Severity% > debug"
+                format="---[precice] %ColorizedSeverity% %Message%"
+                enabled="true"/>
+    </log>
+
+    <data:scalar name="Color"/>
+
+    <mesh name="Alligator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <mesh name="Propagator-Mesh" dimensions="2">
+        <use-data name="Color"/>
+    </mesh>
+
+    <participant name="Alligator">
+        <provide-mesh name="Alligator-Mesh"/>
+        <write-data name="Color" mesh="Alligator-Mesh"/>
+    </participant>
+
+    <participant name="Propagator">
+        <receive-mesh name="Alligator-Mesh" from="Alligator"/>
+        <provide-mesh name="Propagator-Mesh"/>
+        <mapping:nearest-neighbor
+                direction="read"
+                from="Alligator-Mesh"
+                to="Propagator-Mesh"
+                constraint="consistent"/>
+        <read-data name="Color" mesh="Propagator-Mesh"/>
+    </participant>
+
+    <coupling-scheme:serial-explicit>
+        <participants first="Alligator" second="Propagator"/>
+        <time-window-size value="0.01"/>
+        <max-time value="0.3"/>
+        <exchange data="Color" mesh="Alligator-Mesh" from="Alligator" to="Propagator"/>
+    </coupling-scheme:serial-explicit>
+
+    <m2n:sockets acceptor="Alligator" connector="Propagator" exchange-directory=".."/>
+
+</precice-configuration>
