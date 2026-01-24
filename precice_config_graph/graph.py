@@ -1,11 +1,3 @@
-"""
-This graph is intended for the preCICE logical-checker https://github.com/precice-forschungsprojekt/config-checker.
-
-You can find documentation under README.md, docs/Nodes.md and docs/Edges.md.
-
-This graph was developed by Simon Wazynski, Alexander Hutter and Orlando Ackermann as part of https://github.com/precice-forschungsprojekt.
-"""
-
 import sys
 from enum import Enum
 import matplotlib.pyplot as plt
@@ -17,7 +9,7 @@ from .edges import Edge
 from . import enums as e
 from .xml_processing import convert_string_to_bool
 
-LINK_GRAPH_ISSUES: str = "'\033[1;36mhttps://github.com/precice-forschungsprojekt/config-graph/issues\033[0m'"
+LINK_GRAPH_REPOSITORY: str = "'\033[1;36mhttps://github.com/precice/config-graph\033[0m'"
 
 
 def get_graph(root: etree.Element) -> nx.Graph:
@@ -27,7 +19,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
     def find_all_with_prefix(e: etree.Element, prefix: str):
         for child in e.iterchildren():
             if child.tag.startswith(prefix):
-                postfix = child.tag[child.tag.find(":") + 1 :]
+                postfix = child.tag[child.tag.find(":") + 1:]
                 yield child, postfix
 
     def find_all_with_postfix(e: etree.Element, postfix: str):
@@ -41,9 +33,10 @@ def get_graph(root: etree.Element) -> nx.Graph:
             "\033[1;31m[ERROR]\033[0m Exiting graph generation."
             + "\n"
             + message
-            + "\nPlease run 'precice-tools check' for syntax errors."
+            + "\nPlease run 'precice-tools check' (preCICE version <3.30) "
+              "or 'precice-config-validate' (preCICE version ≥3.30) to check for syntax errors."
             + "\n\nIf you are sure this behaviour is incorrect, please leave a report at "
-            + LINK_GRAPH_ISSUES
+            + LINK_GRAPH_REPOSITORY
         )
 
     def error_missing_attribute(e: etree.Element, key: str):
@@ -58,18 +51,18 @@ def get_graph(root: etree.Element) -> nx.Graph:
         size = len(values)
         for i in range(size - 2):
             string += f'"{values[i]}", '
-        string += f'"{values[size-2]}" or "{values[size-1]}".'
+        string += f'"{values[size - 2]}" or "{values[size - 1]}".'
         return string
 
     def error_unknown_type(e: etree.Element, type: str, possible_types_list: list):
         possible_types = list_to_string(possible_types_list)
         message: str = (
-            'Unknown type "'
-            + type
-            + '" for element "'
-            + e.tag
-            + '".\nUse one of '
-            + possible_types
+                'Unknown type "'
+                + type
+                + '" for element "'
+                + e.tag
+                + '".\nUse one of '
+                + possible_types
         )
         error(message)
 
@@ -183,12 +176,12 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 possible_method_list = get_enum_values(e.MappingMethod)
                 possible_methods: str = list_to_string(possible_method_list)
                 message: str = (
-                    'Unknown method "'
-                    + kind
-                    + '" for element "'
-                    + mapping_el.tag
-                    + '".\nUse one of '
-                    + possible_methods
+                        'Unknown method "'
+                        + kind
+                        + '" for element "'
+                        + mapping_el.tag
+                        + '".\nUse one of '
+                        + possible_methods
                 )
                 error(message)
             constraint = e.MappingConstraint(get_attribute(mapping_el, "constraint"))
@@ -319,9 +312,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 participants_list = coupling_scheme_el.findall("participants")
                 if len(participants_list) > 1:
                     message: str = (
-                        "Multiple 'participants' tags in '"
-                        + coupling_scheme_el.tag
-                        + "'"
+                            "Multiple 'participants' tags in '"
+                            + coupling_scheme_el.tag
+                            + "'"
                     )
                     error(message)
                 elif len(participants_list) < 1:
@@ -347,17 +340,17 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     participants.append(participant)
 
                     control = (
-                        "control" in participant_el.attrib
-                        and convert_string_to_bool(participant_el.get("control"))
+                            "control" in participant_el.attrib
+                            and convert_string_to_bool(participant_el.get("control"))
                     )
                     if control:
                         assert (
-                            control_participant is None
+                                control_participant is None
                         )  # there must not be multiple control participants
                         control_participant = participant
 
                 assert (
-                    control_participant is not None
+                        control_participant is not None
                 ), "There must be a control participant"
 
                 coupling_scheme = n.MultiCouplingSchemeNode(
@@ -374,7 +367,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 error_unknown_type(coupling_scheme_el, kind, possible_types_list)
 
         assert (
-            coupling_scheme is not None
+                coupling_scheme is not None
         )  # there must always be one participant that is in control
 
         # Exchanges – <exchange />
@@ -396,16 +389,16 @@ def get_graph(root: etree.Element) -> nx.Graph:
             exchange_nodes.append(exchange)
 
         for (acceleration_el, a_kind) in find_all_with_prefix(
-            coupling_scheme_el, "acceleration"
+                coupling_scheme_el, "acceleration"
         ):
             if kind in ["serial-explicit", "parallel-explicit"]:
                 possible_types = list_to_string(
                     ["serial-implicit", "parallel-implicit", "multi"]
                 )
                 message: str = (
-                    f"The coupling scheme of type '{kind}' does not support acceleration.\nUse one of "
-                    + possible_types
-                    + "\nOtherwise remove the acceleration tag."
+                        f"The coupling scheme of type '{kind}' does not support acceleration.\nUse one of "
+                        + possible_types
+                        + "\nOtherwise remove the acceleration tag."
                 )
                 error(message)
 
@@ -423,9 +416,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
             if a_kind == "constant" and acceleration_el.find("data"):
                 possible_types: str = list_to_string(possible_types_list)
                 message: str = (
-                    "No data tag is expected for 'constant' acceleration.\nUse one of "
-                    + possible_types
-                    + "\nOtherwise remove the acceleration tag."
+                        "No data tag is expected for 'constant' acceleration.\nUse one of "
+                        + possible_types
+                        + "\nOtherwise remove the acceleration tag."
                 )
                 error(message)
 
@@ -444,7 +437,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             acceleration_nodes.append(acceleration)
 
         for (convergence_measure_el, c_kind) in find_all_with_postfix(
-            coupling_scheme_el, "-convergence-measure"
+                coupling_scheme_el, "-convergence-measure"
         ):
             match kind:
                 case "serial-implicit" | "parallel-implicit" | "multi":
@@ -473,9 +466,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
                         ["serial-implicit", "parallel-implicit", "multi"]
                     )
                     message: str = (
-                        f"The coupling scheme of type '{kind}' does not support convergence-measure.\nUse one of "
-                        + possible_types
-                        + f"\nOtherwise remove the {c_kind}-convergence-measure tag."
+                            f"The coupling scheme of type '{kind}' does not support convergence-measure.\nUse one of "
+                            + possible_types
+                            + f"\nOtherwise remove the {c_kind}-convergence-measure tag."
                     )
                     error(message)
 
@@ -782,17 +775,17 @@ def print_graph(graph: nx.Graph):
     def label_for_edge(edge):
         match edge["attr"]:
             case (
-                Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO
-                | Edge.MAPPING__PARTICIPANT__BELONGS_TO
-                | Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO
-                | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO
-                | Edge.READ_DATA__PARTICIPANT__BELONGS_TO
-                | Edge.EXPORT__PARTICIPANT__BELONGS_TO
-                | Edge.ACTION__PARTICIPANT__BELONGS_TO
-                | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO
-                | Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO
-                | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO
-                | Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO
+            Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO
+            | Edge.MAPPING__PARTICIPANT__BELONGS_TO
+            | Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO
+            | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO
+            | Edge.READ_DATA__PARTICIPANT__BELONGS_TO
+            | Edge.EXPORT__PARTICIPANT__BELONGS_TO
+            | Edge.ACTION__PARTICIPANT__BELONGS_TO
+            | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO
+            | Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO
+            | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO
+            | Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO
             ):
                 return "belongs to"
             case Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO:
@@ -810,11 +803,11 @@ def print_graph(graph: nx.Graph):
             case Edge.ACTION__TARGET_DATA:
                 return "target data"
             case (
-                Edge.WATCH_POINT__MESH
-                | Edge.WATCH_INTEGRAL__MESH
-                | Edge.ACTION__MESH
-                | Edge.ACCELERATION_DATA__MESH
-                | Edge.CONVERGENCE_MEASURE__MESH
+            Edge.WATCH_POINT__MESH
+            | Edge.WATCH_INTEGRAL__MESH
+            | Edge.ACTION__MESH
+            | Edge.ACCELERATION_DATA__MESH
+            | Edge.CONVERGENCE_MEASURE__MESH
             ):
                 return "mesh"
             case Edge.ACCELERATION_DATA__DATA | Edge.CONVERGENCE_MEASURE__DATA:
