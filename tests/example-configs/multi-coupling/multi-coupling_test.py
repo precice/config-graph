@@ -427,6 +427,8 @@ def test_graph():
         ),
     ]
 
+    n_coupling_scheme.convergence_measures = convergence_measures
+
     edges += (
             [
                 (
@@ -458,16 +460,11 @@ def test_graph():
     for (node_a, node_b, attr) in edges:
         G_expected.add_edge(node_a, node_b, attr=attr)
 
-    def node_match(node_a, node_b):
-        return node_a == node_b
+    for node in G_expected.nodes():
+        graph.add_node_with_attributes(G_expected, node)
 
-    def edge_match(edge_a, edge_b):
-        return edge_a["attr"] == edge_b["attr"]
-
-    assert nx.is_isomorphic(
-        G_expected, G_actual, node_match=node_match, edge_match=edge_match
-    ), (
-            f"Graphs did not match. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "
+    assert graph.check_graph_equivalence(G_expected, G_actual), (
+            f"Graphs are not equivalent. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "
             + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
     )
 
