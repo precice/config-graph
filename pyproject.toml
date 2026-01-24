@@ -4,20 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "precice-config-graph"
-dynamic = [ "version" ]
+dynamic = ["version"]
 description = "A Library that builds a graph from a preCICE configuration file for validation and visualization purposes"
 
 readme = "README.md"
 license = "MIT"
-license-files = [ "LICENSE" ]
+license-files = ["LICENSE"]
 
 requires-python = ">= 3.10"
 dependencies = [
-    "lxml",
-    "elementpath",
-    "matplotlib",
     "networkx",
-    "pytest"
+    "lxml",
+]
+
+[project.optional-dependencies]
+dev = [
+    "matplotlib",
+    "pytest",
 ]
 
 [project.urls]
