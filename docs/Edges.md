@@ -1,14 +1,15 @@
 # Edges
 
-This project builds a graph based on a precice-config.xml file. The nodes in the graph correspond to the specified xml
-elements and tags.<br>
+This project builds a graph based on a `precice-config.xml` file. 
+The nodes in the graph correspond to the specified xml elements and tags.<br>
 The documentation for preCICE's config tags can be read
 at [preCICE XML reference](https://precice.org/configuration-xml-reference.html).<br>
 The edges mainly add redundancies to allow future checks to be less complex.
 
 > [!NOTE]
-> This graph is built for the [preCICE logic checker](https://github.com/precice-forschungsprojekt/config-checker). This
-> means that there may redundancies or “inconsistencies” in the building of the graph itself.
+> This graph is built for the [preCICE config check](https://github.com/precice/config-check). 
+> This means that there may redundancies or “inconsistencies” in the building of the graph itself, 
+> to allow for easier traversing and checking later on.
 
 Edges are modeled as an enum. The “type” of the edge is important for the checker;
 for the graph the type defines a label for the edge.

@@ -8,16 +8,17 @@ the [preCICE XML reference](https://precice.org/configuration-XML-reference.html
 > [!NOTE]
 > This graph is built for both [preCICE config check](https://github.com/precice/config-check/)
 > and [preCICE case-generate](https://github.com/precice/case-generate).
-> This means that there may be redundancies or “inconsistencies” in the building of the graph itself.
+> This means that there may be redundancies or “inconsistencies” in the building of the graph itself,
+> to allow for easier traversing and checking later on.
 
 Here you will find a list with brief explanations of each node and its parameters.
 
 > [!NOTE]
-> Please note that since version 1.1, each node additionally has a method `to_xml()`,
+> Please note that since version 1.1.0, each node additionally has a method `to_xml()`,
 > to convert it back to a `precice-config.xml` element (string). <br>
 > To allow this conversion to be as thorough as possible, additional, _optional_ attributes were added to many nodes,
-> which are not listed here and _not_ required for using the graph. Their meaning can be inferred from their name or
-> the [preCICE XML reference](https://precice.org/configuration-xml-reference.html).
+> which are not listed here and are _not_ required for using the graph. Their meaning can be inferred from their name
+> or the [preCICE XML reference](https://precice.org/configuration-xml-reference.html).
 
 ## Participant
 
