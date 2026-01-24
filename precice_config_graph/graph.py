@@ -1,9 +1,9 @@
 import sys
 from enum import Enum
-import matplotlib.pyplot as plt
 import networkx as nx
 from lxml import etree
-
+# This is imported in print_graph() to make it optional
+# import matplotlib.pyplot as plt
 from . import nodes as n
 from .edges import Edge
 from . import enums as e
@@ -685,7 +685,14 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
 
 def print_graph(graph: nx.Graph):
-    SIZE = 300
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print(f"\033[1;31m[ERROR]\033[0m 'matplotlib' is required to plot the graph.")
+        print(f"Please install it with: pip install '.[viz]'")
+        return
+
+    SIZE:int = 300
 
     def color_for_node(node):
         match node:

@@ -18,8 +18,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
+viz = [
     "matplotlib",
+]
+dev = [
     "pytest",
 ]
 
