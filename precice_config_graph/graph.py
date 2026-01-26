@@ -1017,41 +1017,40 @@ def check_graph_equivalence(expected: nx.Graph, actual: nx.Graph, ignore_names: 
 
         if not ignore_names:
             return False
-            # Get the attributes of the nodes that are references to named nodes
-            refs_a: set[str] = set(node_a.get("_ref_keys", []))
-            refs_b: set[str] = set(node_b.get("_ref_keys", []))
 
-            # Combine all known reference keys and the meta-key itself to be on the safe side
-            all_refs: set[str] = refs_a.union(refs_b).union({"_ref_keys"})
+        # Get the attributes of the nodes that are references to named nodes
+        refs_a: set[str] = set(node_a.get("_ref_keys", []))
+        refs_b: set[str] = set(node_b.get("_ref_keys", []))
 
-            def transform_attributes(attributes: dict[str, str | int | list[str]], refs_to_transform: set[str]):
-                """
-                Transform the given attributes by manipulating attributes whose keys are contained in "refs_to_transform".
-                :param attributes: The attributes to transform.
-                :param refs_to_transform: The keys of attributes that should be transformed.
-                :return: A dict of the updated attributes.
-                """
-                new_attributes: dict[str, str | int | list[str]] = {}
-                for key, value in attributes.items():
-                    if key in refs_to_transform:
-                        # The attribute is a list of named values. Store the count of values instead of the names.
-                        if isinstance(value, list):
-                            new_attributes[key] = len(value)
-                        else:
-                            # This key is a named value.
-                            # Store "1" to assert that the value existed, but ignore the name
-                            new_attributes[key] = 1
-                    # Keep other values
+        # Combine all known reference keys and the meta-key itself to be on the safe side
+        all_refs: set[str] = refs_a.union(refs_b).union({"_ref_keys"})
+
+        def transform_attributes(attributes: dict[str, str | int | list[str]], refs_to_transform: set[str]):
+            """
+            Transform the given attributes by manipulating attributes whose keys are contained in "refs_to_transform".
+            :param attributes: The attributes to transform.
+            :param refs_to_transform: The keys of attributes that should be transformed.
+            :return: A dict of the updated attributes.
+            """
+            new_attributes: dict[str, str | int | list[str]] = {}
+            for key, value in attributes.items():
+                if key in refs_to_transform:
+                    # The attribute is a list of named values. Store the count of values instead of the names.
+                    if isinstance(value, list):
+                        new_attributes[key] = len(value)
                     else:
-                        new_attributes[key] = value
-                return new_attributes
+                        # This key is a named value.
+                        # Store "1" to assert that the value existed, but ignore the name
+                        new_attributes[key] = 1
+                # Keep other values
+                else:
+                    new_attributes[key] = value
+            return new_attributes
 
-            attributes_a: dict[str, str | int | list[str]] = transform_attributes(node_a, all_refs)
-            attributes_b: dict[str, str | int | list[str]] = transform_attributes(node_b, all_refs)
+        attributes_a: dict[str, str | int | list[str]] = transform_attributes(node_a, all_refs)
+        attributes_b: dict[str, str | int | list[str]] = transform_attributes(node_b, all_refs)
 
-            return attributes_a == attributes_b
-
-        return False
+        return attributes_a == attributes_b
 
     def edge_match(edge_a: dict[str, Edge], edge_b: dict[str, Edge]) -> bool:
         """
