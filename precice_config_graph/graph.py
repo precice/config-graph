@@ -1015,7 +1015,8 @@ def check_graph_equivalence(expected: nx.Graph, actual: nx.Graph, ignore_names: 
         if node_a == node_b:
             return True
 
-        if ignore_names:
+        if not ignore_names:
+            return False
             # Get the attributes of the nodes that are references to named nodes
             refs_a: set[str] = set(node_a.get("_ref_keys", []))
             refs_b: set[str] = set(node_b.get("_ref_keys", []))
