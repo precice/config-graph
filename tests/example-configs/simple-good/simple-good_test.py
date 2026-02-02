@@ -74,7 +74,7 @@ def test_graph():
         n_mesh_generator,
         n_mesh_propagator,
     )
-    n_participant_propagator.mapping = [n_mapping_propagator]
+    n_participant_propagator.mappings = [n_mapping_propagator]
 
     # Exchanges
     n_exchange_color_generator_mesh_generator_propagator = n.ExchangeNode(
@@ -304,23 +304,12 @@ def test_graph():
     for (node_a, node_b, attr) in edges:
         G_expected.add_edge(node_a, node_b, attr=attr)
 
-    # print(nx.to_dict_of_dicts(G_expected))
-    # print("------------------------")
-    # print(nx.to_dict_of_dicts(G_actual))
-    # graph.print_graph(G_actual)
-    # graph.print_graph(G_expected)
+    for node in G_expected.nodes():
+        graph.add_node_with_attributes(G_expected, node)
 
-    def node_match(node_a, node_b):
-        return node_a == node_b
-
-    def edge_match(edge_a, edge_b):
-        return edge_a["attr"] == edge_b["attr"]
-
-    assert nx.is_isomorphic(
-        G_expected, G_actual, node_match=node_match, edge_match=edge_match
-    ), (
-        f"Graphs did not match. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "
-        + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
+    assert graph.check_graph_equivalence(G_expected, G_actual), (
+            f"Graphs are not equivalent. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "
+            + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
     )
 
     print("\nGraphs are isomorphic.")

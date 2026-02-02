@@ -68,6 +68,8 @@ def test_graph():
         api_access=False,
     )
 
+    n_propagator_participant.receive_meshes.append(n_propagator_receive_mesh)
+
     n_mapping = n.MappingNode(
         n_propagator_participant,
         Direction.READ,
@@ -178,14 +180,12 @@ def test_graph():
     for (node_a, node_b, attr) in edges:
         G_expected.add_edge(node_a, node_b, attr=attr)
 
-    def node_match(node_a, node_b):
-        return node_a == node_b
+    for node in G_expected.nodes():
+        graph.add_node_with_attributes(G_expected, node)
 
-    def edge_match(edge_a, edge_b):
-        return edge_a["attr"] == edge_b["attr"]
-
-    assert nx.is_isomorphic(
-        G_expected, G_actual, node_match=node_match, edge_match=edge_match
-    ), f"Graphs did not match: {nx.to_dict_of_dicts(G_actual)}, {nx.to_dict_of_dicts(G_expected)}"
+    assert graph.check_graph_equivalence(G_expected, G_actual), (
+            f"Graphs are not equivalent. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "
+            + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
+    )
 
     print("\nGraphs are isomorphic.")
