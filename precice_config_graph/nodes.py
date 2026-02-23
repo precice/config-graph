@@ -333,7 +333,7 @@ class MappingNode:
             xml_str += f"/>\n"  # close opening element brace
             xml_str += f"\t{self.executor.to_xml()}\n"
             xml_str += f"\t{self.basisfunction.to_xml()}\n"
-            xml_str += f"<mapping:{self.method.value}/>"
+            xml_str += f"</mapping:{self.method.value}>"
         else:
             xml_str += f"/>"
         return xml_str
