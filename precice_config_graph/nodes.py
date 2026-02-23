@@ -73,10 +73,10 @@ class ParticipantNode:
             xml_str += f"\t<provide-mesh name=\"{provide_mesh.name}\" />\n"
         for receive_mesh in self.receive_meshes:
             xml_str += f"\t{receive_mesh.to_xml()}\n"
-        for write_data in self.write_data:
-            xml_str += f"\t{write_data.to_xml()}\n"
         for read_data in self.read_data:
             xml_str += f"\t{read_data.to_xml()}\n"
+        for write_data in self.write_data:
+            xml_str += f"\t{write_data.to_xml()}\n"
         for mapping in self.mappings:
             xml_str += f"\t{mapping.to_xml()}\n"
 
@@ -169,14 +169,19 @@ class CouplingSchemeNode:
     def to_xml(self):
         xml_str: str = f"<coupling-scheme:{self.type.value}>\n"
         xml_str += f"\t<participants first=\"{self.first_participant.name}\" second=\"{self.second_participant.name}\" />\n"
-        xml_str += f"\t<max-time-windows value=\"{self.max_time_windows}\" />\n"
-        xml_str += f"\t<time-window-size value=\"{self.time_window_size}\" />\n"
+
         for exchange in self.exchanges:
             xml_str += f"\t{exchange.to_xml()}\n"
-        if self.acceleration is not None:
-            xml_str += f"\t{self.acceleration.to_xml()}\n"
+
+        xml_str += f"\t<time-window-size value=\"{self.time_window_size}\" />\n"
+        xml_str += f"\t<max-time-windows value=\"{self.max_time_windows}\" />\n"
+
         for convergence in self.convergence_measures:
             xml_str += f"\t{convergence.to_xml()}\n"
+
+        if self.acceleration is not None:
+            xml_str += f"\t{self.acceleration.to_xml()}\n"
+
         xml_str += f"</coupling-scheme:{self.type.value}>\n"
         return xml_str
 
@@ -218,19 +223,23 @@ class MultiCouplingSchemeNode:
 
     def to_xml(self):
         xml_str: str = f"<coupling-scheme:multi>\n"
-        xml_str += f"  <max-time-windows value=\"{self.max_time_windows}\" />\n"
-        xml_str += f"  <time-window-size value=\"{self.time_window_size}\" />\n"
         for participant in self.participants:
             if participant == self.control_participant:
                 xml_str += f"\t<participant name=\"{participant.name}\" control=\"yes\" />\n"
             else:
                 xml_str += f"\t<participant name=\"{participant.name}\" />\n"
+
         for exchange in self.exchanges:
             xml_str += f"\t{exchange.to_xml()}\n"
-        if self.acceleration is not None:
-            xml_str += f"\t{self.acceleration.to_xml()}\n"
+
+        xml_str += f"  <time-window-size value=\"{self.time_window_size}\" />\n"
+        xml_str += f"  <max-time-windows value=\"{self.max_time_windows}\" />\n"
+
         for convergence in self.convergence_measures:
             xml_str += f"\t{convergence.to_xml()}\n"
+
+        if self.acceleration is not None:
+            xml_str += f"\t{self.acceleration.to_xml()}\n"
 
         xml_str += f"</coupling-scheme:multi>\n"
         return xml_str
@@ -552,14 +561,19 @@ class AccelerationNode:
 
     def to_xml(self) -> str:
         xml_str: str = f"<acceleration:{self.type.value}>\n"
-        if self.type == e.AccelerationType.CONSTANT:
-            xml_str += f"\t<relaxation value=\"1\" />\n"
+
         for accelerated_data in self.data:
             xml_str += f"\t{accelerated_data.to_xml()}\n"
+
         if self.preconditioner is not None:
             xml_str += f"\t{self.preconditioner.to_xml()}\n"
+
+        if self.type == e.AccelerationType.CONSTANT:
+            xml_str += f"\t<relaxation value=\"1\" />\n"
+
         if self.filter is not None:
             xml_str += f"\t{self.filter.to_xml()}"
+
         xml_str += f"</acceleration:{self.type.value}>"
         return xml_str
 
