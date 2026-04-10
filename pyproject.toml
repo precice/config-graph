@@ -32,8 +32,8 @@ generate = [
 [project.urls]
 Repository = "https://github.com/precice/config-graph.git"
 
-[tool.setuptools]
-packages = ["precice_config_graph"]
+[tool.setuptools.packages.find]
+include = ["precice_config_graph*"]
 
 [tool.setuptools-git-versioning]
 enabled = true
