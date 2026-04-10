@@ -1,6 +1,7 @@
 import networkx as nx
 
-from precice_config_graph import graph, xml_processing
+from precice_config_graph import xml_processing
+from precice_config_graph.graph import builder, operations
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
 from precice_config_graph.enums import (
@@ -17,7 +18,7 @@ from precice_config_graph.enums import (
 
 def test_graph():
     xml = xml_processing.parse_file("tests/example-configs/actions/precice-config.xml")
-    G_actual = graph.get_graph(xml)
+    G_actual = builder.get_graph(xml)
 
     edges = []
 
@@ -181,9 +182,9 @@ def test_graph():
         G_expected.add_edge(node_a, node_b, attr=attr)
 
     for node in G_expected.nodes():
-        graph.add_node_with_attributes(G_expected, node)
+        builder.add_node_with_attributes(G_expected, node)
 
-    assert graph.check_graph_equivalence(G_expected, G_actual), (
+    assert operations.check_graph_equivalence(G_expected, G_actual), (
             f"Graphs are not equivalent. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "
             + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
     )
