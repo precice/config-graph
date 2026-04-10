@@ -122,7 +122,7 @@ class ReceiveMeshNode:
             participant: ParticipantNode,
             mesh: MeshNode,
             from_participant: ParticipantNode,
-            api_access: bool,
+            api_access: bool = h.RECEIVE_MESH_API_ACCESS,
             line: int = None,
     ):
         self.participant = participant
@@ -439,6 +439,7 @@ class ActionNode:
             timing: e.TimingType,
             target_data: DataNode | None = None,
             source_data: list[DataNode] = None,
+            python_module_path: str = "",
             python_module_name: str = "",
             line: int = None,
     ):
@@ -453,6 +454,7 @@ class ActionNode:
         else:
             self.source_data = source_data
 
+        self.python_module_path = python_module_path
         self.python_module_name = python_module_name
 
         self.line = line
@@ -462,6 +464,7 @@ class ActionNode:
         if self.type != e.ActionType.RECORDER and self.target_data is not None:
             xml_str += f"{h.INDENT}<target-data name=\"{self.target_data.name}\" />\n"
         if self.type == e.ActionType.PYTHON:
+            xml_str += f"{h.INDENT}<path name=\"{self.python_module_path}\" />\n"
             xml_str += f"{h.INDENT}<module name=\"{self.python_module_name}\" />\n"
         for source_data in self.source_data:
             xml_str += f"{h.INDENT}<source-data name=\"{source_data.name}\" />\n"
