@@ -147,14 +147,14 @@ def _create_config_str(config_dict: dict[str, list[n.ParticipantNode |
     mesh_str: str = ""
     for mesh in config_dict["meshes"]:
         mesh_str += f"{mesh.to_xml()}"
-    config_str += textwrap.h.INDENT(mesh_str, h.INDENT)
+    config_str += textwrap.indent(mesh_str, h.INDENT)
 
     config_str += "\n"  # separate mesh from participants
 
     participant_str: str = ""
     for participant in config_dict["participants"]:
         participant_str += f"{participant.to_xml()}"
-    config_str += textwrap.h.INDENT(participant_str, h.INDENT)
+    config_str += textwrap.indent(participant_str, h.INDENT)
 
     config_str += "\n"  # separate participants from m2ns
 
@@ -166,7 +166,7 @@ def _create_config_str(config_dict: dict[str, list[n.ParticipantNode |
     coupling_scheme_str: str = ""
     for coupling_scheme in config_dict["coupling-schemes"]:
         coupling_scheme_str += f"{coupling_scheme.to_xml()}"
-    config_str += textwrap.h.INDENT(coupling_scheme_str, h.INDENT)
+    config_str += textwrap.indent(coupling_scheme_str, h.INDENT)
 
     config_str += f"\n</precice-configuration>"
     return config_str
