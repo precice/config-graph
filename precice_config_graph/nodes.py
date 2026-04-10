@@ -1,7 +1,7 @@
 from __future__ import annotations
 import textwrap
 
-from . import enums as e
+from . import enums as e, helper as h
 
 INDENT = " " * 4
 
@@ -100,7 +100,8 @@ class ParticipantNode:
 
 
 class MeshNode:
-    def __init__(self, name: str, use_data: list[DataNode] = None, line: int = None, dimensions: int = 3):
+    def __init__(self, name: str, use_data: list[DataNode] = None, line: int = None,
+                 dimensions: int = h.MESH_DIMENSIONALITY):
         self.name = name
 
         if use_data is None:
@@ -149,8 +150,8 @@ class CouplingSchemeNode:
             acceleration: AccelerationNode = None,
             convergence_measures: list[ConvergenceMeasureNode] = None,
             line: int = None,
-            max_time_windows: int = 10,
-            time_window_size: float = 1e-1,
+            max_time_windows: int = h.COUPLING_SCHEME_MAX_TIME_WINDOWS,
+            time_window_size: float = h.COUPLING_SCHEME_TIME_WINDOW_SIZE,
     ):
         self.type = type
         self.first_participant = first_participant
@@ -201,8 +202,8 @@ class MultiCouplingSchemeNode:
             exchanges: list[ExchangeNode] = None,
             acceleration: AccelerationNode = None,
             convergence_measures: list[ConvergenceMeasureNode] = None,
-            max_time_windows: int = 10,
-            time_window_size: float = 1e-1,
+            max_time_windows: int = h.COUPLING_SCHEME_MAX_TIME_WINDOWS,
+            time_window_size: float = h.COUPLING_SCHEME_TIME_WINDOW_SIZE,
             line: int = None,
     ):
         self.control_participant = control_participant
@@ -273,17 +274,17 @@ class MappingNode:
             constraint: e.MappingConstraint,
             from_mesh: MeshNode | None = None,
             to_mesh: MeshNode | None = None,
-            polynomial: e.MappingPolynomialType = e.MappingPolynomialType.SEPARATE,
-            x_dead: bool = False,
-            y_dead: bool = False,
-            z_dead: bool = False,
-            solver_rtol: float = 1e-9,
-            vertices_per_cluster: int = 50,
-            relative_overlap: float = 0.15,
-            project_to_input: bool = True,
-            multiscale_type: e.MappingMultiscaleType = e.MappingMultiscaleType.COLLECT,
-            multiscale_axis: e.MappingMultiscaleAxis = e.MappingMultiscaleAxis.X,
-            multiscale_radius: float = 1,
+            polynomial: e.MappingPolynomialType = h.MAPPING_POLYNOMIAL,
+            x_dead: bool = h.MAPPING_X_DEAD,
+            y_dead: bool = h.MAPPING_Y_DEAD,
+            z_dead: bool = h.MAPPING_Z_DEAD,
+            solver_rtol: float = h.MAPPING_SOLVER_RTOL,
+            vertices_per_cluster: int = h.MAPPING_VERTICES_PER_CLUSTER,
+            relative_overlap: float = h.MAPPING_RELATIVE_OVERLAP,
+            project_to_input: bool = h.MAPPING_PROJECT_TO_INPUT,
+            multiscale_type: e.MappingMultiscaleType = h.MAPPING_MULTISCALE_TYPE,
+            multiscale_axis: e.MappingMultiscaleAxis = h.MAPPING_MULTISCALE_AXIS,
+            multiscale_radius: float = h.MAPPING_MULTISCALE_RADIUS,
             basisfunction: MappingBasisFunctionNode = None,
             executor: MappingExecutorNode = None,
             line: int = None,
@@ -417,7 +418,10 @@ class ExchangeNode:
 
 class ExportNode:
     def __init__(
-            self, participant: ParticipantNode, format: e.ExportFormat, line: int = None, directory: str = "."
+            self, participant: ParticipantNode,
+            format: e.ExportFormat,
+            line: int = None,
+            directory: str = h.EXPORT_DIRECTORY
     ):
         self.participant = participant
         self.format = format
@@ -470,7 +474,10 @@ class ActionNode:
 
 class WatchPointNode:
     def __init__(
-            self, name: str, participant: ParticipantNode, mesh: MeshNode, line: int = None,
+            self, name: str,
+            participant: ParticipantNode,
+            mesh: MeshNode,
+            line: int = None,
             coordinate: list[float] = None
     ):
         self.name = name
@@ -492,7 +499,10 @@ class WatchPointNode:
 
 class WatchIntegralNode:
     def __init__(
-            self, name: str, participant: ParticipantNode, mesh: MeshNode, scale_with_connectivity: bool = False,
+            self, name: str,
+            participant: ParticipantNode,
+            mesh: MeshNode,
+            scale_with_connectivity: bool = h.WATCH_INTEGRAL_SCALE_WITH_CONNECTIVITY,
             line: int = None
     ):
         self.name = name
@@ -512,7 +522,7 @@ class M2NNode:
             type: e.M2NType,
             acceptor: ParticipantNode,
             connector: ParticipantNode,
-            directory: str = "..",
+            directory: str = h.M2N_DIRECTORY,
             line: int = None,
     ):
         self.type = type
@@ -594,8 +604,9 @@ class ConvergenceMeasureNode:
             data: DataNode,
             mesh: MeshNode,
             line: int = None,
-            limit: float = 0.1,  # functions as absolute and residual limit (they cannot appear together)
-            rel_limit: float = 0.1,
+            # The "limit" functions as absolute and residual limit (they cannot appear together)
+            limit: float = h.CONVERGENCE_MEASURE_LIMIT,
+            rel_limit: float = h.CONVERGENCE_MEASURE_REL_LIMIT,
     ):
         self.type = type
         self.coupling_scheme = coupling_scheme
@@ -624,8 +635,8 @@ class PreconditionerNode:
             self,
             type: e.PreconditionerType,
             acceleration: AccelerationNode,
-            freeze_after: int = -1,
-            update_on_threshold: bool = True
+            freeze_after: int = h.PRECONDITIONER_FREEZE_AFTER,
+            update_on_threshold: bool = h.PRECONDITIONER_UPDATE_ON_THRESHOLD
     ):
         self.type = type
         self.acceleration = acceleration
@@ -645,8 +656,8 @@ class AccelerationFilterNode:
     def __init__(
             self,
             acceleration: AccelerationNode,
-            type: e.AccelerationFilterType = e.AccelerationFilterType.QR3,
-            limit: float = 1e-16,
+            type: e.AccelerationFilterType = h.ACCELERATION_FILTER_TYPE,
+            limit: float = h.ACCELERATION_FILTER_LIMIT,
     ):
         self.acceleration = acceleration
         self.type = type
@@ -662,8 +673,8 @@ class MappingBasisFunctionNode:
             self,
             type: e.MappingBasisFunctionType,
             mapping: MappingNode,
-            support_radius: float = 0.5,
-            shape_parameter: float = 1,
+            support_radius: float = h.MAPPING_BASIS_FUNCTION_SUPPORT_RADIUS,
+            shape_parameter: float = h.MAPPING_BASIS_FUNCTION_SHAPE_PARAMETER,
     ):
         self.type = type
         self.mapping = mapping
@@ -691,7 +702,12 @@ class MappingBasisFunctionNode:
 
 
 class MappingExecutorNode:
-    def __init__(self, type: e.MappingExecutorType, mapping: MappingNode, gpu_device_id: int = 0, n_threads: int = 0):
+    def __init__(
+            self, type: e.MappingExecutorType,
+            mapping: MappingNode,
+            gpu_device_id: int = h.MAPPING_EXECUTOR_GPU_DEVICE_ID,
+            n_threads: int = h.MAPPING_EXECUTOR_N_THREADS
+    ):
         self.type = type
         self.mapping = mapping
         self.gpu_device_id = gpu_device_id
