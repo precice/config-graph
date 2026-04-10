@@ -24,6 +24,10 @@ viz = [
 dev = [
     "pytest",
 ]
+# Only for generating a config from a graph
+generate = [
+    "precice-config-format"
+]
 
 [project.urls]
 Repository = "https://github.com/precice/config-graph.git"
