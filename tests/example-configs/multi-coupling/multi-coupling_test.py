@@ -24,12 +24,12 @@ def test_graph():
     n_data_displacements3 = n.DataNode("Displacements3", e.DataType.VECTOR)
 
     # Meshes
-    n_mesh_nastin1 = n.MeshNode("NASTIN_Mesh1", [n_data_forces1])
-    n_mesh_solidz1 = n.MeshNode("SOLIDZ_Mesh1", [n_data_displacements1, n_data_forces1])
-    n_mesh_nastin2 = n.MeshNode("NASTIN_Mesh2", [n_data_forces2])
-    n_mesh_solidz2 = n.MeshNode("SOLIDZ_Mesh2", [n_data_displacements2, n_data_forces2])
-    n_mesh_nastin3 = n.MeshNode("NASTIN_Mesh3", [n_data_forces3])
-    n_mesh_solidz3 = n.MeshNode("SOLIDZ_Mesh3", [n_data_displacements3, n_data_forces3])
+    n_mesh_nastin1 = n.MeshNode("NASTIN_Mesh1", [n_data_forces1], dimensions=2)
+    n_mesh_solidz1 = n.MeshNode("SOLIDZ_Mesh1", [n_data_displacements1, n_data_forces1], dimensions=2)
+    n_mesh_nastin2 = n.MeshNode("NASTIN_Mesh2", [n_data_forces2], dimensions=2)
+    n_mesh_solidz2 = n.MeshNode("SOLIDZ_Mesh2", [n_data_displacements2, n_data_forces2], dimensions=2)
+    n_mesh_nastin3 = n.MeshNode("NASTIN_Mesh3", [n_data_forces3], dimensions=2)
+    n_mesh_solidz3 = n.MeshNode("SOLIDZ_Mesh3", [n_data_displacements3, n_data_forces3], dimensions=2)
 
     meshes = [
         n_mesh_nastin1,
@@ -266,6 +266,8 @@ def test_graph():
             n_participant_solizd3,
         ],
         control_participant=n_participant_nastin,
+        max_time_windows=400000,
+        time_window_size=1e-4,
     )
 
     edges += [
@@ -363,6 +365,12 @@ def test_graph():
     acceleration.data.append(acceleration_data2)
     acceleration.data.append(acceleration_data3)
 
+    preconditioner = n.PreconditionerNode(type=e.PreconditionerType.CONSTANT, acceleration=acceleration)
+    acceleration.preconditioner = preconditioner
+
+    filter_node = n.AccelerationFilterNode(acceleration=acceleration, type=e.AccelerationFilterType.QR1ABSOLUTE)
+    acceleration.filter = filter_node
+
     edges += (
             [
                 (
@@ -395,36 +403,42 @@ def test_graph():
             e.ConvergenceMeasureType.RELATIVE,
             n_data_displacements1,
             n_mesh_solidz1,
+            limit=1e-4,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
             e.ConvergenceMeasureType.RELATIVE,
             n_data_displacements2,
             n_mesh_solidz2,
+            limit=1e-4,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
             e.ConvergenceMeasureType.RELATIVE,
             n_data_displacements3,
             n_mesh_solidz3,
+            limit=1e-4,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
             e.ConvergenceMeasureType.RELATIVE,
             n_data_forces1,
             n_mesh_solidz1,
+            limit=1e-4,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
             e.ConvergenceMeasureType.RELATIVE,
             n_data_forces2,
             n_mesh_solidz2,
+            limit=1e-4,
         ),
         n.ConvergenceMeasureNode(
             n_coupling_scheme,
             e.ConvergenceMeasureType.RELATIVE,
             n_data_forces3,
             n_mesh_solidz3,
+            limit=1e-4,
         ),
     ]
 

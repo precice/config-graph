@@ -26,7 +26,7 @@ def test_graph():
     n_color = n.DataNode("Color", DataType.SCALAR)
 
     # Generator
-    n_generator_mesh = n.MeshNode("Generator-Mesh", [n_color])
+    n_generator_mesh = n.MeshNode("Generator-Mesh", [n_color], dimensions=2)
 
     n_generator_participant = n.ParticipantNode(
         "Generator", provide_meshes=[n_generator_mesh]
@@ -56,7 +56,7 @@ def test_graph():
     ]
 
     # Propagator
-    n_propagator_mesh = n.MeshNode("Propagator-Mesh", [n_color])
+    n_propagator_mesh = n.MeshNode("Propagator-Mesh", [n_color], dimensions=2)
 
     n_propagator_participant = n.ParticipantNode(
         "Propagator", provide_meshes=[n_propagator_mesh]
@@ -101,6 +101,7 @@ def test_graph():
         type=M2NType.SOCKETS,
         acceptor=n_generator_participant,
         connector=n_propagator_participant,
+        directory="..",
     )
 
     edges += [
@@ -148,6 +149,8 @@ def test_graph():
         first_participant=n_generator_participant,
         second_participant=n_propagator_participant,
         exchanges=[],
+        time_window_size=0.01,
+        max_time_windows=30,
     )
 
     n_exchange = n.ExchangeNode(
