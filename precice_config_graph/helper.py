@@ -7,6 +7,8 @@ INDENT: str = " " * 4
 # Default values for nodes and config
 MESH_DIMENSIONALITY: int = 3
 
+RECEIVE_MESH_API_ACCESS: bool = False
+
 COUPLING_SCHEME_MAX_TIME_WINDOWS: int = 10
 COUPLING_SCHEME_TIME_WINDOW_SIZE: float = 1e-1
 
