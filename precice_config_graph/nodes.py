@@ -80,11 +80,11 @@ class ParticipantNode:
         for mapping in self.mappings:
             mapping_str: str = mapping.to_xml() + "\n"
             # Multi-line strings need every line to be h.INDENTed
-            xml_str += textwrap.h.INDENT(mapping_str, h.INDENT)
+            xml_str += textwrap.indent(mapping_str, h.INDENT)
 
         for action in self.actions:
             action_str: str = action.to_xml() + "\n"
-            xml_str += textwrap.h.INDENT(action_str, h.INDENT)
+            xml_str += textwrap.indent(action_str, h.INDENT)
         for export in self.exports:
             xml_str += f"{h.INDENT}{export.to_xml()}\n"
         for watchpoint in self.watchpoints:
@@ -185,7 +185,7 @@ class CouplingSchemeNode:
 
         if self.acceleration is not None:
             acceleration_str: str = self.acceleration.to_xml() + "\n"
-            xml_str += textwrap.h.INDENT(acceleration_str, h.INDENT)
+            xml_str += textwrap.indent(acceleration_str, h.INDENT)
 
         xml_str += f"</coupling-scheme:{self.type.value}>\n"
         return xml_str
@@ -245,7 +245,7 @@ class MultiCouplingSchemeNode:
 
         if self.acceleration is not None:
             acceleration_str: str = self.acceleration.to_xml() + "\n"
-            xml_str += textwrap.h.INDENT(acceleration_str, h.INDENT)
+            xml_str += textwrap.indent(acceleration_str, h.INDENT)
 
         xml_str += f"</coupling-scheme:multi>\n"
         return xml_str
