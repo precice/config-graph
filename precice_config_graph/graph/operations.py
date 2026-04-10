@@ -103,26 +103,36 @@ def check_config_equivalence(path_expected: str, path_actual: str, ignore_names:
     return check_graph_equivalence(graph_expected, graph_actual, ignore_names=ignore_names)
 
 
-def create_config_file(graph: nx.Graph, path: str = ".", filename: str = "precice-config.xml") -> int:
+def create_config_file(graph: nx.Graph, path: str = ".", filename: str = "precice-config.xml") -> None:
     """
     Create a formatted precice-config.xml file from a given graph.
     The file is saved to the specified path.
     :param graph: The graph to be converted to a precice-config.xml file.
     :param path: The path where the file should be saved. Defaults to the current directory.
     :param filename: The name of the file to be saved. Defaults to "precice-config.xml".
-    :return:
     """
     directory = Path(path)
     file_path: Path = directory / filename
-    config_str: str = _create_config_str(_create_config_dict(graph))
+    config_str: str = create_config_str(graph)
     with open(file_path, "w") as f:
         f.write(_format_config_string(config_str))
 
-def _create_config_str(config_dict: dict[str, list[n.ParticipantNode |
-                                                   n.DataNode | n.MeshNode |
-                                                   n.CouplingSchemeNode |
-                                                   n.MultiCouplingSchemeNode |
-                                                   n.M2NNode]]) -> str:
+
+def create_config_str(graph: nx.Graph) -> str:
+    """
+    Create a formatted precice-config.xml string from a given graph.
+    :param graph: The graph to be converted to a precice-config.xml file.
+    :return: A string representing a preCICE configuration file.
+    """
+    config_str: str = _create_unformatted_config_str(_create_config_dict(graph))
+    return _format_config_string(config_str)
+
+
+def _create_unformatted_config_str(config_dict: dict[str, list[n.ParticipantNode |
+                                                               n.DataNode | n.MeshNode |
+                                                               n.CouplingSchemeNode |
+                                                               n.MultiCouplingSchemeNode |
+                                                               n.M2NNode]]) -> str:
     """
     Create a string representing a preCICE configuration file.
     This is done by iterating over the given dict and creating a string for each element.
@@ -171,11 +181,12 @@ def _create_config_str(config_dict: dict[str, list[n.ParticipantNode |
     config_str += f"\n</precice-configuration>"
     return config_str
 
+
 def _create_config_dict(graph: nx.Graph) -> dict[str, list[n.ParticipantNode |
-                                                            n.DataNode | n.MeshNode |
-                                                            n.CouplingSchemeNode |
-                                                            n.MultiCouplingSchemeNode |
-                                                            n.M2NNode]]:
+                                                           n.DataNode | n.MeshNode |
+                                                           n.CouplingSchemeNode |
+                                                           n.MultiCouplingSchemeNode |
+                                                           n.M2NNode]]:
     """
     Create a dict containing only the "major" elements of the given graph;
     i.e., the data, participants, meshes, coupling-schemes, and m2n nodes.
@@ -211,6 +222,7 @@ def _create_config_dict(graph: nx.Graph) -> dict[str, list[n.ParticipantNode |
         # This also filters out any unknown types
     return config_dict
 
+
 def _format_config_string(xml_string: str) -> str:
     """
     Format the given XML string using the precice-config-format library.
@@ -222,20 +234,14 @@ def _format_config_string(xml_string: str) -> str:
     except ImportError:
         raise ImportError("The precice-config-format library is not installed. "
                           "Please install it using 'pip install precice-config-format'.")
-    # 1. The parseXML method expects bytes (to handle encoding properly)
     xml_bytes = xml_string.encode("utf-8")
 
-    # 2. Parse the bytes into an lxml tree
     xml_tree = parseXML(xml_bytes)
 
-    # 3. Set up an in-memory text buffer to catch the output
     buffer = io.StringIO()
 
-    # 4. Initialize their PrettyPrinter and tell it to print into our buffer
+    # Assign the stream to the buffer
     printer = PrettyPrinter(stream=buffer)
     printer.printRoot(xml_tree)
 
-    # 5. Grab the final, formatted string out of the buffer!
     return buffer.getvalue()
-
-
