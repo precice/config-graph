@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <precice-configuration>
   <log>
-    <sink
-      filter="%Severity% > debug"
-      format="---[precice] %ColorizedSeverity% %Message%"
-      enabled="true" />
+    <sink format="---[precice] %ColorizedSeverity% %Message%" />
   </log>
 
   <data:scalar name="Color" />
