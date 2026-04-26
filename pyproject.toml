@@ -15,18 +15,8 @@ requires-python = ">= 3.10"
 dependencies = [
     "networkx",
     "lxml",
-]
-
-[project.optional-dependencies]
-viz = [
+    "precice-config-format",
     "matplotlib",
-]
-dev = [
-    "pytest",
-]
-# Only for generating a config from a graph
-generate = [
-    "precice-config-format"
 ]
 
 [project.urls]

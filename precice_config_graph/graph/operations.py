@@ -3,8 +3,7 @@ import textwrap
 from pathlib import Path
 import networkx as nx
 
-# This is done inside the function to make it an optional dependency
-# import preciceconfigformat
+from preciceconfigformat.cli import parseXML, PrettyPrinter
 
 from precice_config_graph import nodes as n
 from precice_config_graph import helper as h
@@ -227,11 +226,6 @@ def _format_config_string(xml_string: str) -> str:
     :param xml_string: An XML string to be formatted, represeting a precice-config.xml file.
     :return: The formatted XML string.
     """
-    try:
-        from preciceconfigformat.cli import parseXML, PrettyPrinter
-    except ImportError:
-        raise ImportError("The precice-config-format library is not installed. "
-                          "Please install it using 'pip install precice-config-format'.")
     xml_bytes = xml_string.encode("utf-8")
 
     xml_tree = parseXML(xml_bytes)

@@ -1,9 +1,5 @@
 import networkx as nx
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    print(f"\033[1;31m[ERROR]\033[0m 'matplotlib' is required to plot the graph.")
-    print(f"Please install it with: pip install '.[viz]'")
+import matplotlib.pyplot as plt
 
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
