@@ -2,8 +2,6 @@ import precice_config_graph.enums as e
 
 """This file contains helper items, such as default values and constants."""
 
-INDENT: str = " " * 4
-
 # Default values for nodes and config
 MESH_DIMENSIONALITY: int = 3
 

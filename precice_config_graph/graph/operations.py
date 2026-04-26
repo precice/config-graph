@@ -1,12 +1,10 @@
 import io
-import textwrap
 from pathlib import Path
 import networkx as nx
 
 from preciceconfigformat.cli import parseXML, PrettyPrinter
 
 from precice_config_graph import nodes as n
-from precice_config_graph import helper as h
 from precice_config_graph.edges import Edge
 from precice_config_graph.xml_processing import parse_file
 from precice_config_graph.graph.builder import get_graph
@@ -141,39 +139,38 @@ def _create_unformatted_config_str(config_dict: dict[str, list[n.ParticipantNode
     # "Header" information
     config_str: str = (f"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
                        f"<precice-configuration>\n"
-                       f"{h.INDENT}<log>\n"
-                       f"{h.INDENT}{h.INDENT}<sink\n"
-                       f"{h.INDENT}{h.INDENT}{h.INDENT}format=\"---[precice] %ColorizedSeverity% %Message%\" />\n"
-                       f"{h.INDENT}</log>\n\n")  # two newlines to separate the header from the content
+                       f"<log>\n"
+                       f"<sink format=\"---[precice] %ColorizedSeverity% %Message%\" />\n"
+                       f"</log>\n\n")  # two newlines to separate the header from the content
 
     for data in config_dict["data"]:
-        config_str += f"{h.INDENT}" + data.to_xml() + "\n"
+        config_str += f"" + data.to_xml() + "\n"
 
     config_str += "\n"  # separate mesh from data
 
     mesh_str: str = ""
     for mesh in config_dict["meshes"]:
         mesh_str += f"{mesh.to_xml()}"
-    config_str += textwrap.indent(mesh_str, h.INDENT)
+    config_str += mesh_str
 
     config_str += "\n"  # separate mesh from participants
 
     participant_str: str = ""
     for participant in config_dict["participants"]:
         participant_str += f"{participant.to_xml()}"
-    config_str += textwrap.indent(participant_str, h.INDENT)
+    config_str += participant_str
 
     config_str += "\n"  # separate participants from m2ns
 
     for m2n in config_dict["m2n"]:
-        config_str += f"{h.INDENT}{m2n.to_xml()}"
+        config_str += f"{m2n.to_xml()}"
 
     config_str += "\n"  # separate m2ns from coupling-schemes
 
     coupling_scheme_str: str = ""
     for coupling_scheme in config_dict["coupling-schemes"]:
         coupling_scheme_str += f"{coupling_scheme.to_xml()}"
-    config_str += textwrap.indent(coupling_scheme_str, h.INDENT)
+    config_str += coupling_scheme_str
 
     config_str += f"\n</precice-configuration>"
     return config_str

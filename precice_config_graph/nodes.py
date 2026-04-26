@@ -1,7 +1,7 @@
 from __future__ import annotations
-import textwrap
 
 from . import enums as e, helper as h
+
 
 class ParticipantNode:
     def __init__(
@@ -70,27 +70,27 @@ class ParticipantNode:
     def to_xml(self):
         xml_str: str = f"<participant name=\"{self.name}\">\n"
         for provide_mesh in self.provide_meshes:
-            xml_str += f"{h.INDENT}<provide-mesh name=\"{provide_mesh.name}\" />\n"
+            xml_str += f"<provide-mesh name=\"{provide_mesh.name}\" />\n"
         for receive_mesh in self.receive_meshes:
-            xml_str += f"{h.INDENT}{receive_mesh.to_xml()}\n"
+            xml_str += f"{receive_mesh.to_xml()}\n"
         for read_data in self.read_data:
-            xml_str += f"{h.INDENT}{read_data.to_xml()}\n"
+            xml_str += f"{read_data.to_xml()}\n"
         for write_data in self.write_data:
-            xml_str += f"{h.INDENT}{write_data.to_xml()}\n"
+            xml_str += f"{write_data.to_xml()}\n"
         for mapping in self.mappings:
             mapping_str: str = mapping.to_xml() + "\n"
-            # Multi-line strings need every line to be h.INDENTed
-            xml_str += textwrap.indent(mapping_str, h.INDENT)
+            # Multi-line strings need every line to be indented
+            xml_str += mapping_str
 
         for action in self.actions:
             action_str: str = action.to_xml() + "\n"
-            xml_str += textwrap.indent(action_str, h.INDENT)
+            xml_str += action_str
         for export in self.exports:
-            xml_str += f"{h.INDENT}{export.to_xml()}\n"
+            xml_str += f"{export.to_xml()}\n"
         for watchpoint in self.watchpoints:
-            xml_str += f"{h.INDENT}{watchpoint.to_xml()}\n"
+            xml_str += f"{watchpoint.to_xml()}\n"
         for watch_integral in self.watch_integrals:
-            xml_str += f"{h.INDENT}{watch_integral.to_xml()}\n"
+            xml_str += f"{watch_integral.to_xml()}\n"
 
         xml_str += f"</participant>\n"
         return xml_str
@@ -111,7 +111,7 @@ class MeshNode:
     def to_xml(self):
         xml_str: str = f"<mesh name=\"{self.name}\" dimensions=\"{self.dimensions}\">\n"
         for data in self.use_data:
-            xml_str += f"{h.INDENT}<use-data name=\"{data.name}\" />\n"
+            xml_str += f"<use-data name=\"{data.name}\" />\n"
         xml_str += f"</mesh>\n"
         return xml_str
 
@@ -172,20 +172,20 @@ class CouplingSchemeNode:
 
     def to_xml(self):
         xml_str: str = f"<coupling-scheme:{self.type.value}>\n"
-        xml_str += f"{h.INDENT}<participants first=\"{self.first_participant.name}\" second=\"{self.second_participant.name}\" />\n"
+        xml_str += f"<participants first=\"{self.first_participant.name}\" second=\"{self.second_participant.name}\" />\n"
 
         for exchange in self.exchanges:
-            xml_str += f"{h.INDENT}{exchange.to_xml()}\n"
+            xml_str += f"{exchange.to_xml()}\n"
 
-        xml_str += f"{h.INDENT}<time-window-size value=\"{self.time_window_size}\" />\n"
-        xml_str += f"{h.INDENT}<max-time-windows value=\"{self.max_time_windows}\" />\n"
+        xml_str += f"<time-window-size value=\"{self.time_window_size}\" />\n"
+        xml_str += f"<max-time-windows value=\"{self.max_time_windows}\" />\n"
 
         for convergence in self.convergence_measures:
-            xml_str += f"{h.INDENT}{convergence.to_xml()}\n"
+            xml_str += f"{convergence.to_xml()}\n"
 
         if self.acceleration is not None:
             acceleration_str: str = self.acceleration.to_xml() + "\n"
-            xml_str += textwrap.indent(acceleration_str, h.INDENT)
+            xml_str += acceleration_str
 
         xml_str += f"</coupling-scheme:{self.type.value}>\n"
         return xml_str
@@ -230,22 +230,22 @@ class MultiCouplingSchemeNode:
         xml_str: str = f"<coupling-scheme:multi>\n"
         for participant in self.participants:
             if participant == self.control_participant:
-                xml_str += f"{h.INDENT}<participant name=\"{participant.name}\" control=\"yes\" />\n"
+                xml_str += f"<participant name=\"{participant.name}\" control=\"yes\" />\n"
             else:
-                xml_str += f"{h.INDENT}<participant name=\"{participant.name}\" />\n"
+                xml_str += f"<participant name=\"{participant.name}\" />\n"
 
         for exchange in self.exchanges:
-            xml_str += f"{h.INDENT}{exchange.to_xml()}\n"
+            xml_str += f"{exchange.to_xml()}\n"
 
-        xml_str += f"{h.INDENT}<time-window-size value=\"{self.time_window_size}\" />\n"
-        xml_str += f"{h.INDENT}<max-time-windows value=\"{self.max_time_windows}\" />\n"
+        xml_str += f"<time-window-size value=\"{self.time_window_size}\" />\n"
+        xml_str += f"<max-time-windows value=\"{self.max_time_windows}\" />\n"
 
         for convergence in self.convergence_measures:
-            xml_str += f"{h.INDENT}{convergence.to_xml()}\n"
+            xml_str += f"{convergence.to_xml()}\n"
 
         if self.acceleration is not None:
             acceleration_str: str = self.acceleration.to_xml() + "\n"
-            xml_str += textwrap.indent(acceleration_str, h.INDENT)
+            xml_str += acceleration_str
 
         xml_str += f"</coupling-scheme:multi>\n"
         return xml_str
@@ -319,35 +319,35 @@ class MappingNode:
 
     def to_xml(self) -> str:
         # General tags
-        xml_str: str = f"<mapping:{self.method.value}\n"
-        xml_str += f"{h.INDENT}direction=\"{self.direction.value}\"\n"
+        xml_str: str = f"<mapping:{self.method.value} "
+        xml_str += f"direction=\"{self.direction.value}\" "
         # For a just-in-time mapping, either "from" or "to" is not specified
-        xml_str += f"{h.INDENT}from=\"{self.from_mesh.name}\"\n" if self.from_mesh else ""
-        xml_str += f"{h.INDENT}to=\"{self.to_mesh.name}\"\n" if self.to_mesh else ""
-        xml_str += f"{h.INDENT}constraint=\"{self.constraint.value}\"\n"
+        xml_str += f"from=\"{self.from_mesh.name}\" " if self.from_mesh else ""
+        xml_str += f"to=\"{self.to_mesh.name}\" " if self.to_mesh else ""
+        xml_str += f"constraint=\"{self.constraint.value}\" "
         # Specialized tags
         if self.method in [e.MappingMethod.RBF, e.MappingMethod.RBF_GLOBAL_DIRECT,
                            e.MappingMethod.RBF_GLOBAL_ITERATIVE]:
-            xml_str += f"{h.INDENT}x-dead=\"{self.x_dead}\"\n"
-            xml_str += f"{h.INDENT}y-dead=\"{self.y_dead}\"\n"
-            xml_str += f"{h.INDENT}z-dead=\"{self.z_dead}\"\n"
+            xml_str += f"x-dead=\"{self.x_dead}\" "
+            xml_str += f"y-dead=\"{self.y_dead}\" "
+            xml_str += f"z-dead=\"{self.z_dead}\" "
         if self.method in [e.MappingMethod.RBF_GLOBAL_DIRECT, e.MappingMethod.RBF_GLOBAL_ITERATIVE,
                            e.MappingMethod.RBF_PUM_DIRECT]:
-            xml_str += f"{h.INDENT}polynomial=\"{self.polynomial.value}\"\n"
+            xml_str += f"polynomial=\"{self.polynomial.value}\" "
         if self.method == e.MappingMethod.RBF_PUM_DIRECT:
-            xml_str += f"{h.INDENT}vertices-per-cluster=\"{self.vertices_per_cluster}\"\n"
-            xml_str += f"{h.INDENT}relative-overlap=\"{self.relative_overlap}\"\n"
-            xml_str += f"{h.INDENT}project-to-input=\"{self.project_to_input}\"\n"
+            xml_str += f"vertices-per-cluster=\"{self.vertices_per_cluster}\" "
+            xml_str += f"relative-overlap=\"{self.relative_overlap}\" "
+            xml_str += f"project-to-input=\"{self.project_to_input}\" "
         if self.method in [e.MappingMethod.AXIAL_GEOMETRIC_MULTISCALE, e.MappingMethod.RADIAL_GEOMETRIC_MULTISCALE]:
-            xml_str += f"{h.INDENT}multiscale-type=\"{self.multiscale_type.value}\"\n"
-            xml_str += f"{h.INDENT}multiscale-axis=\"{self.multiscale_axis.value}\"\n"
-            xml_str += f"{h.INDENT}multiscale-radius=\"{self.multiscale_radius}\"\n"
+            xml_str += f"multiscale-type=\"{self.multiscale_type.value}\" "
+            xml_str += f"multiscale-axis=\"{self.multiscale_axis.value}\" "
+            xml_str += f"multiscale-radius=\"{self.multiscale_radius}\" "
         # Specialized subelements
         if self.method in [e.MappingMethod.RBF_GLOBAL_ITERATIVE, e.MappingMethod.RBF_GLOBAL_DIRECT,
                            e.MappingMethod.RBF_PUM_DIRECT, e.MappingMethod.RBF]:
             xml_str += f"/>\n"  # close opening element brace
-            xml_str += f"{h.INDENT}{self.executor.to_xml()}\n"
-            xml_str += f"{h.INDENT}{self.basisfunction.to_xml()}\n"
+            xml_str += f"{self.executor.to_xml()}\n"
+            xml_str += f"{self.basisfunction.to_xml()}\n"
             xml_str += f"</mapping:{self.method.value}>"
         else:
             xml_str += f"/>"
@@ -462,12 +462,12 @@ class ActionNode:
     def to_xml(self) -> str:
         xml_str: str = f"<action:{self.type.value} mesh=\"{self.mesh.name}\" timing={self.timing.value}>\n"
         if self.type != e.ActionType.RECORDER and self.target_data is not None:
-            xml_str += f"{h.INDENT}<target-data name=\"{self.target_data.name}\" />\n"
+            xml_str += f"<target-data name=\"{self.target_data.name}\" />\n"
         if self.type == e.ActionType.PYTHON:
-            xml_str += f"{h.INDENT}<path name=\"{self.python_module_path}\" />\n"
-            xml_str += f"{h.INDENT}<module name=\"{self.python_module_name}\" />\n"
+            xml_str += f"<path name=\"{self.python_module_path}\" />\n"
+            xml_str += f"<module name=\"{self.python_module_name}\" />\n"
         for source_data in self.source_data:
-            xml_str += f"{h.INDENT}<source-data name=\"{source_data.name}\" />\n"
+            xml_str += f"<source-data name=\"{source_data.name}\" />\n"
         xml_str += f"</action:{self.type.value}>\n"
         return xml_str
 
@@ -533,7 +533,7 @@ class M2NNode:
 
     def to_xml(self) -> str:
         return (f"<m2n:{self.type.value} acceptor=\"{self.acceptor.name}\" connector=\"{self.connector.name}\" "
-                f"exchange-directory=\"{self.directory}\"/>\n")
+                f"exchange-directory=\"{self.directory}\" />\n")
 
 
 class AccelerationDataNode:
@@ -581,16 +581,16 @@ class AccelerationNode:
         xml_str: str = f"<acceleration:{self.type.value}>\n"
 
         for accelerated_data in self.data:
-            xml_str += f"{h.INDENT}{accelerated_data.to_xml()}\n"
+            xml_str += f"{accelerated_data.to_xml()}\n"
 
         if self.preconditioner is not None:
-            xml_str += f"{h.INDENT}{self.preconditioner.to_xml()}\n"
+            xml_str += f"{self.preconditioner.to_xml()}\n"
 
         if self.type == e.AccelerationType.CONSTANT:
-            xml_str += f"{h.INDENT}<relaxation value=\"1\" />\n"
+            xml_str += f"<relaxation value=\"1\" />\n"
 
         if self.filter is not None:
-            xml_str += f"{h.INDENT}{self.filter.to_xml()}"
+            xml_str += f"{self.filter.to_xml()}"
 
         xml_str += f"</acceleration:{self.type.value}>"
         return xml_str
