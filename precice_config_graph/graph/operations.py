@@ -144,9 +144,7 @@ def _create_unformatted_config_str(config_dict: dict[str, list[n.ParticipantNode
                        f"<precice-configuration>\n"
                        f"{h.INDENT}<log>\n"
                        f"{h.INDENT}{h.INDENT}<sink\n"
-                       f"{h.INDENT}{h.INDENT}{h.INDENT}filter=\"%Severity% > debug\"\n"
-                       f"{h.INDENT}{h.INDENT}{h.INDENT}format=\"---[precice] %ColorizedSeverity% %Message%\"\n"
-                       f"{h.INDENT}{h.INDENT}{h.INDENT}enabled=\"true\" />\n"
+                       f"{h.INDENT}{h.INDENT}{h.INDENT}format=\"---[precice] %ColorizedSeverity% %Message%\" />\n"
                        f"{h.INDENT}</log>\n\n")  # two newlines to separate the header from the content
 
     for data in config_dict["data"]:
