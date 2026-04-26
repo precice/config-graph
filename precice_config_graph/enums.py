@@ -112,8 +112,8 @@ class MappingBasisFunctionType(Enum):
     MULTIQUADRICS = "multiquadrics"
     INVERSE_MULTIQUADRICS = "inverse-multiquadrics"
     GAUSSIAN = "gaussian"
-    THIN_PLATE_SPLINE = "thin-plate-splines"
-    VOLUME_SPLINE = "volume-splines"
+    THIN_PLATE_SPLINES = "thin-plate-splines"
+    VOLUME_SPLINES = "volume-splines"
 
 
 class MappingMultiscaleType(Enum):
