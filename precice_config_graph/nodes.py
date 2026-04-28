@@ -68,9 +68,9 @@ class ParticipantNode:
         self.line = line
 
     def to_xml(self):
-        xml_str: str = f"<participant name=\"{self.name}\">\n"
+        xml_str: str = f'<participant name="{self.name}">\n'
         for provide_mesh in self.provide_meshes:
-            xml_str += f"<provide-mesh name=\"{provide_mesh.name}\" />\n"
+            xml_str += f'<provide-mesh name="{provide_mesh.name}" />\n'
         for receive_mesh in self.receive_meshes:
             xml_str += f"{receive_mesh.to_xml()}\n"
         for read_data in self.read_data:
@@ -78,12 +78,12 @@ class ParticipantNode:
         for write_data in self.write_data:
             xml_str += f"{write_data.to_xml()}\n"
         for mapping in self.mappings:
-            mapping_str: str = mapping.to_xml() + "\n"
+            mapping_str: str = mapping.to_xml() + '\n'
             # Multi-line strings need every line to be indented
             xml_str += mapping_str
 
         for action in self.actions:
-            action_str: str = action.to_xml() + "\n"
+            action_str: str = action.to_xml() + '\n'
             xml_str += action_str
         for export in self.exports:
             xml_str += f"{export.to_xml()}\n"
@@ -109,9 +109,9 @@ class MeshNode:
         self.line = line
 
     def to_xml(self):
-        xml_str: str = f"<mesh name=\"{self.name}\" dimensions=\"{self.dimensions}\">\n"
+        xml_str: str = f'<mesh name="{self.name}" dimensions="{self.dimensions}">\n'
         for data in self.use_data:
-            xml_str += f"<use-data name=\"{data.name}\" />\n"
+            xml_str += f'<use-data name="{data.name}" />\n'
         xml_str += f"</mesh>\n"
         return xml_str
 
@@ -132,8 +132,8 @@ class ReceiveMeshNode:
         self.line = line
 
     def to_xml(self):
-        api_access_str: str = "api-access=\"true\" " if self.api_access else ""
-        xml_str: str = f"<receive-mesh name=\"{self.mesh.name}\" from=\"{self.from_participant.name}\" {api_access_str}/>"
+        api_access_str: str = 'api-access="true" ' if self.api_access else ""
+        xml_str: str = f'<receive-mesh name="{self.mesh.name}" from="{self.from_participant.name}" {api_access_str}/>'
         return xml_str
 
 
@@ -172,13 +172,13 @@ class CouplingSchemeNode:
 
     def to_xml(self):
         xml_str: str = f"<coupling-scheme:{self.type.value}>\n"
-        xml_str += f"<participants first=\"{self.first_participant.name}\" second=\"{self.second_participant.name}\" />\n"
+        xml_str += f'<participants first="{self.first_participant.name}" second="{self.second_participant.name}" />\n'
 
         for exchange in self.exchanges:
             xml_str += f"{exchange.to_xml()}\n"
 
-        xml_str += f"<time-window-size value=\"{self.time_window_size}\" />\n"
-        xml_str += f"<max-time-windows value=\"{self.max_time_windows}\" />\n"
+        xml_str += f'<time-window-size value="{self.time_window_size}" />\n'
+        xml_str += f'<max-time-windows value="{self.max_time_windows}" />\n'
 
         for convergence in self.convergence_measures:
             xml_str += f"{convergence.to_xml()}\n"
@@ -230,15 +230,15 @@ class MultiCouplingSchemeNode:
         xml_str: str = f"<coupling-scheme:multi>\n"
         for participant in self.participants:
             if participant == self.control_participant:
-                xml_str += f"<participant name=\"{participant.name}\" control=\"yes\" />\n"
+                xml_str += f'<participant name="{participant.name}" control="yes" />\n'
             else:
-                xml_str += f"<participant name=\"{participant.name}\" />\n"
+                xml_str += f'<participant name="{participant.name}" />\n'
 
         for exchange in self.exchanges:
             xml_str += f"{exchange.to_xml()}\n"
 
-        xml_str += f"<time-window-size value=\"{self.time_window_size}\" />\n"
-        xml_str += f"<max-time-windows value=\"{self.max_time_windows}\" />\n"
+        xml_str += f'<time-window-size value="{self.time_window_size}" />\n'
+        xml_str += f'<max-time-windows value="{self.max_time_windows}" />\n'
 
         for convergence in self.convergence_measures:
             xml_str += f"{convergence.to_xml()}\n"
@@ -258,7 +258,7 @@ class DataNode:
         self.line = line
 
     def to_xml(self) -> str:
-        return f"<data:{self.data_type.value} name=\"{self.name}\" />"
+        return f'<data:{self.data_type.value} name="{self.name}" />'
 
 
 class MappingNode:
@@ -320,28 +320,28 @@ class MappingNode:
     def to_xml(self) -> str:
         # General tags
         xml_str: str = f"<mapping:{self.method.value} "
-        xml_str += f"direction=\"{self.direction.value}\" "
+        xml_str += f'direction="{self.direction.value}" '
         # For a just-in-time mapping, either "from" or "to" is not specified
-        xml_str += f"from=\"{self.from_mesh.name}\" " if self.from_mesh else ""
-        xml_str += f"to=\"{self.to_mesh.name}\" " if self.to_mesh else ""
-        xml_str += f"constraint=\"{self.constraint.value}\" "
+        xml_str += f'from="{self.from_mesh.name}" ' if self.from_mesh else ""
+        xml_str += f'to="{self.to_mesh.name}" ' if self.to_mesh else ""
+        xml_str += f'constraint="{self.constraint.value}" '
         # Specialized tags
         if self.method in [e.MappingMethod.RBF, e.MappingMethod.RBF_GLOBAL_DIRECT,
                            e.MappingMethod.RBF_GLOBAL_ITERATIVE]:
-            xml_str += f"x-dead=\"{self.x_dead}\" "
-            xml_str += f"y-dead=\"{self.y_dead}\" "
-            xml_str += f"z-dead=\"{self.z_dead}\" "
+            xml_str += f'x-dead="{self.x_dead}" '
+            xml_str += f'y-dead="{self.y_dead}" '
+            xml_str += f'z-dead="{self.z_dead}" '
         if self.method in [e.MappingMethod.RBF_GLOBAL_DIRECT, e.MappingMethod.RBF_GLOBAL_ITERATIVE,
                            e.MappingMethod.RBF_PUM_DIRECT]:
-            xml_str += f"polynomial=\"{self.polynomial.value}\" "
+            xml_str += f'polynomial="{self.polynomial.value}" '
         if self.method == e.MappingMethod.RBF_PUM_DIRECT:
-            xml_str += f"vertices-per-cluster=\"{self.vertices_per_cluster}\" "
-            xml_str += f"relative-overlap=\"{self.relative_overlap}\" "
-            xml_str += f"project-to-input=\"{self.project_to_input}\" "
+            xml_str += f'vertices-per-cluster="{self.vertices_per_cluster}" '
+            xml_str += f'relative-overlap="{self.relative_overlap}" '
+            xml_str += f'project-to-input="{self.project_to_input}" '
         if self.method in [e.MappingMethod.AXIAL_GEOMETRIC_MULTISCALE, e.MappingMethod.RADIAL_GEOMETRIC_MULTISCALE]:
-            xml_str += f"multiscale-type=\"{self.multiscale_type.value}\" "
-            xml_str += f"multiscale-axis=\"{self.multiscale_axis.value}\" "
-            xml_str += f"multiscale-radius=\"{self.multiscale_radius}\" "
+            xml_str += f'multiscale-type="{self.multiscale_type.value}" '
+            xml_str += f'multiscale-axis="{self.multiscale_axis.value}" '
+            xml_str += f'multiscale-radius="{self.multiscale_radius}" '
         # Specialized subelements
         if self.method in [e.MappingMethod.RBF_GLOBAL_ITERATIVE, e.MappingMethod.RBF_GLOBAL_DIRECT,
                            e.MappingMethod.RBF_PUM_DIRECT, e.MappingMethod.RBF]:
@@ -368,7 +368,7 @@ class WriteDataNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = f"<write-data name=\"{self.data.name}\" mesh=\"{self.mesh.name}\" />"
+        xml_str: str = f'<write-data name="{self.data.name}" mesh="{self.mesh.name}" />'
         return xml_str
 
 
@@ -386,7 +386,7 @@ class ReadDataNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = f"<read-data name=\"{self.data.name}\" mesh=\"{self.mesh.name}\" />"
+        xml_str: str = f'<read-data name="{self.data.name}" mesh="{self.mesh.name}" />'
         return xml_str
 
 
@@ -408,8 +408,8 @@ class ExchangeNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = (f"<exchange data=\"{self.data.name}\" mesh=\"{self.mesh.name}\" "
-                        f"from=\"{self.from_participant.name}\" to=\"{self.to_participant.name}\" />")
+        xml_str: str = (f'<exchange data="{self.data.name}" mesh="{self.mesh.name}" '
+                        f'from="{self.from_participant.name}" to="{self.to_participant.name}" />')
         return xml_str
 
 
@@ -426,7 +426,7 @@ class ExportNode:
         self.directory = directory
 
     def to_xml(self) -> str:
-        xml_str: str = f"<export:{self.format.value} directory=\"{self.directory}\" />"
+        xml_str: str = f'<export:{self.format.value} directory="{self.directory}" />'
         return xml_str
 
 
@@ -460,14 +460,14 @@ class ActionNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = f"<action:{self.type.value} mesh=\"{self.mesh.name}\" timing={self.timing.value}>\n"
+        xml_str: str = f'<action:{self.type.value} mesh="{self.mesh.name}" timing="{self.timing.value}">\n'
         if self.type != e.ActionType.RECORDER and self.target_data is not None:
-            xml_str += f"<target-data name=\"{self.target_data.name}\" />\n"
+            xml_str += f'<target-data name="{self.target_data.name}" />\n'
         if self.type == e.ActionType.PYTHON:
-            xml_str += f"<path name=\"{self.python_module_path}\" />\n"
-            xml_str += f"<module name=\"{self.python_module_name}\" />\n"
+            xml_str += f'<path name="{self.python_module_path}" />\n'
+            xml_str += f'<module name="{self.python_module_name}" />\n'
         for source_data in self.source_data:
-            xml_str += f"<source-data name=\"{source_data.name}\" />\n"
+            xml_str += f'<source-data name="{source_data.name}" />\n'
         xml_str += f"</action:{self.type.value}>\n"
         return xml_str
 
@@ -493,7 +493,7 @@ class WatchPointNode:
 
     def to_xml(self) -> str:
         coordinate = ";".join(map(str, self.coordinate))  # Coordinate of the form 0;1;2 ...
-        xml_str: str = f"<watch-point name=\"{self.name}\" mesh=\"{self.mesh.name}\" coordinate=\"{coordinate}\" />"
+        xml_str: str = f'<watch-point name="{self.name}" mesh="{self.mesh.name}" coordinate="{coordinate}" />'
         return xml_str
 
 
@@ -512,7 +512,8 @@ class WatchIntegralNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = f"<watch-integral name=\"{self.name}\" mesh=\"{self.mesh.name}\" scale-with-connectivity=\"{self.scale_with_connectivity}\" />"
+        xml_str: str = (f'<watch-integral name="{self.name}" mesh="{self.mesh.name}" '
+                        f'scale-with-connectivity="{self.scale_with_connectivity}" />')
         return xml_str
 
 
@@ -532,8 +533,8 @@ class M2NNode:
         self.line = line
 
     def to_xml(self) -> str:
-        return (f"<m2n:{self.type.value} acceptor=\"{self.acceptor.name}\" connector=\"{self.connector.name}\" "
-                f"exchange-directory=\"{self.directory}\" />\n")
+        return (f'<m2n:{self.type.value} acceptor="{self.acceptor.name}" connector="{self.connector.name}" '
+                f'exchange-directory="{self.directory}" />\n')
 
 
 class AccelerationDataNode:
@@ -550,7 +551,7 @@ class AccelerationDataNode:
         self.line = line
 
     def to_xml(self) -> str:
-        xml_str: str = f"<data name=\"{self.data.name}\" mesh=\"{self.mesh.name}\" />"
+        xml_str: str = f'<data name="{self.data.name}" mesh="{self.mesh.name}" />'
         return xml_str
 
 
@@ -587,7 +588,7 @@ class AccelerationNode:
             xml_str += f"{self.preconditioner.to_xml()}\n"
 
         if self.type == e.AccelerationType.CONSTANT:
-            xml_str += f"<relaxation value=\"1\" />\n"
+            xml_str += f'<relaxation value="1" />\n'
 
         if self.filter is not None:
             xml_str += f"{self.filter.to_xml()}"
@@ -619,14 +620,14 @@ class ConvergenceMeasureNode:
     def to_xml(self) -> str:
         limit_str: str = ""
         if self.type == e.ConvergenceMeasureType.ABSOLUTE:
-            limit_str = f"limit=\"{self.limit}\" "
+            limit_str = f'limit="{self.limit}" '
         elif self.type == e.ConvergenceMeasureType.RELATIVE:
-            limit_str = f"limit=\"{self.rel_limit}\" "
+            limit_str = f'limit="{self.rel_limit}" '
         elif self.type == e.ConvergenceMeasureType.ABSOLUTE_OR_RELATIVE:
-            limit_str = f"abs-limit=\"{self.limit}\" rel-limit=\"{self.rel_limit}\" "
+            limit_str = f'abs-limit="{self.limit}" rel-limit="{self.rel_limit}" '
         elif self.type == e.ConvergenceMeasureType.RESIDUAL_RELATIVE:
-            limit_str = f"limit=\"{self.limit}\" "
-        xml_str: str = f"<{self.type.value}-convergence-measure data=\"{self.data.name}\" mesh=\"{self.mesh.name}\" {limit_str}/>"
+            limit_str = f'limit="{self.limit}" '
+        xml_str: str = f'<{self.type.value}-convergence-measure data="{self.data.name}" mesh="{self.mesh.name}" {limit_str}/>'
         return xml_str
 
 
@@ -646,9 +647,9 @@ class PreconditionerNode:
     def to_xml(self) -> str:
         threshold_str: str = ""
         if self.acceleration.type != e.AccelerationType.AITKEN:
-            threshold_str = f"update-on-threshold=\"{self.update_on_threshold}\" "
+            threshold_str = f'update-on-threshold="{self.update_on_threshold}" '
 
-        xml_str: str = f"<preconditioner type=\"{self.type.value}\" freeze-after=\"{self.freeze_after}\" {threshold_str}/>"
+        xml_str: str = f'<preconditioner type="{self.type.value}" freeze-after="{self.freeze_after}" {threshold_str}/>'
         return xml_str
 
 
@@ -664,7 +665,7 @@ class AccelerationFilterNode:
         self.limit = limit
 
     def to_xml(self) -> str:
-        xml_str: str = f"<filter type=\"{self.type.value}\" limit=\"{self.limit}\" />"
+        xml_str: str = f'<filter type="{self.type.value}" limit="{self.limit}" />'
         return xml_str
 
 
@@ -691,12 +692,12 @@ class MappingBasisFunctionNode:
                          e.MappingBasisFunctionType.COMPACT_TPS_C2,
                          e.MappingBasisFunctionType.GAUSSIAN,
                          ]:
-            support_radius += f"support-radius=\"{self.support_radius}\" "
+            support_radius += f'support-radius="{self.support_radius}" '
         shape_parameter_str: str = ""
         if self.type in [e.MappingBasisFunctionType.MULTIQUADRICS,
                          e.MappingBasisFunctionType.INVERSE_MULTIQUADRICS,
                          e.MappingBasisFunctionType.GAUSSIAN]:
-            shape_parameter_str = f"shape-parameter=\"{self.shape_parameter}\" "
+            shape_parameter_str = f'shape-parameter="{self.shape_parameter}" '
         xml_str: str = f"<basis-function:{self.type.value} {shape_parameter_str}{support_radius}/>"
         return xml_str
 
@@ -716,9 +717,9 @@ class MappingExecutorNode:
     def to_xml(self) -> str:
         gpu_device_id_str: str = ""
         if self.type in [e.MappingExecutorType.CUDA, e.MappingExecutorType.HIP]:
-            gpu_device_id_str += f"gpu-device-id=\"{self.gpu_device_id}\" "
+            gpu_device_id_str += f'gpu-device-id="{self.gpu_device_id}" '
         n_threads_str: str = ""
         if self.type == e.MappingExecutorType.OPENMP:
-            n_threads_str += f"n-threads=\"{self.n_threads}\" "
+            n_threads_str += f'n-threads="{self.n_threads}" '
         xml_str: str = f"<executor:{self.type.value} {n_threads_str}{gpu_device_id_str}/>"
         return xml_str

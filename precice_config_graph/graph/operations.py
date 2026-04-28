@@ -137,10 +137,10 @@ def _create_unformatted_config_str(config_dict: dict[str, list[n.ParticipantNode
     :return: A string representing a preCICE configuration file.
     """
     # "Header" information
-    config_str: str = (f"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+    config_str: str = (f'<?xml version="1.0" encoding="UTF-8" ?>\n'
                        f"<precice-configuration>\n"
                        f"<log>\n"
-                       f"<sink format=\"---[precice] %ColorizedSeverity% %Message%\" />\n"
+                       f'<sink format="---[precice] %ColorizedSeverity% %Message%" />\n'
                        f"</log>\n\n")  # two newlines to separate the header from the content
 
     for data in config_dict["data"]:
