@@ -110,18 +110,42 @@ def create_config_file(graph: nx.Graph, path: str = ".", filename: str = "precic
     """
     directory = Path(path)
     file_path: Path = directory / filename
-    config_str: str = create_config_str(graph)
+    config_dict: dict = _create_config_dict(graph)
+    config_str: str = _create_config_str(config_dict)
     with open(file_path, "w") as f:
         f.write(_format_config_string(config_str))
 
 
-def create_config_str(graph: nx.Graph) -> str:
+def create_config_file_from_dict(config_dict: dict[str, list[n.ParticipantNode |
+                                                             n.DataNode | n.MeshNode |
+                                                             n.CouplingSchemeNode |
+                                                             n.MultiCouplingSchemeNode |
+                                                             n.M2NNode]],
+                                 path: str = ".", filename: str = "precice-config.xml") -> None:
+    """
+    Create a formatted precice-config.xml file from a given dict that contains the configuration elements.
+    The file is saved to the specified path.
+    :param config_dict: A dict containing the configuration elements.
+    :param path: The path where the file should be saved. Defaults to the current directory.
+    :param filename: The name of the file to be saved. Defaults to "precice-config.xml".
+    """
+    directory = Path(path)
+    file_path: Path = directory / filename
+    config_str: str = _create_unformatted_config_str(config_dict)
+    with open(file_path, "w") as f:
+        f.write(_format_config_string(config_str))
+
+def _create_config_str(config_dict: dict[str, list[n.ParticipantNode |
+                                                   n.DataNode | n.MeshNode |
+                                                   n.CouplingSchemeNode |
+                                                   n.MultiCouplingSchemeNode |
+                                                   n.M2NNode]]) -> str:
     """
     Create a formatted precice-config.xml string from a given graph.
-    :param graph: The graph to be converted to a precice-config.xml file.
+    :param config_dict: A dict representing a precice-config.xml file.
     :return: A string representing a preCICE configuration file.
     """
-    config_str: str = _create_unformatted_config_str(_create_config_dict(graph))
+    config_str: str = _create_unformatted_config_str(config_dict)
     return _format_config_string(config_str)
 
 
