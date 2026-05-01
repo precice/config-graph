@@ -41,7 +41,7 @@ def check_graph_equivalence(expected: nx.Graph, actual: nx.Graph, ignore_names: 
         refs_b: set[str] = set(node_b.get("_ref_keys", []))
 
         # Combine all known reference keys and the meta-key itself to be on the safe side
-        all_refs: set[str] = refs_a.union(refs_b).union({"_ref_keys"})
+        all_refs: set[str] = refs_a.union(refs_b).union({"_ref_keys", "name"})
 
         def transform_attributes(attributes: dict[str, str | int | list[str]], refs_to_transform: set[str]):
             """
@@ -134,6 +134,7 @@ def create_config_file_from_dict(config_dict: dict[str, list[n.ParticipantNode |
     config_str: str = _create_unformatted_config_str(config_dict)
     with open(file_path, "w") as f:
         f.write(_format_config_string(config_str))
+
 
 def _create_config_str(config_dict: dict[str, list[n.ParticipantNode |
                                                    n.DataNode | n.MeshNode |
