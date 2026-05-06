@@ -72,7 +72,7 @@ A coupling-scheme node represents a coupling-scheme element of the XML file.
 - `first_participant`: The participant of the coupling-scheme that gets referred to as `first=“”`.
 - `second_participant`: The participant of the coupling-scheme that gets referred to as `second=“”`.
 - `exchanges`: A list of exchanges between the participants. This links to `Exchange` nodes for further references.
-- `accelerations`: The acceleration node that will contain references to all data-accelerations of the coupling-scheme.
+- `acceleration`: The acceleration node that will contain references to all data-accelerations of the coupling-scheme.
 - `convergence_measures`: A list of convergence-measure. Defines the convergence criterion of certain data of a mesh in
   a coupling-scheme.
 - `line`: The line number where the coupling-scheme is defined in the config.xml.

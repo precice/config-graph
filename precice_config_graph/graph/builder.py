@@ -2,12 +2,12 @@ import sys
 from enum import Enum
 import networkx as nx
 from lxml import etree
-# This is imported in print_graph() to make it optional
-# import matplotlib.pyplot as plt
-from . import nodes as n
-from .edges import Edge
-from . import enums as e
-from .xml_processing import convert_string_to_bool, parse_file
+
+from precice_config_graph import nodes as n
+from precice_config_graph import helper as h
+from precice_config_graph.edges import Edge
+from precice_config_graph import enums as e
+from precice_config_graph.xml_processing import convert_string_to_bool, parse_file
 
 LINK_GRAPH_REPOSITORY: str = "'\033[1;36mhttps://github.com/precice/config-graph\033[0m'"
 
@@ -54,10 +54,11 @@ def get_graph(root: etree.Element) -> nx.Graph:
         string += f'"{values[size - 2]}" or "{values[size - 1]}".'
         return string
 
-    def error_unknown_type(e: etree.Element, type: str, possible_types_list: list):
+    def error_unknown_type(e: etree.Element, type: str, enum: Enum, unknown_str: str = "type"):
+        possible_types_list = get_enum_values(enum)
         possible_types = list_to_string(possible_types_list)
         message: str = (
-                'Unknown type "'
+                f'Unknown {unknown_str} "'
                 + type
                 + '" for element "'
                 + e.tag
@@ -101,8 +102,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
         try:
             type = e.DataType(kind)
         except ValueError:
-            possible_types_list = get_enum_values(e.DataType)
-            error_unknown_type(data_el, kind, possible_types_list)
+            error_unknown_type(data_el, kind, e.DataType)
         line: int = data_el.sourceline
         node = n.DataNode(name, type, line=line)
         data_nodes[name] = node
@@ -111,7 +111,11 @@ def get_graph(root: etree.Element) -> nx.Graph:
     for mesh_el in root.findall("mesh"):
         name = get_attribute(mesh_el, "name")
         line: int = mesh_el.sourceline
-        mesh = n.MeshNode(name, line=line)
+
+        dim_str = mesh_el.get("dimensions")
+        mesh_dims = int(dim_str) if dim_str else 3
+
+        mesh = n.MeshNode(name, dimensions=mesh_dims, line=line)
 
         # Data usages – <use-data />: Will be mapped to edges
         for use_data in mesh_el.findall("use-data"):
@@ -173,23 +177,100 @@ def get_graph(root: etree.Element) -> nx.Graph:
             try:
                 method = e.MappingMethod(kind)
             except ValueError:
-                possible_method_list = get_enum_values(e.MappingMethod)
-                possible_methods: str = list_to_string(possible_method_list)
-                message: str = (
-                        'Unknown method "'
-                        + kind
-                        + '" for element "'
-                        + mapping_el.tag
-                        + '".\nUse one of '
-                        + possible_methods
-                )
-                error(message)
+                error_unknown_type(mapping_el, kind, e.MappingMethod, unknown_str="method")
             constraint = e.MappingConstraint(get_attribute(mapping_el, "constraint"))
 
             if not from_mesh and not to_mesh:
                 error_missing_attribute(mapping_el, 'from" or "to')
             just_in_time = not (from_mesh and to_mesh)
             line: int = mapping_el.sourceline
+
+            # Optional attributes
+            polynomial_str: str = mapping_el.get("polynomial", h.MAPPING_POLYNOMIAL)
+            try:
+                # If it is a string, it will try to convert it to MappingPolynomialType.
+                # If it is already a MappingPolynomialType, nothing will happen.
+                polynomial = e.MappingPolynomialType(polynomial_str)
+            except ValueError:
+                error_unknown_type(mapping_el, polynomial_str, e.MappingPolynomialType, unknown_str="polynomial")
+
+            x_dead_str: str = mapping_el.get("x-dead")
+            x_dead = convert_string_to_bool(x_dead_str) if x_dead_str else h.MAPPING_X_DEAD
+            y_dead_str: str = mapping_el.get("y-dead")
+            y_dead = convert_string_to_bool(y_dead_str) if y_dead_str else h.MAPPING_Y_DEAD
+            z_dead_str: str = mapping_el.get("z-dead")
+            z_dead = convert_string_to_bool(z_dead_str) if z_dead_str else h.MAPPING_Z_DEAD
+
+            rtol_str = mapping_el.get("solver-rtol")
+            rtol = float(rtol_str) if rtol_str else h.MAPPING_SOLVER_RTOL
+
+            vertices_per_cluster_str: str = mapping_el.get("vertices-per-cluster")
+            vertices_per_cluster = int(
+                vertices_per_cluster_str) if vertices_per_cluster_str else h.MAPPING_VERTICES_PER_CLUSTER
+
+            project_to_input_str = mapping_el.get("project-to-input")
+            project_to_input = convert_string_to_bool(
+                project_to_input_str) if project_to_input_str else h.MAPPING_PROJECT_TO_INPUT
+
+            multiscale_type_str: str = mapping_el.get("multiscale-type", h.MAPPING_MULTISCALE_TYPE)
+            try:
+                multiscale_type = e.MappingMultiscaleType(multiscale_type_str)
+            except ValueError:
+                error_unknown_type(mapping_el, multiscale_type_str, e.MappingMultiscaleType)
+
+            multiscale_axis_str: str = mapping_el.get("multiscale-axis", h.MAPPING_MULTISCALE_AXIS)
+            try:
+                multiscale_axis = e.MappingMultiscaleAxis(multiscale_axis_str)
+            except ValueError:
+                error_unknown_type(mapping_el, multiscale_axis_str, e.MappingMultiscaleAxis,
+                                   unknown_str="multiscale-axis")
+
+            multiscale_radius_str: str = mapping_el.get("multiscale-radius")
+            multiscale_radius = float(multiscale_radius_str) if multiscale_radius_str else h.MAPPING_MULTISCALE_RADIUS
+
+            basis_function: n.MappingBasisFunctionNode | None = None
+            # There exists a maximum of one basis-function tag per mapping tag.
+            for (basisfunction_el, bftype_str) in find_all_with_prefix(mapping_el, "basis-function"):
+                try:
+                    bftype = e.MappingBasisFunctionType(bftype_str)
+                except ValueError:
+                    error_unknown_type(basisfunction_el, bftype_str, e.MappingBasisFunctionType,
+                                       unknown_str="basis-function")
+
+                support_radius_str: str = basisfunction_el.get("support-radius")
+                support_radius: float = float(
+                    support_radius_str) if support_radius_str else h.MAPPING_BASIS_FUNCTION_SUPPORT_RADIUS
+
+                shape_parameter_str: str = basisfunction_el.get("shape-parameter")
+                shape_parameter: float = float(
+                    shape_parameter_str) if shape_parameter_str else h.MAPPING_BASIS_FUNCTION_SHAPE_PARAMETER
+
+                basis_function = n.MappingBasisFunctionNode(
+                    bftype,
+                    None,
+                    support_radius,
+                    shape_parameter
+                )
+
+            executor: n.MappingExecutorNode | None = None
+            for (executor_el, etype) in find_all_with_prefix(mapping_el, "executor"):
+                try:
+                    etype = e.MappingExecutorType(etype)
+                except ValueError:
+                    error_unknown_type(executor_el, etype, e.MappingExecutorType, unknown_str="executor-type")
+
+                gpu_device_id_str: str = executor_el.get("gpu-device-id")
+                gpu_device_id = int(gpu_device_id_str) if gpu_device_id_str else h.MAPPING_EXECUTOR_GPU_DEVICE_ID
+
+                n_threads_str: str = executor_el.get("n-threads")
+                n_threads = int(n_threads_str) if n_threads_str else h.MAPPING_EXECUTOR_N_THREADS
+
+                executor = n.MappingExecutorNode(
+                    etype,
+                    None,
+                    gpu_device_id,
+                    n_threads,
+                )
 
             mapping = n.MappingNode(
                 participant,
@@ -200,21 +281,42 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 from_mesh,
                 to_mesh,
                 line=line,
+                polynomial=polynomial,
+                x_dead=x_dead,
+                y_dead=y_dead,
+                z_dead=z_dead,
+                solver_rtol=rtol,
+                vertices_per_cluster=vertices_per_cluster,
+                project_to_input=project_to_input,
+                multiscale_type=multiscale_type,
+                multiscale_axis=multiscale_axis,
+                multiscale_radius=multiscale_radius,
+                basisfunction=basis_function,
+                executor=executor,
             )
+
+            if mapping.basisfunction:
+                mapping.basisfunction.mapping = mapping
+
+            if mapping.executor:
+                mapping.executor.mapping = mapping
 
             participant.mappings.append(mapping)
             mapping_nodes.append(mapping)
 
         # Exports
         # <export:… />
-        for (_, kind) in find_all_with_prefix(participant_el, "export"):
+        for (export_el, kind) in find_all_with_prefix(participant_el, "export"):
             try:
                 type = e.ExportFormat(kind)
             except ValueError:
-                possible_types_list = get_enum_values(e.ExportFormat)
-                error_unknown_type(_, kind, possible_types_list)
-            line: int = _.sourceline
-            export = n.ExportNode(participant, type, line=line)
+                error_unknown_type(export_el, kind, e.ExportFormat, unknown_str="export-format")
+            line: int = export_el.sourceline
+
+            directory = export_el.get("directory", h.EXPORT_DIRECTORY)
+
+            export = n.ExportNode(participant, type, line=line, directory=directory)
+            participant.exports.append(export)
             export_nodes.append(export)
 
         # Actions
@@ -230,22 +332,35 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     target_data = data_nodes[get_attribute(target_data_el, "name")]
 
             source_data: list[n.DataNode] = []
+            path_str: str = ""
+            module_name: str = ""
             if kind in ["summation", "python"]:
                 source_data_els = action_el.findall("source-data")
                 for source_data_el in source_data_els:
                     source_data.append(
                         data_nodes[get_attribute(source_data_el, "name")]
                     )
-
+                for path_str_el in action_el.findall("path"):
+                    path_str: str = path_str_el.get("name", "")
+                for module_name_el in action_el.findall("module"):
+                    module_name: str = module_name_el.get("name", "")
             try:
                 type = e.ActionType(kind)
             except ValueError:
-                possible_types_list = get_enum_values(e.ActionType)
-                error_unknown_type(action_el, kind, possible_types_list)
+                error_unknown_type(action_el, kind, e.ActionType, unknown_str="type")
+
             line: int = action_el.sourceline
 
             action = n.ActionNode(
-                participant, type, mesh, timing, target_data, source_data, line=line
+                participant,
+                type,
+                mesh,
+                timing,
+                target_data,
+                source_data,
+                line=line,
+                python_module_path=path_str,
+                python_module_name=module_name
             )
             participant.actions.append(action)
             action_nodes.append(action)
@@ -257,8 +372,14 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh = mesh_nodes[get_attribute(watch_point_el, "mesh")]
             line: int = watch_point_el.sourceline
 
-            watch_point = n.WatchPointNode(point_name, participant, mesh, line=line)
+            coordinate_str = watch_point_el.get("coordinate")
+            coord_list: list[float] = []
+            if coordinate_str:
+                coord_list = [float(x) for x in coordinate_str.split(";")]
+
+            watch_point = n.WatchPointNode(point_name, participant, mesh, line=line, coordinate=coord_list)
             watch_point_nodes.append(watch_point)
+            participant.watchpoints.append(watch_point)
 
         # Watch-Integral
         # <watch-integral />
@@ -267,8 +388,17 @@ def get_graph(root: etree.Element) -> nx.Graph:
             mesh = mesh_nodes[get_attribute(watch_integral_el, "mesh")]
             line: int = watch_integral_el.sourceline
 
-            watch_integral = n.WatchIntegralNode(integral_name, participant, mesh, line=line)
+            scale_with_connectivity_str = watch_integral_el.get("scale-with-connectivity")
+            scale_with_connectivity = convert_string_to_bool(
+                scale_with_connectivity_str) if scale_with_connectivity_str else h.WATCH_INTEGRAL_SCALE_WITH_CONNECTIVITY
+
+            watch_integral = n.WatchIntegralNode(integral_name,
+                                                 participant,
+                                                 mesh,
+                                                 line=line,
+                                                 scale_with_connectivity=scale_with_connectivity)
             watch_integral_nodes.append(watch_integral)
+            participant.watch_integrals.append(watch_integral)
 
         # Now that participant_node is completely built, add it and children to the graph and our dictionary
         participant_nodes[name] = participant
@@ -291,10 +421,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             from_participant = participant_nodes[from_participant_name]
 
             api_access_str = receive_mesh_el.get("api-access")
-            if api_access_str:
-                api_access = convert_string_to_bool(api_access_str)
-            else:
-                api_access = False
+            api_access = convert_string_to_bool(api_access_str) if api_access_str else h.RECEIVE_MESH_API_ACCESS
             line: int = receive_mesh_el.sourceline
 
             receive_mesh = n.ReceiveMeshNode(
@@ -328,8 +455,25 @@ def get_graph(root: etree.Element) -> nx.Graph:
 
                 type = e.CouplingSchemeType(kind)
 
+                time_window_size: float = h.COUPLING_SCHEME_TIME_WINDOW_SIZE
+                for time_window_size_el in coupling_scheme_el.findall("time-window-size"):
+                    time_window_size_str: str = time_window_size_el.get("value")
+                    time_window_size: float = float(
+                        time_window_size_str) if time_window_size_str else h.COUPLING_SCHEME_TIME_WINDOW_SIZE
+
+                max_time_windows: int = h.COUPLING_SCHEME_MAX_TIME_WINDOWS
+                for max_time_window_el in coupling_scheme_el.findall("max-time-windows"):
+                    max_time_window_str: str = max_time_window_el.get("value")
+                    max_time_windows: int = int(
+                        max_time_window_str) if max_time_window_str else h.COUPLING_SCHEME_MAX_TIME_WINDOWS
+
                 coupling_scheme = n.CouplingSchemeNode(
-                    type, first_participant, second_participant, line=line
+                    type,
+                    first_participant,
+                    second_participant,
+                    line=line,
+                    time_window_size=time_window_size,
+                    max_time_windows=max_time_windows,
                 )
             case "multi":
                 control_participant = None
@@ -354,18 +498,28 @@ def get_graph(root: etree.Element) -> nx.Graph:
                         control_participant is not None
                 ), "There must be a control participant"
 
+                max_time_windows: int = h.COUPLING_SCHEME_MAX_TIME_WINDOWS
+                time_window_size: float = h.COUPLING_SCHEME_TIME_WINDOW_SIZE
+                for time_window_size_el in coupling_scheme_el.findall("time-window-size"):
+                    time_window_size_str: str = time_window_size_el.get("value")
+                    time_window_size: float = float(
+                        time_window_size_str) if time_window_size_str else h.COUPLING_SCHEME_TIME_WINDOW_SIZE
+
+                for max_time_window_el in coupling_scheme_el.findall("max-time-windows"):
+                    max_time_windows_str: str = max_time_window_el.get("value")
+                    max_time_windows: int = int(
+                        max_time_windows_str) if max_time_windows_str else h.COUPLING_SCHEME_MAX_TIME_WINDOWS
+
                 coupling_scheme = n.MultiCouplingSchemeNode(
-                    control_participant, participants, line=line
+                    control_participant,
+                    participants,
+                    line=line,
+                    max_time_windows=max_time_windows,
+                    time_window_size=time_window_size,
                 )
             case _:
-                possible_types_list = [
-                    "serial-explicit",
-                    "serial-implicit",
-                    "parallel-explicit",
-                    "parallel-implicit",
-                    "multi",
-                ]
-                error_unknown_type(coupling_scheme_el, kind, possible_types_list)
+                # TODO This does not print multi as a possible type.
+                error_unknown_type(coupling_scheme_el, kind, e.CouplingSchemeType)
 
         assert (
                 coupling_scheme is not None
@@ -389,6 +543,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             coupling_scheme.exchanges.append(exchange)
             exchange_nodes.append(exchange)
 
+        # Acceleration
         for (acceleration_el, a_kind) in find_all_with_prefix(
                 coupling_scheme_el, "acceleration"
         ):
@@ -397,7 +552,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     ["serial-implicit", "parallel-implicit", "multi"]
                 )
                 message: str = (
-                        f"The coupling scheme of type '{kind}' does not support acceleration.\nUse one of "
+                        f"The coupling scheme of type '{kind}' does not support accelerations.\nUse one of "
                         + possible_types
                         + "\nOtherwise remove the acceleration tag."
                 )
@@ -406,8 +561,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
             try:
                 type = e.AccelerationType(a_kind)
             except ValueError:
-                possible_types_list = get_enum_values(e.AccelerationType)
-                error_unknown_type(acceleration_el, a_kind, possible_types_list)
+                error_unknown_type(acceleration_el, a_kind, e.AccelerationType)
             line: int = acceleration_el.sourceline
 
             acceleration = n.AccelerationNode(coupling_scheme, type, line=line)
@@ -424,6 +578,7 @@ def get_graph(root: etree.Element) -> nx.Graph:
                 error(message)
 
             if a_kind in possible_types_list:
+                # Accelerated data
                 for a_data in acceleration_el.findall("data"):
                     a_data_name = get_attribute(a_data, "name")
                     data = data_nodes[a_data_name]
@@ -433,6 +588,47 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     a_data_node = n.AccelerationDataNode(acceleration, data, mesh, line=line)
                     acceleration.data.append(a_data_node)
                     acceleration_data_nodes.append(a_data_node)
+
+                # Preconditioner (just one expected)
+                preconditioner: n.PreconditionerNode | None = None
+                for preconditioner_el in acceleration_el.findall("preconditioner"):
+                    p_type_str = preconditioner_el.get("type")
+                    try:
+                        p_type = e.PreconditionerType(p_type_str)
+                    except ValueError:
+                        error_unknown_type(preconditioner_el, p_type_str, e.PreconditionerType)
+
+                    freeze_after_str = preconditioner_el.get("freeze-after")
+                    freeze_after = int(freeze_after_str) if freeze_after_str else h.PRECONDITIONER_FREEZE_AFTER
+
+                    update_on_threshold_str = preconditioner_el.get("update-on-threshold")
+                    update_on_threshold = convert_string_to_bool(
+                        update_on_threshold_str) if update_on_threshold_str else h.PRECONDITIONER_UPDATE_ON_THRESHOLD
+
+                    preconditioner = n.PreconditionerNode(p_type, acceleration, freeze_after, update_on_threshold)
+
+                if preconditioner:
+                    acceleration.preconditioner = preconditioner
+
+                if a_kind == "aitken":
+                    continue
+
+                # AccelerationFilter (only possible on IQN-ILS and IQN-IMVJ
+                acceleration_filter: n.AccelerationFilterNode | None = None
+                for acceleration_filter_el in acceleration_el.findall("filter"):
+                    a_filter_type_str = acceleration_filter_el.get("type", h.ACCELERATION_FILTER_TYPE)
+                    try:
+                        a_filter_type = e.AccelerationFilterType(a_filter_type_str)
+                    except ValueError:
+                        error_unknown_type(acceleration_filter_el, a_filter_type_str, e.AccelerationFilterType)
+
+                    a_filter_limit_str = acceleration_filter_el.get("limit")
+                    a_filter_limit = float(a_filter_limit_str) if a_filter_limit_str else h.ACCELERATION_FILTER_LIMIT
+
+                    acceleration_filter = n.AccelerationFilterNode(acceleration, a_filter_type, a_filter_limit)
+
+                if acceleration_filter:
+                    acceleration.filter = acceleration_filter
 
             coupling_scheme.acceleration = acceleration
             acceleration_nodes.append(acceleration)
@@ -456,8 +652,23 @@ def get_graph(root: etree.Element) -> nx.Graph:
                     c_mesh = mesh_nodes[c_mesh_name]
                     line: int = convergence_measure_el.sourceline
 
+                    # Only one of these can occur at the same time
+                    limit_str = convergence_measure_el.get("limit")
+                    abs_limit_str = convergence_measure_el.get("abs-limit")
+                    limit = float(limit_str) if limit_str else float(
+                        abs_limit_str) if abs_limit_str else h.CONVERGENCE_MEASURE_LIMIT
+
+                    rel_limit_str = convergence_measure_el.get("rel-limit")
+                    rel_limit = float(rel_limit_str) if rel_limit_str else h.CONVERGENCE_MEASURE_LIMIT
+
                     convergence_measure = n.ConvergenceMeasureNode(
-                        coupling_scheme, type, c_data, c_mesh, line=line
+                        coupling_scheme,
+                        type,
+                        c_data,
+                        c_mesh,
+                        line=line,
+                        limit=limit,
+                        rel_limit=rel_limit
                     )
                     coupling_scheme.convergence_measures.append(convergence_measure)
                     convergence_measure_nodes.append(convergence_measure)
@@ -492,7 +703,9 @@ def get_graph(root: etree.Element) -> nx.Graph:
         connector = participant_nodes[connector_name]
         line: int = m2n_el.sourceline
 
-        m2n = n.M2NNode(type, acceptor, connector, line=line)
+        directory = m2n_el.get("exchange-directory", h.M2N_DIRECTORY)
+
+        m2n = n.M2NNode(type, acceptor, connector, line=line, directory=directory)
         m2n_nodes.append(m2n)
 
     # BUILD GRAPH
@@ -720,6 +933,9 @@ def add_node_with_attributes(g: nx.Graph, node_obj) -> None:
                 # If so, then store the name and add the key to the "reference_keys"
                 clean_attributes[key] = sorted([item.name for item in value])
                 ref_keys.add(key)
+            # Store a list of primitive types
+            elif isinstance(value[0], (int, float, str, bool)):
+                clean_attributes[key] = value.copy()
             else:
                 # Store the count of other nodes
                 clean_attributes[key] = len(value)
@@ -745,338 +961,3 @@ def add_node_with_attributes(g: nx.Graph, node_obj) -> None:
     clean_attributes["_ref_keys"] = sorted(list(ref_keys))
 
     g.add_node(node_obj, **clean_attributes)
-
-
-def print_graph(graph: nx.Graph):
-    try:
-        import matplotlib.pyplot as plt
-    except ImportError:
-        print(f"\033[1;31m[ERROR]\033[0m 'matplotlib' is required to plot the graph.")
-        print(f"Please install it with: pip install '.[viz]'")
-        return
-
-    SIZE:int = 300
-
-    def color_for_node(node):
-        match node:
-            case n.DataNode():
-                return [1, 0.3, 0]
-            case n.ReadDataNode() | n.WriteDataNode():
-                return [1, 0.5, 0.5]
-            case n.MeshNode():
-                return [0.9, 0.6, 0]
-            case n.ReceiveMeshNode():
-                return [0.95, 0.75, 0]
-            case n.ParticipantNode():
-                return [0.3, 0.6, 1.0]
-            case n.ExchangeNode():
-                return [0.8, 0.8, 0.8]
-            case n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
-                return [0.65, 0.65, 0.65]
-            case n.WriteDataNode():
-                return [0.7, 0, 1.0]
-            case n.MappingNode():
-                return [0.1, 0.7, 0.1]
-            case n.ExportNode():
-                return [0.5, 0.8, 1.0]
-            case n.ActionNode():
-                return [0.3, 0.5, 0.8]
-            case n.WatchPointNode() | n.WatchIntegralNode():
-                return [0.5, 0.0, 1.0]
-            case _:
-                return [0.5, 0.5, 0.5]
-
-    def append_list(list, node, color, size=SIZE):
-        list[2].append(node)
-        list[3].append(color)
-        list[4].append(size * list[1])
-
-    nodes_circle = ["o", 1, [], [], []]
-    nodes_circle_small = [".", 1, [], [], []]
-    nodes_triangle_up = ["^", 1, [], [], []]
-    nodes_triangle_down = ["v", 1, [], [], []]
-    nodes_triangle_left = ["<", 1, [], [], []]
-    nodes_triangle_right = [">", 1, [], [], []]
-    nodes_square = ["s", 0.9, [], [], []]
-    nodes_diamond = ["d", 0.9, [], [], []]
-    nodes_diamond_wide = ["D", 0.8, [], [], []]
-    nodes_pentagon = ["p", 1.4, [], [], []]
-    nodes_hexagon_vertical = ["h", 1.4, [], [], []]
-    nodes_hexagon_horizontal = ["H", 1.4, [], [], []]
-    nodes_octagon = ["8", 1.2, [], [], []]
-    nodes_plus = ["P", 1.1, [], [], []]
-    nodes_cross = ["X", 1, [], [], []]
-    nodes_star = ["*", 1.5, [], [], []]
-    node_lists = [
-        nodes_circle,
-        nodes_circle_small,
-        nodes_triangle_up,
-        nodes_triangle_down,
-        nodes_triangle_left,
-        nodes_triangle_right,
-        nodes_square,
-        nodes_diamond,
-        nodes_diamond_wide,
-        nodes_pentagon,
-        nodes_hexagon_vertical,
-        nodes_hexagon_horizontal,
-        nodes_octagon,
-        nodes_plus,
-        nodes_cross,
-        nodes_star,
-    ]
-
-    for node in graph.nodes():
-        color = color_for_node(node)
-        match node:
-            case n.ParticipantNode():
-                append_list(nodes_star, node, color)
-            case n.MeshNode():
-                append_list(nodes_square, node, color)
-            case n.CouplingSchemeNode() | n.MultiCouplingSchemeNode():
-                append_list(nodes_octagon, node, color)
-            case n.DataNode():
-                append_list(nodes_diamond_wide, node, color)
-            case n.AccelerationNode():
-                append_list(nodes_plus, node, color)
-            case _:
-                append_list(nodes_circle, node, color)
-
-    def label_for_edge(edge):
-        match edge["attr"]:
-            case (
-            Edge.RECEIVE_MESH__PARTICIPANT__BELONGS_TO
-            | Edge.MAPPING__PARTICIPANT__BELONGS_TO
-            | Edge.EXCHANGE__COUPLING_SCHEME__BELONGS_TO
-            | Edge.WRITE_DATA__PARTICIPANT__BELONGS_TO
-            | Edge.READ_DATA__PARTICIPANT__BELONGS_TO
-            | Edge.EXPORT__PARTICIPANT__BELONGS_TO
-            | Edge.ACTION__PARTICIPANT__BELONGS_TO
-            | Edge.WATCH_POINT__PARTICIPANT__BELONGS_TO
-            | Edge.WATCH_INTEGRAL__PARTICIPANT__BELONGS_TO
-            | Edge.ACCELERATION__COUPLING_SCHEME__BELONGS_TO
-            | Edge.CONVERGENCE_MEASURE__COUPLING_SCHEME__BELONGS_TO
-            ):
-                return "belongs to"
-            case Edge.ACCELERATION_DATA__ACCELERATION__BELONGS_TO:
-                return "accelerates"
-            case Edge.RECEIVE_MESH__PARTICIPANT_RECEIVED_FROM:
-                return "received from"
-            case Edge.PROVIDE_MESH__PARTICIPANT_PROVIDES:
-                return "provides"
-            case Edge.MAPPING__TO_MESH | Edge.EXCHANGE__EXCHANGES_TO:
-                return "to"
-            case Edge.MAPPING__FROM_MESH | Edge.EXCHANGE__EXCHANGED_FROM:
-                return "from"
-            case Edge.ACTION__SOURCE_DATA:
-                return "source data"
-            case Edge.ACTION__TARGET_DATA:
-                return "target data"
-            case (
-            Edge.WATCH_POINT__MESH
-            | Edge.WATCH_INTEGRAL__MESH
-            | Edge.ACTION__MESH
-            | Edge.ACCELERATION_DATA__MESH
-            | Edge.CONVERGENCE_MEASURE__MESH
-            ):
-                return "mesh"
-            case Edge.ACCELERATION_DATA__DATA | Edge.CONVERGENCE_MEASURE__DATA:
-                return "data"
-            case Edge.M2N__PARTICIPANT_ACCEPTOR:
-                return "acceptor"
-            case Edge.M2N__PARTICIPANT_CONNECTOR:
-                return "connector"
-            case Edge.COUPLING_SCHEME__PARTICIPANT_FIRST:
-                return "first"
-            case Edge.COUPLING_SCHEME__PARTICIPANT_SECOND:
-                return "second"
-            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT:
-                return "participant"
-            case Edge.MULTI_COUPLING_SCHEME__PARTICIPANT__CONTROL:
-                return "control"
-            case Edge.USE_DATA:
-                return "uses"
-            case Edge.WRITE_DATA__WRITES_TO_MESH | Edge.WRITE_DATA__WRITES_TO_DATA:
-                return "writes to"
-            case Edge.READ_DATA__DATA_READ_BY | Edge.READ_DATA__MESH_READ_BY:
-                return "read by"
-            case _:
-                return ""
-
-    node_labels = dict()
-    for node in graph.nodes():
-        match node:
-            case n.ParticipantNode() | n.MeshNode() | n.DataNode() | n.WatchPointNode() | n.WatchIntegralNode():
-                node_labels[node] = node.name
-            case n.CouplingSchemeNode():
-                node_labels[node] = f"Coupling Scheme ({node.type.value})"
-            case n.MultiCouplingSchemeNode():
-                node_labels[node] = "Multi Coupling Scheme"
-            case n.ExchangeNode():
-                node_labels[node] = "Exchange"
-            case n.MappingNode():
-                node_labels[node] = f"Mapping ({node.direction.name})"
-            case n.ExportNode():
-                node_labels[node] = f"Export ({node.format.value})"
-            case n.ActionNode():
-                node_labels[node] = f"Action ({node.type.value})"
-            case n.WriteDataNode():
-                node_labels[node] = f"Write {node.data.name}"
-            case n.ReadDataNode():
-                node_labels[node] = f"Read {node.data.name}"
-            case n.ReceiveMeshNode():
-                node_labels[node] = f"Receive {node.mesh.name}"
-            case n.M2NNode():
-                node_labels[node] = f"M2N {node.type.value}"
-            case n.AccelerationNode():
-                node_labels[node] = f"Acceleration {node.type.value}"
-            case n.AccelerationDataNode():
-                node_labels[node] = f"Accelerate {node.data.name}"
-            case n.ConvergenceMeasureNode():
-                node_labels[node] = f"{node.type.value}-convergence-measure"
-            case _:
-                node_labels[node] = ""
-
-    pos = nx.spring_layout(
-        graph, seed=1
-    )  # set the seed so that generated graph always has same layout
-
-    for list in node_lists:
-        if len(list[2]) == 0:
-            continue
-        nx.draw_networkx_nodes(
-            graph,
-            pos,
-            node_shape=list[0],
-            nodelist=list[2],
-            node_color=list[3],
-            node_size=list[4],
-        )
-    nx.draw_networkx_labels(graph, pos, labels=node_labels)
-    nx.draw_networkx_edges(graph, pos)
-    nx.draw_networkx_edge_labels(
-        graph,
-        pos,
-        edge_labels={
-            tuple(edge): label_for_edge(d) for *edge, d in graph.edges(data=True)
-        },
-    )
-
-    # Create a plot for the debugging view of the graph
-    handles = []
-    unique_types = []
-    for list in node_lists:
-        marker_type = list[0]
-        marker_mult = list[1]
-        for node in list[2]:
-            name = node.__class__.__name__
-            # Only display each node type once
-            if name not in unique_types:
-                unique_types.append(name)
-                # Remove the 'Node' suffix
-                label = name[:-4]
-                handles.append(
-                    plt.Line2D(
-                        [],
-                        [],
-                        marker=marker_type,
-                        color="w",
-                        markerfacecolor=color_for_node(node),
-                        markersize=12 * marker_mult,
-                        label=label,
-                    )
-                )
-
-    plt.legend(handles=handles, loc="upper left", title="Node types:")
-
-    plt.show()
-
-
-def check_graph_equivalence(expected: nx.Graph, actual: nx.Graph, ignore_names: bool = False) -> bool:
-    """
-    Check if two graphs are equivalent, with the option to ignore names.
-    This check is done by comparing the attributes of the nodes and edges of the graphs.
-    If names are ignored, any attribute that is a reference to another node will be ignored,
-    as it may contain a different name.
-    :param expected: The expected graph.
-    :param actual: The actual graph.
-    :param ignore_names: A flag indicating whether to ignore names when comparing the graphs.
-    :return: True if the graphs are equivalent, False otherwise.
-    """
-
-    def node_match(node_a: dict[str, str | int | list[str]], node_b: dict[str, str | int | list[str]]) -> bool:
-        """
-        Compare two nodes for equivalence based on their attributes.
-        :param node_a: A node represented by a dict of attributes.
-        :param node_b: A node represented by a dict of attributes.
-        :return:
-        """
-        # If the nodes match completely, then they will also match if names are ignored
-        if node_a == node_b:
-            return True
-
-        if not ignore_names:
-            return False
-
-        # Get the attributes of the nodes that are references to named nodes
-        refs_a: set[str] = set(node_a.get("_ref_keys", []))
-        refs_b: set[str] = set(node_b.get("_ref_keys", []))
-
-        # Combine all known reference keys and the meta-key itself to be on the safe side
-        all_refs: set[str] = refs_a.union(refs_b).union({"_ref_keys"})
-
-        def transform_attributes(attributes: dict[str, str | int | list[str]], refs_to_transform: set[str]):
-            """
-            Transform the given attributes by manipulating attributes whose keys are contained in "refs_to_transform".
-            :param attributes: The attributes to transform.
-            :param refs_to_transform: The keys of attributes that should be transformed.
-            :return: A dict of the updated attributes.
-            """
-            new_attributes: dict[str, str | int | list[str]] = {}
-            for key, value in attributes.items():
-                if key in refs_to_transform:
-                    # The attribute is a list of named values. Store the count of values instead of the names.
-                    if isinstance(value, list):
-                        new_attributes[key] = len(value)
-                    else:
-                        # This key is a named value.
-                        # Store "1" to assert that the value existed, but ignore the name
-                        new_attributes[key] = 1
-                # Keep other values
-                else:
-                    new_attributes[key] = value
-            return new_attributes
-
-        attributes_a: dict[str, str | int | list[str]] = transform_attributes(node_a, all_refs)
-        attributes_b: dict[str, str | int | list[str]] = transform_attributes(node_b, all_refs)
-
-        return attributes_a == attributes_b
-
-    def edge_match(edge_a: dict[str, Edge], edge_b: dict[str, Edge]) -> bool:
-        """
-        Compare two edges for equivalence based on their attributes.
-        Edges have only one attribute, namely their edge type.
-        :param edge_a: An edge represented by a dict of its attributes.
-        :param edge_b: An edge represented by a dict of its attributes.
-        :return: True if the edges are equivalent, False otherwise.
-        """
-        return edge_a["attr"] == edge_b["attr"]
-
-    return nx.is_isomorphic(expected, actual, node_match=node_match, edge_match=edge_match)
-
-
-def check_config_equivalence(path_expected: str, path_actual: str, ignore_names: bool = False) -> bool:
-    """
-    Check if two precice-config.xml files are equivalent.
-    This check is done for the graph structure, including nodes and edges.
-    :param path_expected: Path to the precice-config.xml file with the expected results
-    :param path_actual: Path to the precice-config.xml file with the actual results
-    :param ignore_names: A flag indicating whether to ignore names when comparing the graphs.
-    This is helpful when checking only for "isomorphism" or equivalent structure, not equivalent values.
-    :return: True if the two configs are equivalent, False otherwise
-    """
-    file_expected = parse_file(path_expected)
-    graph_expected: nx.Graph = get_graph(file_expected)
-    file_actual = parse_file(path_actual)
-    graph_actual: nx.Graph = get_graph(file_actual)
-    return check_graph_equivalence(graph_expected, graph_actual, ignore_names=ignore_names)

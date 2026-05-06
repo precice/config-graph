@@ -1,4 +1,4 @@
-import precice_config_graph.graph as graph
+from precice_config_graph.graph import operations
 
 
 def test_graph_equivalence_true():
@@ -8,7 +8,7 @@ def test_graph_equivalence_true():
     """
     path_to_expected: str = "tests/graph-equivalence/equivalent/expected-precice-config.xml"
     path_to_actual: str = "tests/graph-equivalence/equivalent/actual-precice-config.xml"
-    assert graph.check_config_equivalence(path_to_expected, path_to_actual,
+    assert operations.check_config_equivalence(path_to_expected, path_to_actual,
                                           ignore_names=True), "Graphs are not equivalent."
 
 
@@ -19,7 +19,7 @@ def test_graph_equivalence_false():
     """
     path_to_expected: str = "tests/graph-equivalence/not-equivalent/expected-precice-config.xml"
     path_to_actual: str = "tests/graph-equivalence/not-equivalent/actual-precice-config.xml"
-    assert not graph.check_config_equivalence(path_to_expected, path_to_actual,
+    assert not operations.check_config_equivalence(path_to_expected, path_to_actual,
                                               ignore_names=True), "Graphs are equivalent."
 
 
@@ -30,4 +30,4 @@ def test_graph_equivalence_names_false():
     """
     path_to_expected: str = "tests/graph-equivalence/not-equivalent/expected-precice-config.xml"
     path_to_actual: str = "tests/graph-equivalence/not-equivalent/names_actual-precice-config.xml"
-    assert not graph.check_config_equivalence(path_to_expected, path_to_actual), "Graphs are equivalent."
+    assert not operations.check_config_equivalence(path_to_expected, path_to_actual), "Graphs are equivalent."

@@ -1,6 +1,7 @@
 import networkx as nx
 
-from precice_config_graph import graph, xml_processing
+from precice_config_graph import xml_processing
+from precice_config_graph.graph import builder, operations
 from precice_config_graph import nodes as n
 from precice_config_graph.edges import Edge
 from precice_config_graph.enums import (
@@ -17,7 +18,7 @@ def test_graph():
     xml = xml_processing.parse_file(
         "tests/example-configs/simple-good/precice-config.xml"
     )
-    G_actual = graph.get_graph(xml)
+    G_actual = builder.get_graph(xml)
 
     edges = []
 
@@ -25,8 +26,8 @@ def test_graph():
     n_data_color = n.DataNode("Color", DataType.SCALAR)
 
     # Meshes
-    n_mesh_generator = n.MeshNode("Generator-Mesh", [n_data_color])
-    n_mesh_propagator = n.MeshNode("Propagator-Mesh", [n_data_color])
+    n_mesh_generator = n.MeshNode("Generator-Mesh", [n_data_color], dimensions=2)
+    n_mesh_propagator = n.MeshNode("Propagator-Mesh", [n_data_color], dimensions=2)
 
     # Participants
     n_participant_generator = n.ParticipantNode(
@@ -91,6 +92,8 @@ def test_graph():
         n_participant_generator,
         n_participant_propagator,
         [n_exchange_color_generator_mesh_generator_propagator],
+        time_window_size=0.01,
+        max_time_windows=30
     )
     n_exchange_color_generator_mesh_generator_propagator.coupling_scheme = (
         n_coupling_scheme_generator_propagator
@@ -101,6 +104,7 @@ def test_graph():
         M2NType.SOCKETS,
         n_participant_generator,
         n_participant_propagator,
+        directory="..",
     )
 
     # Edges in the order specified by docs/Edges.md
@@ -305,9 +309,9 @@ def test_graph():
         G_expected.add_edge(node_a, node_b, attr=attr)
 
     for node in G_expected.nodes():
-        graph.add_node_with_attributes(G_expected, node)
+        builder.add_node_with_attributes(G_expected, node)
 
-    assert graph.check_graph_equivalence(G_expected, G_actual), (
+    assert operations.check_graph_equivalence(G_expected, G_actual), (
             f"Graphs are not equivalent. Some stats: Expected: (num nodes: {len(G_expected.nodes)}, num edges: {len(G_expected.edges)}), "
             + f"Actual: (num nodes: {len(G_actual.nodes)}, num edges: {len(G_actual.edges)})"
     )

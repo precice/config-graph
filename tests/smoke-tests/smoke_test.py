@@ -7,7 +7,7 @@ import git
 import pathlib
 import pytest
 
-from precice_config_graph import graph
+from precice_config_graph.graph import builder
 from precice_config_graph import xml_processing
 
 
@@ -37,5 +37,5 @@ def test_smoke(config):
     print(f"Testing graph generation of {config}")
     xml = xml_processing.parse_file(config)
     assert xml is not None, "Parsing failed"
-    G = graph.get_graph(xml)
+    G = builder.get_graph(xml)
     assert G

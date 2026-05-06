@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from precice_config_graph import graph as g
+from precice_config_graph.graph import builder, visualizer
 from precice_config_graph.xml_processing import parse_file
 
 color_cyan: str = "\033[1;36m"
@@ -29,9 +29,9 @@ def main():
         )
 
     root = parse_file(file_path)
-    graph = g.get_graph(root)
+    graph = builder.get_graph(root)
 
-    g.print_graph(graph)
+    visualizer.print_graph(graph)
 
 
 if __name__ == "__main__":
